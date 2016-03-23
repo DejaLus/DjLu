@@ -1,1 +1,39 @@
-<h1>Papers</h1>
+<nav id="papers-navbar" class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+            </button>
+            <a class="navbar-brand page-scroll" href="#page-top">DjLu</a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="navbar">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#">Add a paper</a></li>
+                <li><a href="#">{{ @SESSION.username }}</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div id="papers-container">
+	<div id="papers-col-left">
+		<table class="table table-striped">
+			<tr>
+				<th>Title</th>
+				<th>Author</th>
+				<th>Date</th>
+			</tr>
+			<repeat group="{{ @papers }}" value="{{ @paper }}">
+			<tr>
+				<td>{{ @paper.title }}</td>
+				<td>{{ @paper.author }}</td>
+				<td>{{ @paper.year }}</td>
+			</tr>
+			</repeat>
+		</table>
+	</div>
+	<div id="papers-col-right">
+		Paper details here
+	</div>
+</div>

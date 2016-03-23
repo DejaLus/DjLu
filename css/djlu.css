@@ -1,1 +1,4 @@
-
+#papers-navbar { margin: 0; }
+#papers-col-left, #papers-col-right { position: absolute; top: 50px; bottom: 0; overflow-x: hidden; overflow-y: auto; }
+#papers-col-left  { left:  0; width:70%; padding: 20px 20px 70px 20px; }
+#papers-col-right { right: 0; width:30%; padding: 20px 20px 70px 20px; }

@@ -1,5 +1,7 @@
 **/.DS_Store
 **/._*
 tmp/*
+data/*
 !tmp/.gitkeep
+!data/.gitkeep
 config.ini
