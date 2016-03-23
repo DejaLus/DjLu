@@ -3,15 +3,12 @@
 namespace pages;
 
 /**
- * This homepage redirect users either to the user's papers list or to the login page if
- * no user is logged in.
+ * Display the homepage of the project
  */
 class Home {
 
     public static function main ($f3) {
-
-        // TODO
-
-        $f3->reroute("@login");
+        $f3->set('content', 'home.htm');
+        echo \Template::instance()->render('layout.htm');
     }
 }
