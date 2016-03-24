@@ -69,8 +69,8 @@ class Login {
             $f3->reroute("@papers");
         }
         catch (\Exception $e) {
-            // TODO better handling of error, go back to home and stuff
-            die($e->getMessage());
+            \lib\Flash::instance()->addMessage($e->getMessage(), "danger");
+            $f3->reroute("@home");
         }
     }
 
@@ -108,11 +108,12 @@ class Login {
             $this->dbMapper->git = $git;
             $this->dbMapper->insert();
 
-            // TODO show some successful stuff
+            \lib\Flash::instance()->addMessage("Hi ".$username."! You account has been created. You can now login.", "success");
+            $f3->reroute("@home");
         }
         catch (\Exception $e) {
-            // TODO better handling of error, go back to home and stuff
-            die($e->getMessage());
+            \lib\Flash::instance()->addMessage($e->getMessage(), "danger");
+            $f3->reroute("@home");
         }
     }
 }

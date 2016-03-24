@@ -7,6 +7,11 @@
 
 <section id="login">
     <div class="container">
+        <repeat group="{{ \lib\Flash::instance()->getMessages() }}" value="{{ @msg }}">
+        <div class="alert alert-{{ @msg.status }}">
+            {{ @msg.text | esc }}
+        </div>
+        </repeat>
         <div class="col-sm-6">
             <h2 class="col-sm-offset-2">Login</h2>
             <form class="form-horizontal" method="POST" action="{{ 'login' | alias }}">
