@@ -1,6 +1,6 @@
 # DjLu
 
-Complitness:
+Progress:
 
 ||||| 5%
 
