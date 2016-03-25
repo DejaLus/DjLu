@@ -8,25 +8,20 @@ namespace pages;
 class Papers {
 
     private $f3;
+    private $user;
 
-    /**
-     * Check if the user is logged in
-     */
-    private function isLoggedIn () {
-        if ($this->f3->exists("SESSION.username"))
-            return true;
-        $login = new Login();
-        return $login->autologin();
+    public function __construct () {
+        $this->f3 = \Base::instance();
+        $this->user = \models\User::instance();
     }
 
     /**
      * Show list of papers for the authed user
      */
-    public function listAll ($f3) {
-        $this->f3 = $f3;
+    public function listAll () {
 
         // check if logged in
-        if (!$this->isLoggedIn())
+        if (!$this->user->isLoggedIn())
             $this->f3->reroute("@home");
 
         // TODO list papers
@@ -47,8 +42,8 @@ class Papers {
             "year" => "2014")
         );
 
-        $f3->set("papers", $papers);
-        $f3->set("content", "papers.htm");
+        $this->f3->set("papers", $papers);
+        $this->f3->set("content", "papers.htm");
         echo \Template::instance()->render("layout.htm");
     }
 
