@@ -10,7 +10,7 @@
         <div class="collapse navbar-collapse" id="navbar">
             <ul class="nav navbar-nav navbar-right">
                 <li><a href="#">Add a paper</a></li>
-                <li><a href="#">{{ @SESSION.username }}</a></li>
+                <li><a href="#">{{ \models\User::instance()->getUsername() }}</a></li>
             </ul>
         </div>
     </div>
