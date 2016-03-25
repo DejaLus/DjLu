@@ -2,6 +2,9 @@
 
 namespace models;
 
+/**
+ * Model class to handle user related work (login, register, user preferences, etc.)
+ */
 class User extends \Prefab {
 
     private $f3;
@@ -20,6 +23,21 @@ class User extends \Prefab {
      */
     public function getUsername () {
         return $this->f3->get("SESSION.username");
+    }
+
+    /**
+     * Return user's preferences
+     * @return array preferences as an array
+     */
+    public function getPreferences () {
+        if (!$this->isLoggedIn())
+            return array();
+
+        $filePath = $this->f3->get("DATA_PATH").$this->getUsername()."/preferences.json";
+        if (is_file($filePath))
+            return json_decode(file_get_contents($filePath), true);
+        else
+            return array();
     }
 
     /**

@@ -17,23 +17,51 @@
 </nav>
 
 <div id="papers-container">
-	<div id="papers-col-left">
-		<table class="table table-striped">
-			<tr>
-				<th>Title</th>
-				<th>Author</th>
-				<th>Date</th>
-			</tr>
-			<repeat group="{{ @papers }}" value="{{ @paper }}">
-			<tr>
-				<td>{{ @paper.title }}</td>
-				<td>{{ @paper.author }}</td>
-				<td>{{ @paper.year }}</td>
-			</tr>
-			</repeat>
-		</table>
-	</div>
-	<div id="papers-col-right">
-		Paper details here
-	</div>
+    <div id="papers-col-left">
+        <loop from="{{ @i=0 }}" to="{{ @i < count(\models\Papers::$TAGS_GROUPS) }}" step="{{ @i++ }}">
+            <h3>{{ \models\Papers::$TAGS_GROUPS_LABELS[@i] }}</h3>
+            <ul class="nav">
+                <repeat group="{{ @tags[\models\Papers::$TAGS_GROUPS[@i]] }}" key="{{ @tag }}" value="{{ @color }}">
+                <li><a href="#" style="background: {{ @color }}; color: {{ \lib\Formatting::textColorFromBgColor(@color); }}">{{ @tag }}</a></li>
+                </repeat>
+            </ul>
+        </loop>
+    </div>
+    <div id="papers-col-middle">
+        <table class="table table-striped" id="papers-table">
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th class="text-right">Publication</th>
+                <th class="text-right">Added</th>
+                <th></th>
+            </tr>
+            <repeat group="{{ @papers }}" value="{{ @paper }}">
+            <tr>
+                <td>{{ @paper.title }}<br/>
+                <span class="labels-list">
+                    <span class="labels-sublist labels-sublist-left">
+                    {{ \lib\Formatting::formatTags(@paper.tags_content, @tags.content) }}
+                    <check if="{{ is_array(@paper.tags_notes) && count(@paper.tags_notes) > 0 }}">
+                    <span class="hspace"></span>
+                    {{ \lib\Formatting::formatTags(@paper.tags_notes) }}
+                    </check>
+
+                    </span>
+                    <span class="labels-sublist labels-sublist-right">
+                    {{ \lib\Formatting::formatTags(@paper.tags_reading, @tags.reading) }}
+                    {{ \lib\Formatting::formatRating(@paper.rating, true) }}
+                    </span>
+                </span></td>
+                <td data-toggle="tooltip" data-placement="top" title="{{ \lib\Formatting::formatAuthors(@paper.authors, 'full') }}">{{ \lib\Formatting::formatAuthors(@paper.authors) }}</td>
+                <td class="text-right">{{ @paper.in }} {{ @paper.year }}</td>
+                <td class="text-right">{{ \lib\Formatting::formatDate(@paper.date_added) }}</td>
+                <td><i class="fa fa-file-pdf-o"></i></td>
+            </tr>
+            </repeat>
+        </table>
+    </div>
+    <div id="papers-col-right">
+        Paper details here
+    </div>
 </div>

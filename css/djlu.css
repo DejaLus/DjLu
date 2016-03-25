@@ -1,4 +1,107 @@
-#papers-navbar { margin: 0; }
-#papers-col-left, #papers-col-right { position: absolute; top: 50px; bottom: 0; overflow-x: hidden; overflow-y: auto; }
-#papers-col-left  { left:  0; width:70%; padding: 20px 20px 70px 20px; }
-#papers-col-right { right: 0; width:30%; padding: 20px 20px 70px 20px; }
+/***** SET GENERAL PAPERS PAGE LAYOUT *****/
+
+#papers-navbar {
+    margin: 0;
+    z-index: 100;
+}
+
+#papers-container {
+    font-size: 95%;
+}
+
+#papers-col-left, #papers-col-middle, #papers-col-right {
+    position: absolute;
+    top: 51px;
+    bottom: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+#papers-col-left {
+    left: 0;
+    width: 13%;
+    box-shadow: 1px 1px 5px rgba(0,0,0,.075);
+    border-right: 1px solid #ddd;
+    z-index: 10;
+}
+
+#papers-col-middle {
+    left: 13%;
+    width: 68%;
+}
+
+#papers-col-right {
+    right: 0;
+    width: 19%;
+    box-shadow: -1px 1px 5px rgba(0,0,0,.075);
+    border-left: 1px solid #ddd;
+    z-index: 10;
+}
+
+/***** LEFT COLUMN (TAGS) *****/
+
+#papers-col-left h3 {
+    margin: 7px 0 5px 7px;
+    font-size: 17px;
+}
+
+#papers-col-left a {
+    padding: 4px 10px;
+}
+
+/***** TABLE OF PAPERS *****/
+
+#papers-table th {
+    padding: 9px 0px 9px 8px;
+}
+
+#papers-table td {
+    padding: 5px 0px 25px 8px;
+}
+
+#papers-table tr td:last-of-type {
+    padding-right: 3px;
+}
+
+#papers-table .labels-list {
+    position: absolute;
+    height: 1.45em;
+    width: 100%;
+    margin-left: -8px;
+    padding: 0 8px;
+}
+
+#papers-table .labels-sublist {
+    overflow-x: scroll;
+    white-space: nowrap;
+    height: 1.45em;
+}
+
+#papers-table .labels-sublist-left {
+    width: 70%;
+    display: inline-block;
+}
+
+#papers-table .labels-sublist-right {
+    width: 27%;
+    text-align: right;
+    float: right;
+    display: inline-block;
+}
+
+#papers-table .hspace {
+    width: 30px;
+    display: inline-block;
+}
+
+#papers-table .rating {
+    font-size: 80%;
+    width: 75px;
+    display: inline-block;
+}
+
+#papers-table .date {
+    color: #BFBFBF;
+    font-size: 88%;
+}
+
