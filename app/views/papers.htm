@@ -4,13 +4,13 @@
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
                 <span class="sr-only">Toggle navigation</span>
             </button>
-            <a class="navbar-brand page-scroll" href="#page-top">DjLu</a>
+            <a class="navbar-brand page-scroll" href="#page-top">DjLu - {{ \models\User::instance()->getUsername() }}'s library</a>
         </div>
 
         <div class="collapse navbar-collapse" id="navbar">
             <ul class="nav navbar-nav navbar-right">
                 <li><a href="#">Add a paper</a></li>
-                <li><a href="#">{{ \models\User::instance()->getUsername() }}</a></li>
+                <li><a href="{{ 'logout' | alias }}" id="js_logout">Logout</a></li>
             </ul>
         </div>
     </div>
