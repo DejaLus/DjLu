@@ -22,7 +22,7 @@ class Git extends \Prefab {
      * @return array  log of git output and success status
      */
     public function pull () {
-        exec("git -C ".$this->path." pull --rebase 2>&1", $log, $result);
+        exec("git -C ".$this->path." pull 2>&1", $log, $result);
         return array("log" => implode("\n", $log), "success" => ($result == 0));
     }
 
