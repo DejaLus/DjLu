@@ -58,7 +58,11 @@
                 <td><span data-toggle="tooltip" data-placement="top" title="{{ \lib\Formatting::formatAuthors(@paper.authors, 'full') }}">{{ \lib\Formatting::formatAuthors(@paper.authors) }}</span></td>
                 <td class="text-right">{{ @paper.in }} {{ @paper.year }}</td>
                 <td class="text-right">{{ \lib\Formatting::formatDate(@paper.date_added) }}</td>
-                <td><i class="fa fa-file-pdf-o"></i></td>
+                <td>
+                    <check if="{{ !empty(@paper.url) }}">
+                    <a href="{{ @paper.url }}" class="pdf" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
+                    </check>
+                </td>
             </tr>
             </repeat>
         </table>
