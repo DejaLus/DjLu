@@ -105,6 +105,10 @@
     font-size: 88%;
 }
 
+#papers-table .pdf {
+    color: inherit;
+}
+
 #papers_modals .spinner {
     font-size: 35px;
     text-align: center;
