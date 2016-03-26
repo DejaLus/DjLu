@@ -23,8 +23,10 @@ class Papers {
     public function listAll () {
 
         // check if logged in
-        if (!$this->user->isLoggedIn())
+        if (!$this->user->isLoggedIn()) {
+            \lib\Flash::instance()->addMessage("You need to be logged in to access your library", "danger");
             $this->f3->reroute("@home");
+        }
 
         // get papers list
         $papers = $this->model->getPapers();

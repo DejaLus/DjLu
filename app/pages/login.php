@@ -32,6 +32,16 @@ class Login {
     }
 
     /**
+     * Do logout processing
+     */
+    public function logout ($f3) {
+
+        \models\User::instance()->logout();
+        \lib\Flash::instance()->addMessage("Logout successful", "info");
+        $f3->reroute("@home");
+    }
+
+    /**
      * Register a new user in the DB
      */
     public function register ($f3) {

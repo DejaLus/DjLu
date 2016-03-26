@@ -95,6 +95,15 @@ class User extends \Prefab {
     }
 
     /**
+     * Do logout processing
+     */
+    public function logout () {
+        $this->f3->clear("SESSION.username");
+        $this->f3->set("COOKIE.username", "", -1);
+        $this->f3->set("COOKIE.token", "", -1);
+    }
+
+    /**
      * Register a new user in the DB
      */
     public function register ($username, $password, $git) {
