@@ -122,7 +122,7 @@ class User extends \Prefab {
         exec("git clone ".escapeshellarg($git)." ".escapeshellarg($this->f3->get("DATA_PATH").$username)." 2>&1", $gitOut, $gitOutCode);
 
         if ($gitOutCode != 0)
-            throw new \Exception("Git clone failed. Output:\n\n".$gitOut);
+            throw new \Exception("Git clone failed. Output:<br><br>".implode("<br>", $gitOut));
 
         // insert in DB
         $password = sha1($this->f3->get("APP_SALT").$username.$password);
