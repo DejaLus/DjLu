@@ -9,8 +9,10 @@
 
         <div class="collapse navbar-collapse" id="navbar">
             <ul class="nav navbar-nav navbar-right">
-                <li><a href="#">Add a paper</a></li>
-                <li><a href="{{ 'logout' | alias }}" id="js_logout">Logout</a></li>
+                <li><a href="#" id="js_pull"><i class="fa fa-refresh"></i> Pull</a></li>
+                <li><a href="#" id="js_push"><i class="fa fa-cloud-upload"></i> Commit &amp; push</a></li>
+                <li><a href="#" id="js_add"><i class="fa fa-plus"></i> Add a paper</a></li>
+                <li><a href="{{ 'logout' | alias }}" id="js_logout"><i class="fa fa-sign-out"></i> Logout</a></li>
             </ul>
         </div>
     </div>
@@ -53,7 +55,7 @@
                     {{ \lib\Formatting::formatRating(@paper.rating, true) }}
                     </span>
                 </span></td>
-                <td data-toggle="tooltip" data-placement="top" title="{{ \lib\Formatting::formatAuthors(@paper.authors, 'full') }}">{{ \lib\Formatting::formatAuthors(@paper.authors) }}</td>
+                <td><span data-toggle="tooltip" data-placement="top" title="{{ \lib\Formatting::formatAuthors(@paper.authors, 'full') }}">{{ \lib\Formatting::formatAuthors(@paper.authors) }}</span></td>
                 <td class="text-right">{{ @paper.in }} {{ @paper.year }}</td>
                 <td class="text-right">{{ \lib\Formatting::formatDate(@paper.date_added) }}</td>
                 <td><i class="fa fa-file-pdf-o"></i></td>
@@ -63,5 +65,50 @@
     </div>
     <div id="papers-col-right">
         Paper details here
+    </div>
+</div>
+
+<!-- Modals -->
+<div class="modal fade" id="js_pull_modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><i class="fa fa-cloud-download"></i> Git pull</h4>
+            </div>
+            <div class="modal-body" id="js_pull_modal_content"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" id="js_pull_modal_close" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="js_pull_modal_reload">Reload</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="papers_modals">
+    <div class="modal fade" id="js_push_modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title"><i class="fa fa-cloud-upload"></i> Git commit &amp; push</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="js_push_modal_status">
+                        <p><strong>The following changes will be commited</strong></p>
+                        <div id="js_push_modal_status_content"></div>
+                    </div>
+                    <div id="js_push_modal_message" class="form-group">
+                        <label for="i_commit">Commit message</label>
+                        <textarea class="form-control" rows="4" id="i_commit"></textarea>
+                    </div>
+                    <div id="js_push_modal_result" class="form-group">
+                        <p class="text-center spinner"><i class="fa fa-refresh faa-spin animated"></i></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" id="js_push_modal_close" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="js_push_modal_send">Commit &amp; push</button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

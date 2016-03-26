@@ -105,3 +105,11 @@
     font-size: 88%;
 }
 
+#papers_modals .spinner {
+    font-size: 35px;
+    text-align: center;
+}
+
+#papers_modals .js_push_modal_status_content pre {
+    max-height: 200px;
+}

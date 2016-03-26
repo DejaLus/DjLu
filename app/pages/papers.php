@@ -38,8 +38,32 @@ class Papers {
 
         $this->f3->set("papers", $papers);
         $this->f3->set("tags", $tags);
+        $this->f3->set("js", "djlu.js");
         $this->f3->set("content", "papers.htm");
         echo \Template::instance()->render("layout.htm");
     }
 
+    /**
+     * API call to pull the repo
+     */
+    public function apiPull () {
+        $out = \models\Git::instance()->pull();
+        echo json_encode($out);
+    }
+
+    /**
+     * API call to get the status of the repo
+     */
+    public function apiStatus () {
+        echo \models\Git::instance()->status();
+    }
+
+    /**
+     * API call to commit and push the changes in the repo
+     */
+    public function apiPush () {
+        $message = $this->f3->get("POST.message");
+        $out = \models\Git::instance()->commitPush($message);
+        echo json_encode($out);
+    }
 }
