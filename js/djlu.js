@@ -3,7 +3,6 @@
 $(document).ready(function() {
 
     // TOOLTIPS
-    $('[data-toggle="tooltip"]').tooltip({ container: 'body' });
 
     function getOrElse(map, key, elseVal, join) {
         var el = map[key] ? map[key] : elseVal;
@@ -22,37 +21,44 @@ $(document).ready(function() {
         $("#paper-details .date_added").html(getOrElse(data.json, "date_added", ""));
         $("#paper-details .url").html(getOrElse(data.json, "url", ""));
     }
-    $("#papers-table .paper").on("click", function () {
 
-        $("#paper-placeholder").hide();
-        $("#paper-details").hide();
-        $("#paper-bibtex").hide();
-        $("#paper-notes").hide();
-        $("#paper-wait").show();
-        $("#papers-table .paper").removeClass("active");
-        $(this).addClass("active");
+    function initPapersTableStuff () {
+        $('[data-toggle="tooltip"]').tooltip({ container: 'body' });
 
-        var key = $(this).attr("data-paper-key");
+        $("#papers-table .paper").on("click", function () {
 
-        $.get("/api/paper/"+key, function (data) {
+            $("#paper-placeholder").hide();
+            $("#paper-details").hide();
+            $("#paper-bibtex").hide();
+            $("#paper-notes").hide();
+            $("#paper-wait").show();
+            $("#papers-table .paper").removeClass("active");
+            $(this).addClass("active");
 
-            $("#paper-details").attr("data-key", key);
-            displayPaperInfo(data);
+            var key = $(this).attr("data-paper-key");
 
-            if (data.bibRaw != undefined)
-                $("#paper-bibtex-content").html(data.bibRaw);
-            if (data.md != undefined)
-                $("#paper-notes-content").html(data.md);
+            $.get("/api/paper/"+key, function (data) {
 
-            $("#paper-wait").hide();
-            $("#paper-details").show();
-            if (data.bibRaw != undefined)
-                $("#paper-bibtex").show();
-            if (data.md != undefined)
-                $("#paper-notes").show();
+                $("#paper-details").attr("data-key", key);
+                displayPaperInfo(data);
 
-        }, "json");
-    });
+                if (data.bibRaw != undefined)
+                    $("#paper-bibtex-content").html(data.bibRaw);
+                if (data.md != undefined)
+                    $("#paper-notes-content").html(data.md);
+
+                $("#paper-wait").hide();
+                $("#paper-details").show();
+                if (data.bibRaw != undefined)
+                    $("#paper-bibtex").show();
+                if (data.md != undefined)
+                    $("#paper-notes").show();
+
+            }, "json");
+        });
+    }
+
+    initPapersTableStuff();
 
     // EDIT PAPER FIELD
     $("#paper-details > *:has(span[data-key])").on("dblclick", function () {
@@ -159,6 +165,31 @@ $(document).ready(function() {
                 }, "json");
             });
         });
+    });
+
+    // ADD A PAPER
+    $("#js_add").on("click", function () {
+        $("#js_add_modal_bibtex").show();
+        $("#js_add_modal_wait").hide();
+        $("#js_add_modal").modal();
+    });
+    $("#js_add_modal_send").on("click", function () {
+        $("#js_add_modal_bibtex").hide();
+        $("#js_add_modal_wait").show();
+
+        $.post("/api/paper/add", {bibtex: $("#i_bibtex").val()}, function (data) {
+            if (data.success) {
+                $("#js_add_modal").modal("hide");
+                $("#papers-table-header").after(data.tr);
+                initPapersTableStuff();
+                $.notify({ message: "Paper added successfully" }, { type: "success" });
+            }
+            else {
+                $("#js_add_modal_bibtex").show();
+                $("#js_add_modal_wait").hide();
+                $.notify({ message: "Fail to add paper: "+data.message }, { type: "danger",  z_index: 1051 });
+            }
+        }, "json");
     });
 
 });
