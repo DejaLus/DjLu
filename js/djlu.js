@@ -163,6 +163,8 @@ $(document).ready(function() {
                         '<p><strong>Git output log:</strong></p>'+
                         '<pre>'+data.log+'</pre>');
                 }, "json");
+
+                $("#js_push_modal_send").removeAttr("disabled");
             });
         });
     });
