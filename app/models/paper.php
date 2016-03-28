@@ -40,7 +40,7 @@ class Paper {
      */
     private function getPaperFolder () {
         foreach (scandir($this->dataPath) as $fname) {
-            $keyI = preg_replace('/^([^_])_.+$/', '\1', $fname);
+            $keyI = preg_replace('/^([^_]+)_.+$/', '\1', $fname);
             $dirPath = $this->dataPath."/".$fname;
             $jsonPath = $this->dataPath."/".$fname."/".$this->key.".json";
             if ($fname != "." && $fname != ".." && $keyI == $this->key && is_dir($dirPath) && is_file($jsonPath))
