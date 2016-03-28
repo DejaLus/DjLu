@@ -19,7 +19,7 @@ class Paper {
      */
     public static $JSON_EDITABLE_FIELDS = array("title", "authors", "year", "url", "date_added", "tags_content", "tags_reading", "tags_notes");
 
-    function __construct($key) {
+    function __construct($key = "") {
         $this->f3 = \Base::instance();
         $user = \models\User::instance();
 
@@ -27,10 +27,12 @@ class Paper {
             throw new \Exception("User not logged in");
 
         $this->dataPath = $this->f3->get("DATA_PATH").$user->getUsername();
-        $this->key = $key;
-        $this->folder = $this->getPaperFolder();
-        if ($this->folder)
-            $this->path = $this->dataPath."/".$this->folder;
+        if ($key != "") {
+            $this->key = $key;
+            $this->folder = $this->getPaperFolder();
+            if ($this->folder)
+                $this->path = $this->dataPath."/".$this->folder;
+        }
     }
 
     /**
@@ -58,14 +60,61 @@ class Paper {
     }
 
     /**
-     * TODO Create the paper entry in the repository
-     * @param  [type] $folderTitle Title of the folder to add after the paper key (can be empty)
-     * @param  [type] $bibtex      Bibtex record of the paper
-     * @param  [type] $json        Initial info for the JSON, probably tags (optional)
-     * @param  [type] $notes       Notes about the paper (optional)
+     * Get the key of the paper
+     * @return string
      */
-    public function create ($folderTitle, $bibtex, $notes) {
-        return;
+    public function getKey() {
+        return $this->key;
+    }
+
+    /**
+     * Create the paper entry in the repository from the bibtex
+     * @param  string $bibtexRaw      Bibtex record of the paper
+     */
+    public function createFromBibTex ($bibtexRaw) {
+        $bibtex = new \models\BibTex(array('removeCurlyBraces' => true, 'extractAuthors' => false));
+        $bibtex->content = $bibtexRaw;
+        $bibtex->parse();
+
+        // if bibtex invalid
+        if (!is_array($bibtex->data) || count($bibtex->data) == 0)
+            throw new \Exception("Invalid bibtex data");
+
+        // extract data
+        $data = $bibtex->data[0];
+        $this->key = $data["cite"];
+
+        // check key, title, author
+        if (!preg_match("/^[a-zA-Z0-9]+$/", $this->key))
+            throw new \Exception("Key can only contain letters and numbers");
+        if ($this->getPaperFolder()) // paper already exists
+            throw new \Exception("A paper with this key already exists");
+        if (empty($data["title"]) || empty($data["author"]))
+            throw new \Exception("Empty title or author");
+
+        // create folder
+        $folderTitle = preg_replace("/[^a-zA-Z]/", " ", $data["title"]);
+        $folderTitle = preg_replace("/ +/", "_", $folderTitle);
+        $folderTitle = substr($folderTitle, 0, 50);
+
+        mkdir($this->dataPath."/".$this->key."_".$folderTitle, 0755);
+        $this->folder = $this->key."_".$folderTitle;
+        $this->path = $this->dataPath."/".$this->folder;
+
+        // create JSON data
+        $json = array(
+            "title" => $data["title"],
+            "authors" => explode(" and ", $data["author"]),
+            "year" => $data["year"] ? $data["year"] : "",
+            "date_added" => date("Y-m-d H:i"),
+            "in" => $data["booktitle"] ? $data["booktitle"] : "",
+            "tags_reading" => array("new"),
+            "url" => $data["url"] ? $data["url"] : "");
+
+        $this->writeJSON($json);
+
+        // save bibtex
+        file_put_contents($this->path."/".$this->key.".bib", $bibtexRaw);
     }
 
     /**
