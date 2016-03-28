@@ -31,10 +31,10 @@ class Papers extends \Prefab {
             $jsonPath = $folderPath."/".$fname."/".$key.".json";
 
             if ($fname != "." && $fname != ".." && is_dir($dirPath) && is_file($jsonPath)) {
-                $paper['key'] = $key;
-                $paper['folder'] = $fname;
                 $paper = json_decode(file_get_contents($jsonPath), true);
-                $papers[] = $paper;
+                $paper["key"] = $key;
+                $paper["folder"] = $fname;
+                $papers[$key] = $paper;
             }
         }
 
