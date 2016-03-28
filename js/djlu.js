@@ -26,6 +26,8 @@ $(document).ready(function() {
 
         $("#paper-placeholder").hide();
         $("#paper-details").hide();
+        $("#paper-bibtex").hide();
+        $("#paper-notes").hide();
         $("#paper-wait").show();
         $("#papers-table .paper").removeClass("active");
         $(this).addClass("active");
@@ -37,8 +39,18 @@ $(document).ready(function() {
             $("#paper-details").attr("data-key", key);
             displayPaperInfo(data);
 
+            if (data.bibRaw != undefined)
+                $("#paper-bibtex-content").html(data.bibRaw);
+            if (data.md != undefined)
+                $("#paper-notes-content").html(data.md);
+
             $("#paper-wait").hide();
             $("#paper-details").show();
+            if (data.bibRaw != undefined)
+                $("#paper-bibtex").show();
+            if (data.md != undefined)
+                $("#paper-notes").show();
+
         }, "json");
     });
 

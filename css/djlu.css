@@ -94,7 +94,7 @@
 }
 
 #papers-table tr.active td {
-    background: #D9EDF3;
+    background: #D9E4F7;
 }
 
 #papers-table .hspace {
@@ -109,7 +109,7 @@
 }
 
 #papers-table .date {
-    color: #BFBFBF;
+    color: #C8D0DF;
     font-size: 88%;
 }
 
@@ -133,8 +133,28 @@
     line-height: 1.15em;
 }
 
-#paper-details {
+#paper-details, #paper-bibtex, #paper-notes {
     padding: 8px;
+}
+
+#paper-bibtex h4, #paper-notes h4 {
+    font-size: 16px;
+    text-transform: uppercase;
+    font-weight: 500;
+    text-align: center;
+    margin: 0;
+    color: #47597A;
+}
+
+#paper-bibtex hr, #paper-notes hr {
+    max-width: 50px;
+    border-color: #47597A;
+    border-width: 3px;
+    margin: 11px auto 18px;
+}
+
+#paper-bibtex-content, #paper-notes-content {
+    font-size: 80%;
 }
 
 #paper-details .title {
