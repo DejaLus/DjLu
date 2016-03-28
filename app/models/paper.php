@@ -119,7 +119,15 @@ class Paper {
             $fpath = $this->path."/".$this->key.".".$ext;
             if (is_file($fpath)) {
                 if ($ext == "json")
-                    $out[$ext] = json_decode(file_get_contents($fpath), true);
+                    $out["json"] = json_decode(file_get_contents($fpath), true);
+                elseif ($ext == "bib") {
+                    $out["bibRaw"] = file_get_contents($fpath);
+                    $bibtex = new \models\BibTex(array('removeCurlyBraces' => true, 'extractAuthors' => true));
+                    $bibtex->content = $out["bibRaw"];
+                    $bibtex->parse();
+                    if (is_array($bibtex->data) && count($bibtex->data) > 0)
+                        $out["bib"] = $bibtex->data[0];
+                }
                 else
                     $out[$ext] = file_get_contents($fpath);
             }
