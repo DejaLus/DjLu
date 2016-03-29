@@ -10,7 +10,6 @@ class User extends \Prefab {
     private $f3;
     private $db;
     private $dbMapper;
-    private $disableGit = true;
 
     function __construct() {
 
@@ -120,14 +119,14 @@ class User extends \Prefab {
             throw new \Exception("Invalid username, regex to match is [a-zA-Z0-9-_.]{3,50}");
         if (strlen($password) < 5)
             throw new \Exception("Password too short");
-        if (!disableGit) if (!preg_match("#^(git@[\w\.]+)(:(//)?)([\w\.@\:/\-~]+)(\.git)(/)?$#", $git)) throw new \Exception("Invalid git SSH clone path, regex to match is (git@[\w\.]+)(:(//)?)([\w\.@\:/\-~]+)(\.git)(/)?");
+        if (!preg_match("#^(git@[\w\.]+)(:(//)?)([\w\.@\:/\-~]+)(\.git)(/)?$#", $git)) throw new \Exception("Invalid git SSH clone path, regex to match is (git@[\w\.]+)(:(//)?)([\w\.@\:/\-~]+)(\.git)(/)?");
         if ($this->dbMapper->count(array("@username=?", $username)) > 0)
             throw new \Exception("Username already exists");
 
         // clone git
-        if (!disableGit) exec("git clone ".escapeshellarg($git)." ".escapeshellarg($this->f3->get("DATA_PATH").$username)." 2>&1", $gitOut, $gitOutCode);
+        exec("git clone ".escapeshellarg($git)." ".escapeshellarg($this->f3->get("DATA_PATH").$username)." 2>&1", $gitOut, $gitOutCode);
 
-        if (!disableGit) if ($gitOutCode != 0)
+        if ($gitOutCode != 0)
             throw new \Exception("Git clone failed. Output:<br><br>".implode("<br>", $gitOut));
 
         // insert in DB
