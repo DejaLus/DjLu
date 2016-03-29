@@ -10,7 +10,7 @@ class User extends \Prefab {
     private $f3;
     private $db;
     private $dbMapper;
-    private $disableGit = false;
+    private $disableGit = true;
 
     function __construct() {
 
@@ -92,9 +92,7 @@ class User extends \Prefab {
         $sid = $this->f3->get("COOKIE.PHPSESSID");
         // auth ok
         if (count($dbpass) < 1 || !password_verify($dbpass[0]['password'] . $sid, $password))
-            throw new \Exception("Bad account or password : " . $dbpass[0]['password'] . " : " . $sid);
-
-        throw new \Exception("CORRECT!");
+            throw new \Exception("Bad account or password for " . $dbpass[0]['username'] . " : " . $sid);
 
         // set session and cookies
         $this->f3->set("SESSION.username", $username);
