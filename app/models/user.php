@@ -10,6 +10,7 @@ class User extends \Prefab {
     private $f3;
     private $db;
     private $dbMapper;
+    private $disableGit = true;
 
     function __construct() {
 
@@ -54,6 +55,8 @@ class User extends \Prefab {
      */
     public function autologin () {
 
+    	// while we don't find a secure way to auto-login, we don't do it.
+    	/*
         if (!$this->f3->exists("SESSION.username") && $this->f3->exists("COOKIE.username") && $this->f3->exists("COOKIE.token")) {
 
             // get info
@@ -71,6 +74,7 @@ class User extends \Prefab {
             $this->f3->set("COOKIE.username", "", -1);
             $this->f3->set("COOKIE.token", "", -1);
         }
+        */
 
         return false;
     }
@@ -81,17 +85,22 @@ class User extends \Prefab {
      */
     public function login ($username, $password) {
 
-        // hash password
-        $password = sha1($this->f3->get("APP_SALT").$username.$password);
+        $dbpass = $this->dbMapper->find(array("@username=?", $username));
+        if (count($dbpass) > 1)
+            throw new \Exception("Internal auth error #ABDErr1");
 
+        $sid = $this->f3->get("COOKIE.PHPSESSID");
         // auth ok
-        if (!$this->dbMapper->count(array("@username=? and @password", $username, $password)) > 0)
-            throw new \Exception("Bad account or password");
+        if (count($dbpass) < 1 || !password_verify($dbpass[0]['password'] . $sid, $password))
+            throw new \Exception("Bad account or password : " . $dbpass[0]['password'] . " : " . $sid);
+
+        throw new \Exception("CORRECT!");
 
         // set session and cookies
         $this->f3->set("SESSION.username", $username);
         $this->f3->set("COOKIE.username", $username);
-        $this->f3->set("COOKIE.token", sha1($this->f3->get("APP_SALT").$password), 60*60*24*14);
+        // while we don't find a secure way to auto-login, we don't do it.
+        // $this->f3->set("COOKIE.token", sha1($this->f3->get("APP_SALT").$password), 60*60*24*14);
     }
 
     /**
@@ -113,19 +122,17 @@ class User extends \Prefab {
             throw new \Exception("Invalid username, regex to match is [a-zA-Z0-9-_.]{3,50}");
         if (strlen($password) < 5)
             throw new \Exception("Password too short");
-        if (!preg_match("#^(git@[\w\.]+)(:(//)?)([\w\.@\:/\-~]+)(\.git)(/)?$#", $git))
-            throw new \Exception("Invalid git SSH clone path, regex to match is (git@[\w\.]+)(:(//)?)([\w\.@\:/\-~]+)(\.git)(/)?");
+        if (!disableGit) if (!preg_match("#^(git@[\w\.]+)(:(//)?)([\w\.@\:/\-~]+)(\.git)(/)?$#", $git)) throw new \Exception("Invalid git SSH clone path, regex to match is (git@[\w\.]+)(:(//)?)([\w\.@\:/\-~]+)(\.git)(/)?");
         if ($this->dbMapper->count(array("@username=?", $username)) > 0)
             throw new \Exception("Username already exists");
 
         // clone git
-        exec("git clone ".escapeshellarg($git)." ".escapeshellarg($this->f3->get("DATA_PATH").$username)." 2>&1", $gitOut, $gitOutCode);
+        if (!disableGit) exec("git clone ".escapeshellarg($git)." ".escapeshellarg($this->f3->get("DATA_PATH").$username)." 2>&1", $gitOut, $gitOutCode);
 
-        if ($gitOutCode != 0)
+        if (!disableGit) if ($gitOutCode != 0)
             throw new \Exception("Git clone failed. Output:<br><br>".implode("<br>", $gitOut));
 
         // insert in DB
-        $password = sha1($this->f3->get("APP_SALT").$username.$password);
         $this->dbMapper->username = $username;
         $this->dbMapper->password = $password;
         $this->dbMapper->git = $git;
