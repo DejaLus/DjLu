@@ -119,15 +119,20 @@ class User extends \Prefab {
             throw new \Exception("Invalid username, regex to match is [a-zA-Z0-9-_.]{3,50}");
         if (strlen($password) < 5)
             throw new \Exception("Password too short");
-        if (!preg_match("#^(git@[\w\.]+)(:(//)?)([\w\.@\:/\-~]+)(\.git)(/)?$#", $git)) throw new \Exception("Invalid git SSH clone path, regex to match is (git@[\w\.]+)(:(//)?)([\w\.@\:/\-~]+)(\.git)(/)?");
+        if (!preg_match("#^(git@([\w\.]+))(:(//)?)([\w\.@\:/\-~]+)(\.git)(/)?$#", $git, $match))
+            throw new \Exception("Invalid git SSH clone path, regex to match is (git@[\w\.]+)(:(//)?)([\w\.@\:/\-~]+)(\.git)(/)?");
         if ($this->dbMapper->count(array("@username=?", $username)) > 0)
             throw new \Exception("Username already exists");
 
         // clone git
+        $host = escapeshellarg($match[2]);
+        exec("grep ".$host." ~/.ssh/known_hosts", $dummy, $knownHost);
+        if ($knownHost != 0)
+            exec("ssh-keyscan ".$host." >> ~/.ssh/known_hosts");
         exec("git clone ".escapeshellarg($git)." ".escapeshellarg($this->f3->get("DATA_PATH").$username)." 2>&1", $gitOut, $gitOutCode);
 
         if ($gitOutCode != 0)
-            throw new \Exception("Git clone failed. Output:<br><br>".implode("<br>", $gitOut));
+            throw new \Exception("Git clone failed. Output:\n\n".implode("\n", $gitOut));
 
         // insert in DB
         $this->dbMapper->username = $username;

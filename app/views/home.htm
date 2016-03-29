@@ -9,7 +9,7 @@
     <div class="container">
         <repeat group="{{ \lib\Flash::instance()->getMessages() }}" value="{{ @msg }}">
         <div class="alert alert-{{ @msg.status }}">
-            {{ @msg.text | esc }}
+            {{ nl2br(@msg.text) }}
         </div>
         </repeat>
         <div class="col-sm-6">
