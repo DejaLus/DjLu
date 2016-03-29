@@ -51,6 +51,7 @@ class User extends \Prefab {
 
     /**
      * Do auto-login based on cookie
+     * TODO improve the security of the autologin
      */
     public function autologin () {
 
@@ -81,12 +82,14 @@ class User extends \Prefab {
      */
     public function login ($username, $password) {
 
-        // hash password
-        $password = sha1($this->f3->get("APP_SALT").$username.$password);
+        $dbpass = $this->dbMapper->find(array("@username=?", $username));
+        if (count($dbpass) > 1)
+            throw new \Exception("Internal auth error #ABDErr1");
 
+        $sid = $this->f3->get("COOKIE.PHPSESSID");
         // auth ok
-        if (!$this->dbMapper->count(array("@username=? and @password", $username, $password)) > 0)
-            throw new \Exception("Bad account or password");
+        if (count($dbpass) < 1 || !password_verify($dbpass[0]['password'] . $sid, $password))
+            throw new \Exception("Bad account or password for " . $dbpass[0]['username'] . " : " . $sid);
 
         // set session and cookies
         $this->f3->set("SESSION.username", $username);
@@ -129,7 +132,6 @@ class User extends \Prefab {
             throw new \Exception("Git clone failed. Output:\n\n".implode("\n", $gitOut));
 
         // insert in DB
-        $password = sha1($this->f3->get("APP_SALT").$username.$password);
         $this->dbMapper->username = $username;
         $this->dbMapper->password = $password;
         $this->dbMapper->git = $git;

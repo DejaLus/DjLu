@@ -14,17 +14,19 @@
         </repeat>
         <div class="col-sm-6">
             <h2 class="col-sm-offset-2">Login</h2>
-            <form class="form-horizontal" method="POST" action="{{ 'login' | alias }}">
+            <form class="form-horizontal" id="djlogin" method="POST" action="{{ 'login' | alias }}">
                 <div class="form-group">
                     <label for="i_username" class="col-sm-2 control-label">Username</label>
                     <div class="col-sm-10">
                         <input type="text" class="form-control" id="i_username" placeholder="Username" name="username">
+                        <input type="text" id="s_sid" style="display: none;" value="<?php echo session_id(); ?>">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="i_password" class="col-sm-2 control-label">Password</label>
                     <div class="col-sm-10">
-                        <input type="password" class="form-control" id="i_password" placeholder="Password" name="password">
+                        <input type="password" class="form-control" id="i_password" placeholder="Password">
+                        <input type="text" id="i_password4" name="password" style="display: none;">
                     </div>
                 </div>
                 <div class="form-group">
@@ -36,7 +38,7 @@
         </div>
         <div class="col-sm-6">
             <h2 class="col-sm-offset-2">Register</h2>
-            <form class="form-horizontal" method="POST" action="{{ 'register' | alias }}">
+            <form class="form-horizontal" id="djregister" method="POST" action="{{ 'register' | alias }}">
                 <div class="form-group">
                     <label for="i_username2" class="col-sm-2 control-label">Username</label>
                     <div class="col-sm-10">
@@ -46,13 +48,14 @@
                 <div class="form-group">
                     <label for="i_password2" class="col-sm-2 control-label">Password</label>
                     <div class="col-sm-10">
-                        <input type="password" class="form-control" id="i_password2" placeholder="Password" name="password">
+                        <input type="password" class="form-control" id="i_password2" placeholder="Password">
+                        <input type="text" style="display:none;" id="i_password3" name="password">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="i_git" class="col-sm-2 control-label">Git</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="i_git" placeholder="Git repo SSH command (e.g. git@github.com:ThomasRobertFr/papers.git)" name="git">
+                        <input type="text" class="form-control" id="i_git" placeholder="Git repo SSH command (e.g. git@github.com:DejaLus/demoLibrary.git)" name="git">
                     </div>
                 </div>
                 <div class="form-group">
