@@ -10,7 +10,7 @@ class User extends \Prefab {
     private $f3;
     private $db;
     private $dbMapper;
-    private $disableGit = true;
+    private $disableGit = false;
 
     function __construct() {
 
