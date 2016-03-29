@@ -3,7 +3,98 @@
 $(document).ready(function() {
 
     // TOOLTIPS
-    $('[data-toggle="tooltip"]').tooltip({ container: 'body' });
+
+    function getOrElse(map, key, elseVal, join) {
+        var el = map[key] ? map[key] : elseVal;
+        return join ? el.join(join) : el;
+    }
+
+    // DISPLAY PAPER INFOS
+    function displayPaperInfo (data) {
+        $("#paper-details .title").html(getOrElse(data.json, "title", ""));
+        $("#paper-details .authors").html(getOrElse(data.json, "authors", [], "; "));
+        $("#paper-details .in").html(getOrElse(data.json, "in", ""));
+        $("#paper-details .year").html(getOrElse(data.json, "year", ""));
+        $("#paper-details .tags_content").html(getOrElse(data.json, "tags_content", [], "; "));
+        $("#paper-details .tags_reading").html(getOrElse(data.json, "tags_reading", [], "; "));
+        $("#paper-details .tags_notes").html(getOrElse(data.json, "tags_notes", [], "; "));
+        $("#paper-details .date_added").html(getOrElse(data.json, "date_added", ""));
+        $("#paper-details .url").html(getOrElse(data.json, "url", ""));
+    }
+
+    function initPapersTableStuff () {
+        $('[data-toggle="tooltip"]').tooltip({ container: 'body' });
+
+        $("#papers-table .paper").on("click", function () {
+
+            $("#paper-placeholder").hide();
+            $("#paper-details").hide();
+            $("#paper-bibtex").hide();
+            $("#paper-notes").hide();
+            $("#paper-wait").show();
+            $("#papers-table .paper").removeClass("active");
+            $(this).addClass("active");
+
+            var key = $(this).attr("data-paper-key");
+
+            $.get("/api/paper/"+key, function (data) {
+
+                $("#paper-details").attr("data-key", key);
+                displayPaperInfo(data);
+
+                if (data.bibRaw != undefined)
+                    $("#paper-bibtex-content").html(data.bibRaw);
+                if (data.md != undefined)
+                    $("#paper-notes-content").html(data.md);
+
+                $("#paper-wait").hide();
+                $("#paper-details").show();
+                if (data.bibRaw != undefined)
+                    $("#paper-bibtex").show();
+                if (data.md != undefined)
+                    $("#paper-notes").show();
+
+            }, "json");
+        });
+    }
+
+    initPapersTableStuff();
+
+    // EDIT PAPER FIELD
+    $("#paper-details > *:has(span[data-key])").on("dblclick", function () {
+
+        // get info element
+        var el = $(this).children("span[data-key]");
+        var key = $("#paper-details").attr("data-key");
+        var field = el.attr("data-key");
+
+        $("#js_edit_modal_form").show();
+        $("#js_edit_modal_wait").hide();
+
+        $("#i_edit").val(el.html());
+        $("#i_edit_label").html(el.attr("data-title"));
+
+        // on click send
+        $("#js_edit_modal_send").unbind("click").on("click", function () {
+
+            // send request
+            $.post("/api/paper/"+key,
+                {"field" : field, "value" : $("#i_edit").val()},
+                function (data) {
+                    $("#js_edit_modal").modal("hide");
+                    if (data.success) {
+                        displayPaperInfo(data);
+                        $("#paper-row-"+key).html(data.tr);
+                        $.notify({ message: "Paper edited successfully" }, { type: "success" });
+                    }
+                    else
+                        $.notify({ message: "Failed to edit paper" }, { type: "danger" });
+
+                }, "json");
+        });
+
+        $("#js_edit_modal").modal();
+    });
 
     // GIT PULL
     $("#js_pull_modal_reload").on("click", function () { location.reload(); });
@@ -72,30 +163,35 @@ $(document).ready(function() {
                         '<p><strong>Git output log:</strong></p>'+
                         '<pre>'+data.log+'</pre>');
                 }, "json");
+
+                $("#js_push_modal_send").removeAttr("disabled");
             });
         });
+    });
 
+    // ADD A PAPER
+    $("#js_add").on("click", function () {
+        $("#js_add_modal_bibtex").show();
+        $("#js_add_modal_wait").hide();
+        $("#js_add_modal").modal();
+    });
+    $("#js_add_modal_send").on("click", function () {
+        $("#js_add_modal_bibtex").hide();
+        $("#js_add_modal_wait").show();
 
-
-        /*$.get("/api/pull", function (data) {
-            console.log(data);
-
-            if (data.success)
-                $("#js_pull_modal .modal-body").html('<p>Git pull finished with success. Please reload the page.</p>'+
-                    '<p class="text-center"><a class="btn btn-success" onclick="location.reload()"><i class="fa fa-refresh"></i> Reload the page</a></p>'+
-                    '<h4>Git output log:</h4>'+
-                    '<pre>'+data.log+'</pre>');
-            else
-                $("#js_pull_modal .modal-body").html('<p>Git pull failed.</p>'+
-                    '<p class="text-center"><button type="button" class="btn btn-danger" data-dismiss="modal">Close</button></p>'+
-                    '<h4>Git output log:</h4>'+
-                    '<pre>'+data.log+'</pre>');
-        }, "json").fail(function (data) {
-            $("#js_pull_modal .modal-body").html('<p>We got an invalid JSON reponse.</p>'+
-                    '<p class="text-center"><button type="button" class="btn btn-danger" data-dismiss="modal">Close</button></p>'+
-                    '<h4>Reponse log:</h4>'+
-                    '<pre style="white-space: normal;">'+data.responseText+'</pre>');
-        });*/
+        $.post("/api/paper/add", {bibtex: $("#i_bibtex").val()}, function (data) {
+            if (data.success) {
+                $("#js_add_modal").modal("hide");
+                $("#papers-table-header").after(data.tr);
+                initPapersTableStuff();
+                $.notify({ message: "Paper added successfully" }, { type: "success" });
+            }
+            else {
+                $("#js_add_modal_bibtex").show();
+                $("#js_add_modal_wait").hide();
+                $.notify({ message: "Fail to add paper: "+data.message }, { type: "danger",  z_index: 1051 });
+            }
+        }, "json");
     });
 
 });

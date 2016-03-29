@@ -1,0 +1,24 @@
+<td>{{ @paper.title }}<br/>
+    <span class="labels-list">
+        <span class="labels-sublist labels-sublist-left">
+        {{ \lib\Formatting::formatTags(@paper.tags_content, @tags.content) }}
+        <check if="{{ is_array(@paper.tags_notes) && count(@paper.tags_notes) > 0 }}">
+        <span class="hspace"></span>
+        {{ \lib\Formatting::formatTags(@paper.tags_notes) }}
+        </check>
+
+        </span>
+        <span class="labels-sublist labels-sublist-right">
+        {{ \lib\Formatting::formatTags(@paper.tags_reading, @tags.reading) }}
+        {{ \lib\Formatting::formatRating(@paper.rating, true) }}
+        </span>
+    </span>
+</td>
+<td><span data-toggle="tooltip" data-placement="top" title="{{ \lib\Formatting::formatAuthors(@paper.authors, 'full') }}">{{ \lib\Formatting::formatAuthors(@paper.authors) }}</span></td>
+<td class="text-right">{{ @paper.in }} {{ @paper.year }}</td>
+<td class="text-right">{{ \lib\Formatting::formatDate(@paper.date_added) }}</td>
+<td>
+    <check if="{{ !empty(@paper.url) }}">
+    <a href="{{ @paper.url }}" class="pdf" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
+    </check>
+</td>

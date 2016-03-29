@@ -4,4 +4,3 @@ tmp/*
 data/*
 !tmp/.gitkeep
 !data/.gitkeep
-config.ini

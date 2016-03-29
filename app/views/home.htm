@@ -31,7 +31,7 @@
                 </div>
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
-                        <button type="button" onclick="void(0); login();" class="btn btn-default">Login</button>
+                        <button type="button" onclick="void(0); login();" class="btn btn-primary">Login</button>
                     </div>
                 </div>
             </form>
@@ -60,10 +60,14 @@
                 </div>
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
-                        <button type="button" onclick="void(0); register();" class="btn btn-default">Register</button>
+                        <button type="button" onclick="void(0); register();" class="btn btn-primary">Register</button>
                     </div>
                 </div>
             </form>
+            <p>The server needs to be able to read and write on the git repository of your library through SSH. Therefore, you need to grant the server's SSH public key (see below) access to your repository. On GitHub, we suggest you use the <a href="https://developer.github.com/guides/managing-deploy-keys/#deploy-keys">Deploy Key</a> feature.</p>
+            <p>You can test the app by cloning our <a href="https://github.com/DejaLus/demoLibrary">demo library</a> or initialize you own library with our <a href="https://github.com/DejaLus/baseLibrary">base library</a>.</p>
+            <p>The server's public key is:</p>
+            <pre>{{ exec("cat ~/.ssh/id_rsa.pub"); }}</pre>
         </div>
     </div>
 </section>

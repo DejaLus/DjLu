@@ -26,15 +26,15 @@ class Papers extends \Prefab {
         // iterate of the folders of the user
         foreach (scandir($folderPath) as $fname) {
 
-            $key = preg_replace('/^([^_])_.+$/', '\1', $fname); // before _ is the "key" of the paper
+            $key = preg_replace('/^([^_]+)_.+$/', '\1', $fname); // before _ is the "key" of the paper
             $dirPath = $folderPath."/".$fname;
             $jsonPath = $folderPath."/".$fname."/".$key.".json";
 
             if ($fname != "." && $fname != ".." && is_dir($dirPath) && is_file($jsonPath)) {
-                $paper['key'] = $key;
-                $paper['folder'] = $fname;
                 $paper = json_decode(file_get_contents($jsonPath), true);
-                $papers[] = $paper;
+                $paper["key"] = $key;
+                $paper["folder"] = $fname;
+                $papers[$key] = $paper;
             }
         }
 
