@@ -40,12 +40,23 @@
 
 /***** LEFT COLUMN (TAGS) *****/
 
+#papers-col-left .group-link {
+    cursor: pointer;
+    opacity: 0.6;
+    filter: alpha(opacity=60);
+}
+
+#papers-col-left ul li.active {
+    opacity: 1;
+    filter: alpha(opacity=100);
+}
+
 #papers-col-left h3 {
     margin: 7px 0 5px 7px;
     font-size: 17px;
 }
 
-#papers-col-left a {
+#papers-col-left li {
     padding: 4px 10px;
 }
 

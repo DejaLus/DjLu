@@ -56,6 +56,16 @@ $(document).ready(function() {
 
             }, "json");
         });
+
+        $(".group-link").on("click", function () {
+            // $("#papers-table").hide();
+            // $("#group-wait").show();
+            if($(this).hasClass("active")) {
+                $(this).removeClass("active");
+            } else {
+                $(this).addClass("active");
+            }
+        });
     }
 
     initPapersTableStuff();
