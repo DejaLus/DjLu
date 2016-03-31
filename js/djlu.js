@@ -22,13 +22,12 @@ $(document).ready(function() {
     }
     $("#papers-col-right-handle").on("mousedown touchstart", function (e) {
 
-        var left = $("#papers-col-left");
         var middle = $("#papers-col-middle");
         var right = $("#papers-col-right");
         var handle = $("#papers-col-right-handle");
         var middleWidth = middle.width();
         var rightWidth = right.width();
-        var totalWidth = left.width() + middleWidth + rightWidth;
+        var totalWidth = middleWidth + rightWidth;
         var middleWidthPercent = middleWidth / totalWidth * 100.0;
         var rightWidthPercent = rightWidth / totalWidth * 100.0;
 
@@ -61,11 +60,10 @@ $(document).ready(function() {
         });
     });
     $("#papers-col-right-close").on("click", function () {
-        var left = $("#papers-col-left");
         var middle = $("#papers-col-middle");
         var right = $("#papers-col-right");
         var handle = $("#papers-col-right-handle");
-        var totalWidth = left.width() + middle.width() + right.width();
+        var totalWidth = middle.width() + right.width();
 
         var newMiddle = (middle.width() + right.width()) / totalWidth * 100.0;
         var newRight  =  0;
@@ -77,11 +75,10 @@ $(document).ready(function() {
         $("#papers-col-right-open").show();
     });
     $("#papers-col-right-open").on("click", function () {
-        var left = $("#papers-col-left");
         var middle = $("#papers-col-middle");
         var right = $("#papers-col-right");
         var handle = $("#papers-col-right-handle");
-        var totalWidth = left.width() + middle.width() + right.width();
+        var totalWidth = middle.width() + right.width();
 
         var newMiddle = (middle.width() + right.width()) / totalWidth * 75.0;
         var newRight  = (middle.width() + right.width()) / totalWidth * 25.0;
@@ -164,7 +161,62 @@ $(document).ready(function() {
 
             }, "json");
         });
+
+        $(".group-link").on("click", function () {
+            if($(this).hasClass("group-filter-active")) {
+                $(this).removeClass("group-filter-active");
+            } else {
+                $(this).addClass("group-filter-active");
+            }
+            searchPapers();
+        });
+
+        $(".no-groups").on("click", function () {
+            var group = "." + $(this).attr("group-key");
+            $(group).each(function(){
+                if($(this).hasClass("group-filter-active")) {
+                    $(this).removeClass("group-filter-active");
+                }
+            });
+            searchPapers();
+        });
+
+        $(".all-groups").on("click", function () {
+            var group = "." + $(this).attr("group-key");
+            $(group).each(function(){
+                if(!$(this).hasClass("group-filter-active")) {
+                    $(this).addClass("group-filter-active");
+                }
+            });
+            searchPapers();
+        });
     }
+
+    function searchPapers() {
+        $(".paper").each(function(){
+            $(this).show();
+        });
+        $(".labels-list").each(function(){
+            var children = $(this).children(".labels-sublist");
+            var element = $(this).parent().parent();
+            $(".group-filter-active").each(function(){
+                var group = $(this).attr("group-key");
+                var grtag = $(this).attr("group-tag");
+                var found = false;
+                children.each(function(){
+                    $(this).children().each(function(){
+                        if($(this).attr("group-key") == group && $(this).attr("group-tag") == grtag){
+                            found = true;
+                        }
+                    });
+                });
+                if(!found) {
+                    element.hide();
+                }
+            });
+        });
+        
+    }   
 
     initPapersTableStuff();
 

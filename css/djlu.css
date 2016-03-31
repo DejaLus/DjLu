@@ -30,27 +30,29 @@
 
 #papers-col-left {
     left: 0;
-    width: 13%;
+    width: 30px;
     box-shadow: 1px 1px 5px rgba(0,0,0,.075);
     border-right: 1px solid #ddd;
+    background: white;
     z-index: 10;
 }
 
 #papers-col-middle {
-    left: 13%;
-    width: 68%;
+    left: 0px;
+    padding-left: 30px;
+    width: 75%;
 }
 
 #papers-col-right {
     right: 0;
-    width: 19%;
+    width: 25%;
     box-shadow: -1px 1px 5px rgba(0,0,0,.075);
     border-left: 1px solid #ddd;
     z-index: 10;
 }
 
 #papers-col-right-handle {
-    right: 19%;
+    right: 25%;
     margin-right: -4px;
     width: 7px;
     cursor: ew-resize;
@@ -72,12 +74,44 @@
 
 /***** LEFT COLUMN (TAGS) *****/
 
+.all-groups, .no-groups {
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#papers-col-left-container, #papers-col-left:hover {
+    width: 200px;
+}
+
+#papers-col-left .label-small {
+    display: inline;
+    padding-left: 40px;
+}
+
+#papers-col-left:hover .label-small {
+    display: none;
+}
+
+#papers-col-left .group-link {
+    cursor: pointer;
+    opacity: 0.3;
+}
+
+#papers-col-left ul li.group-filter-active {
+    opacity: 1;
+}
+
 #papers-col-left h3 {
     margin: 7px 0 5px 7px;
     font-size: 17px;
+    text-align: center;
 }
 
-#papers-col-left a {
+#papers-col-left li {
+    padding: 4px 10px;
+}
+
+#papers-col-left p {
     padding: 4px 10px;
 }
 
@@ -101,7 +135,7 @@
     height: 1.45em;
     width: 100%;
     margin-left: -8px;
-    padding: 0 8px;
+    padding: 0 38px 0 8px;
 }
 
 #papers-table .labels-sublist {

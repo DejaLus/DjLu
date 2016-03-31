@@ -102,10 +102,11 @@ class Formatting {
     /**
      * Format a list of tags, possibly using an array of colors
      * @param  array $tags   list of tags
+     * @param  integer $key_index   index of the key (to match the javascript search)
      * @param  array  $tagsDB associative array (key = tag, value = hex color)
      * @return string         formated string
      */
-    public static function formatTags($tags, $tagsDB = array()) {
+    public static function formatTags($tags, $key_index, $tagsDB = array()) {
 
         $out = "";
 
@@ -113,7 +114,7 @@ class Formatting {
             foreach ($tags as $tag) {
                 $bg = isset($tagsDB[$tag]) ? $tagsDB[$tag] : "#777";
                 $fg = isset($tagsDB[$tag]) ? self::textColorFromBgColor($tagsDB[$tag]) : "#fff";
-                $out .= '<span class="label label-default" style="background: '.$bg.'; color: '.$fg.'">'.$tag.'</span> ';
+                $out .= '<span class="label label-default" group-tag="'.$tag.'" group-key="'.$key_index.'" style="background: '.$bg.'; color: '.$fg.'">'.$tag.'</span> ';
             }
         }
 
