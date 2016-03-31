@@ -72,7 +72,7 @@
 }
 
 #papers-table .labels-sublist {
-    overflow-x: scroll;
+    overflow-x: hidden;
     white-space: nowrap;
     height: 1.45em;
 }
