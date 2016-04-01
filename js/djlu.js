@@ -2,6 +2,16 @@
 
 $(document).ready(function() {
 
+    var markdownEditor = new SimpleMDE({
+        element: $("#paper-notes-editor")[0],
+        spellChecker: true,
+        indentWithTabs: false,
+        renderingConfig: {codeSyntaxHighlighting: true},
+        status: false,
+        tabSize: 4,
+        toolbar: ["link", "table", "|", "preview", "side-by-side", "fullscreen"]
+    });
+
     // TOOLTIPS
 
     function getOrElse(map, key, elseVal, join) {
@@ -43,17 +53,25 @@ $(document).ready(function() {
                 $("#paper-details").attr("data-key", key);
                 displayPaperInfo(data);
 
-                if (data.bibRaw != undefined)
+                // bibtex
+                if (data.bibRaw != undefined) {
                     $("#paper-bibtex-content").html(data.bibRaw);
-                if (data.md != undefined)
-                    $("#paper-notes-content").html(data.md);
+                    $("#paper-bibtex").show();
+                }
 
+                // display all
                 $("#paper-wait").hide();
                 $("#paper-details").show();
-                if (data.bibRaw != undefined)
-                    $("#paper-bibtex").show();
-                if (data.md != undefined)
+
+                // notes
+                if (data.md != undefined) {
                     $("#paper-notes").show();
+                    markdownEditor.value(data.md);
+                    markdownEditor.codemirror.refresh();
+                    if (!markdownEditor.isPreviewActive())
+                        markdownEditor.togglePreview()
+                }
+
 
             }, "json");
         });
