@@ -111,33 +111,33 @@ class Paper {
             "tags_reading" => array("new"),
             "url" => $data["url"] ? $data["url"] : "");
 
-        $this->writeJSON($json);
+        if ($this->writeJSON($json) === false)
+            throw new \Exception("Failed to write JSON file");
 
         // save bibtex
-        file_put_contents($this->path."/".$this->key.".bib", $bibtexRaw);
+        if (file_put_contents($this->path."/".$this->key.".bib", $bibtexRaw) === false)
+            throw new \Exception("Failed to write bibtex file");
     }
 
     /**
-     * Edit a field about the paper
+     * Edit a field in the JSON of the paper
      * @param  string $field
      * @param  string $value
-     * @return boolean        success
      */
-    public function edit ($field, $value) {
-
+    private function editJSON ($field, $value) {
         if (!$field || !in_array($field, self::$JSON_EDITABLE_FIELDS))
-            return false;
+            throw new \Exception("Field not editable");
 
         $value = trim($value);
 
         // check valid value
         if (($field == "title" || $field == "authors") && empty($value))
-            return false;
+            throw new \Exception("Field cannot be empty");
         if ($field == "date_added" && !preg_match("/([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2})/", $value, $matches)) {
             if (!checkdate($matches[2], $matches[3], $matches[1]) ||
                 (int) $matches[4] < 0 || (int) $matches[4] > 23 ||
                 (int) $matches[5] < 0 || (int) $matches[4] > 59)
-                return false;
+                throw new \Exception("Invalid date / time");
         }
 
         // preprocess value
@@ -151,7 +151,42 @@ class Paper {
         // edit JSON
         $json = $this->getJSON();
         $json[$field] = $value;
-        return $this->writeJSON($json);
+        if ($this->writeJSON($json) === false)
+            throw new \Exception("Failed to write file");
+    }
+
+    /**
+     * Edit the markdown file
+     * @param  string $content Content of the file to write
+     */
+    private function editMD ($content) {
+
+        $content = trim($content);
+        $mdPath = $this->path."/".$this->key.".md";
+
+        if (empty($content) && is_file($mdPath))
+            if (!unlink($mdPath))
+                throw new \Exception("Failed to remove notes");
+
+        if (!empty($content))
+            if (file_put_contents($mdPath, $content) === false)
+                throw new \Exception("Failed to save file");
+    }
+
+    /**
+     * Edit a field about the paper
+     * @param  string $file
+     * @param  string $field
+     * @param  string $value
+     * @return boolean        success
+     */
+    public function edit ($file, $field, $value) {
+
+        if ($file == "json")
+            return $this->editJSON($field, $value);
+        if ($file == "md")
+            return $this->editMD($value);
+        throw new \Exception("File not editable");
     }
 
     /**

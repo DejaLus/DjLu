@@ -6,10 +6,11 @@ $(document).ready(function() {
         element: $("#paper-notes-editor")[0],
         spellChecker: true,
         indentWithTabs: false,
-        renderingConfig: {codeSyntaxHighlighting: true},
+        renderingConfig: {codeSyntaxHighlighting: true, singleLineBreaks: false},
         status: false,
         tabSize: 4,
-        toolbar: ["link", "table", "|", "preview", "side-by-side", "fullscreen"]
+        toolbar: ["link", "table", "|", "preview", "side-by-side", "fullscreen", "|",
+        {name: "save", action: saveNotes, className: "fa fa-save", title: "Save"}]
     });
 
     // TOOLTIPS
@@ -62,16 +63,23 @@ $(document).ready(function() {
                 // display all
                 $("#paper-wait").hide();
                 $("#paper-details").show();
+                $("#paper-notes-add").hide();
+                $("#paper-notes-content").hide();
+                $("#paper-notes").show();
 
                 // notes
                 if (data.md != undefined) {
-                    $("#paper-notes").show();
+                    $("#paper-notes-content").show();
+                    if (markdownEditor.isPreviewActive()) // needs to be in edit mode
+                        markdownEditor.togglePreview();
                     markdownEditor.value(data.md);
                     markdownEditor.codemirror.refresh();
-                    if (!markdownEditor.isPreviewActive())
-                        markdownEditor.togglePreview()
+                    markdownEditor.togglePreview();
                 }
-
+                else {
+                    $("#paper-notes-add").show();
+                    markdownEditor.value("");
+                }
 
             }, "json");
         });
@@ -98,7 +106,7 @@ $(document).ready(function() {
 
             // send request
             $.post("/api/paper/"+key,
-                {"field" : field, "value" : $("#i_edit").val()},
+                {"file" : "json", "field" : field, "value" : $("#i_edit").val()},
                 function (data) {
                     $("#js_edit_modal").modal("hide");
                     if (data.success) {
@@ -107,13 +115,36 @@ $(document).ready(function() {
                         $.notify({ message: "Paper edited successfully" }, { type: "success" });
                     }
                     else
-                        $.notify({ message: "Failed to edit paper" }, { type: "danger" });
+                        $.notify({ message: "Failed to edit paper: "+data.message }, { type: "danger" });
 
                 }, "json");
         });
 
         $("#js_edit_modal").modal();
     });
+
+    // ADD / SAVE PAPER NOTES
+    $("#paper-notes-add-btn").on("click", function () {
+        $("#paper-notes-add").hide();
+        $("#paper-notes-content").show();
+        markdownEditor.codemirror.refresh();
+        if (markdownEditor.isPreviewActive())
+            markdownEditor.togglePreview();
+    });
+    function saveNotes() {
+        if (!markdownEditor.isPreviewActive())
+            markdownEditor.togglePreview();
+
+        $.post("/api/paper/"+$("#paper-details").attr("data-key"),
+            {"file" : "md", "field" : "", "value" : markdownEditor.value()},
+            function (data) {
+                if (data.success) {
+                    $.notify({ message: "Notes saved successfully" }, { type: "success" });
+                }
+                else
+                    $.notify({ message: "Failed to save notes: "+data.message }, { type: "danger" });
+            }, "json");
+    }
 
     // GIT PULL
     $("#js_pull_modal_reload").on("click", function () { location.reload(); });

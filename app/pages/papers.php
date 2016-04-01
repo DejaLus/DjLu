@@ -81,13 +81,15 @@ class Papers {
     public function apiPaperEdit ($f3, $args) {
 
         $paper = new \models\Paper($args["key"]);
-        $success = $paper->edit($f3->get("POST.field"), $f3->get("POST.value")) !== false;
-        $out = $success ? $paper->getFiles() : array();
-        $out["success"] = $success;
+        try {
+            $paper->edit($f3->get("POST.file"), $f3->get("POST.field"), $f3->get("POST.value"));
 
-        // TODO optimize this...
-        // get the new tr
-        if ($success) {
+            // TODO make this optional
+            $out = $paper->getFiles();
+            $out["success"] = true;
+
+            // TODO optimize this and make it optional...
+            // get the new tr
             // we need to get all papers just to be able to compute labels list and colors :(
             $papers = $this->model->getPapers();
             $addDates = array_map(function ($x) { return $x["date_added"]; }, $papers);
@@ -97,9 +99,12 @@ class Papers {
             // get the right paper and get HTML
             $this->f3->set("paper", $papers[$args["key"]]);
             $out["tr"] = \Template::instance()->render("paper.htm", "text/html");
-        }
 
-        echo json_encode($out);
+            echo json_encode($out);
+        }
+        catch (\Exception $e) {
+            echo json_encode(array("success" => false, "message" => $e->getMessage()));
+        }
     }
 
     /**
