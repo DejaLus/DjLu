@@ -160,10 +160,20 @@
                     <h4 class="modal-title"><i class="fa fa-plus"></i> Add a paper</h4>
                 </div>
                 <div class="modal-body">
-                    <div id="js_add_modal_bibtex" class="form-group">
-                        <label for="i_bibtex">BibTex entry (please mind the citation key, it will be the identifier)</label>
-                        <textarea class="form-control" rows="9" id="i_bibtex"></textarea>
-                    </div>
+                    <form id="js_add_modal_input">
+                        <div class="form-group">
+                            <label for="i_citation_key">Citation key</label>
+                            <input type="text" class="form-control" rows="9" id="i_citation_key" name="citationKey" />
+                        </div>
+                        <div class="form-group">
+                            <label for="i_id">ID (arXiv ID or DOI)</label>
+                            <input type="text" class="form-control" id="i_id" name="id" />
+                        </div>
+                        <div class="form-group">
+                            <label for="i_bibtex">BibTex entry</label>
+                            <textarea class="form-control" rows="9" id="i_bibtex" name="bibtex"></textarea>
+                        </div>
+                    </form>
                     <div id="js_add_modal_wait">
                         <p class="text-center spinner"><i class="fa fa-refresh faa-spin animated"></i></p>
                     </div>

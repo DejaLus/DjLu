@@ -111,9 +111,12 @@ class Papers {
      * Parse a bibtex to extract basic infos
      */
     public function apiPaperAdd ($f3) {
-        $paper = new \models\Paper();
+        $paper = new \models\Paper($f3->get("POST.citationKey"));
         try {
-            $paper->createFromBibTex($f3->get("POST.bibtex"));
+            if (!empty($f3->get("POST.id")))
+                $paper->createFromID($f3->get("POST.id"));
+            else
+                $paper->createFromBibTex($f3->get("POST.bibtex"));
 
             $out = array("success" => true, "tr" => "");
 

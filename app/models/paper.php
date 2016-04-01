@@ -68,6 +68,86 @@ class Paper {
     }
 
     /**
+     * Get the bibtex from arXiv ID
+     * @param  string $id arXiv ID
+     * @return string     bibtex
+     */
+    private function bibTexFromArXiv ($id) {
+        $id = preg_replace("#^arXiv:(.+)$#", '\1', $id);
+        $xml = @file_get_contents("http://export.arxiv.org/api/query?id_list=".$id);
+        if (!$xml)
+            throw new \Exception("Error while loading, the ID probably do not exist");
+
+        $xml = json_decode(json_encode(simplexml_load_string($xml)), true);
+
+        if ($xml["entry"]["title"] == "Error")
+            throw new \Exception("No paper found for arXiv id ".$id);
+
+        $time = strtotime($xml["entry"]["published"]);
+        $bib = array(
+            "cite" => $this->key,
+            "entryType" => "article",
+            "title" => trim($xml["entry"]["title"]),
+            "author" => implode(" and ", array_map(function ($x) { return $x["name"]; }, $xml["entry"]["author"])),
+            "booktitle" => "arXiv",
+            "year" => date("Y", $time),
+            "month" => date("M", $time),
+            "archivePrefix" => "arXiv",
+            "arxivId" => $id,
+            "eprint" => $id,
+            "url" => trim($xml["entry"]["id"]),
+            "abstract" => trim($xml["entry"]["summary"])
+            );
+
+        $bibtex = new \models\BibTex(array("removeCurlyBraces" => true, "extractAuthors" => false));
+        $bibtex->addEntry($bib);
+        return $bibtex->toBibTex();
+    }
+
+    /**
+     * Get the bibtex from DOI
+     * @param  string $id DOI
+     * @return string     bibtex
+     */
+    private function bibTexFromDOI ($id) {
+        $id = preg_replace("#^doi:(.+)$#", '\1', $id);
+
+        $context = stream_context_create(array(
+            "http" => array(
+                "method" => "GET",
+                "header" => "Accept: text/bibliography; style=bibtex\r\n"
+            )
+        ));
+
+        $id = preg_replace("#^arXiv:(.+)$#", '\1', $id);
+        $data = @file_get_contents("http://dx.doi.org/".$id, false, $context);
+
+        if (!$data)
+            throw new \Exception("Error while loading, the ID probably do not exist");
+
+        return $data;
+    }
+
+    /**
+     * Create a paper record from a standard ID (DOI, arXiv)
+     * @param  string $id
+     */
+    public function createFromId ($id) {
+
+        $id = trim($id);
+
+        // arvix
+        if (strpos($id, "arXiv:") === 0)
+            $bibtex = $this->bibTexFromArXiv($id);
+        elseif (strpos($id, "doi:") === 0)
+            $bibtex = $this->bibTexFromDOI($id);
+        else
+            throw new \Exception("ID not supported");
+
+        $this->createFromBibTex($bibtex);
+    }
+
+    /**
      * Create the paper entry in the repository from the bibtex
      * @param  string $bibtexRaw      Bibtex record of the paper
      */
@@ -82,7 +162,10 @@ class Paper {
 
         // extract data
         $data = $bibtex->data[0];
-        $this->key = $data["cite"];
+        if (!$this->key)
+            $this->key = $data["cite"];
+        else
+            $bibtex->data[0]["cite"] = $this->key;
 
         // check key, title, author
         if (!preg_match("/^[a-zA-Z0-9]+$/", $this->key))
@@ -115,7 +198,7 @@ class Paper {
             throw new \Exception("Failed to write JSON file");
 
         // save bibtex
-        if (file_put_contents($this->path."/".$this->key.".bib", $bibtexRaw) === false)
+        if (file_put_contents($this->path."/".$this->key.".bib", $bibtex->toBibTex()) === false)
             throw new \Exception("Failed to write bibtex file");
     }
 

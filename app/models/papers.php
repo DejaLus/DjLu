@@ -41,6 +41,24 @@ class Papers extends \Prefab {
         return $papers;
     }
 
+    public function getKeys () {
+
+        $folderPath = $this->f3->get("DATA_PATH").$this->username;
+        $keys = array();
+
+        foreach (scandir($folderPath) as $fname) {
+
+            $key = preg_replace('/^([^_]+)_.+$/', '\1', $fname);
+            $dirPath = $folderPath."/".$fname;
+            $jsonPath = $folderPath."/".$fname."/".$key.".json";
+
+            if ($fname != "." && $fname != ".." && is_dir($dirPath) && is_file($jsonPath))
+                $keys[] = $key;
+        }
+
+        return $keys;
+    }
+
     public function getDeclaredTags () {
         $preferences = \models\User::instance()->getPreferences();
         $tags = array("content" => array(), "reading" => array());

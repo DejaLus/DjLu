@@ -221,15 +221,15 @@ $(document).ready(function() {
 
     // ADD A PAPER
     $("#js_add").on("click", function () {
-        $("#js_add_modal_bibtex").show();
+        $("#js_add_modal_input").show();
         $("#js_add_modal_wait").hide();
         $("#js_add_modal").modal();
     });
     $("#js_add_modal_send").on("click", function () {
-        $("#js_add_modal_bibtex").hide();
+        $("#js_add_modal_input").hide();
         $("#js_add_modal_wait").show();
 
-        $.post("/api/paper/add", {bibtex: $("#i_bibtex").val()}, function (data) {
+        $.post("/api/paper/add", $("#js_add_modal_input").serialize(), function (data) {
             if (data.success) {
                 $("#js_add_modal").modal("hide");
                 $("#papers-table-header").after(data.tr);
@@ -237,7 +237,7 @@ $(document).ready(function() {
                 $.notify({ message: "Paper added successfully" }, { type: "success" });
             }
             else {
-                $("#js_add_modal_bibtex").show();
+                $("#js_add_modal_input").show();
                 $("#js_add_modal_wait").hide();
                 $.notify({ message: "Fail to add paper: "+data.message }, { type: "danger",  z_index: 1051 });
             }
