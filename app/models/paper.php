@@ -17,7 +17,7 @@ class Paper {
      * Array of editable fields
      * @var array
      */
-    public static $JSON_EDITABLE_FIELDS = array("title", "authors", "year", "url", "date_added", "tags_content", "tags_reading", "tags_notes");
+    public static $JSON_EDITABLE_FIELDS = array("title", "authors", "in", "rating", "year", "url", "date_added", "tags_content", "tags_reading", "tags_notes");
 
     function __construct($key = "") {
         $this->f3 = \Base::instance();

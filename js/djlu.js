@@ -20,6 +20,7 @@ $(document).ready(function() {
         $("#paper-details .tags_notes").html(getOrElse(data.json, "tags_notes", [], "; "));
         $("#paper-details .date_added").html(getOrElse(data.json, "date_added", ""));
         $("#paper-details .url").html(getOrElse(data.json, "url", ""));
+        $("#paper-details .rating").html(getOrElse(data.json, "rating", ""));
     }
 
     function initPapersTableStuff () {
