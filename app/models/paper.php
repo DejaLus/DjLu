@@ -72,7 +72,7 @@ class Paper {
      * @param  string $id arXiv ID
      * @return string     bibtex
      */
-    private function bibTexFromArXiv ($id) {
+    private static function bibTexFromArXiv ($id) {
         $id = preg_replace("#^arXiv:(.+)$#", '\1', $id);
         $xml = @file_get_contents("http://export.arxiv.org/api/query?id_list=".$id);
         if (!$xml)
@@ -85,7 +85,7 @@ class Paper {
 
         $time = strtotime($xml["entry"]["published"]);
         $bib = array(
-            "cite" => $this->key,
+            "cite" => $xml["entry"]["author"][0]["name"].date("Y", $time),
             "entryType" => "article",
             "title" => trim($xml["entry"]["title"]),
             "author" => implode(" and ", array_map(function ($x) { return $x["name"]; }, $xml["entry"]["author"])),
@@ -109,7 +109,7 @@ class Paper {
      * @param  string $id DOI
      * @return string     bibtex
      */
-    private function bibTexFromDOI ($id) {
+    private static function bibTexFromDOI ($id) {
         $id = preg_replace("#^doi:(.+)$#", '\1', $id);
 
         $context = stream_context_create(array(
@@ -131,41 +131,77 @@ class Paper {
     /**
      * Create a paper record from a standard ID (DOI, arXiv)
      * @param  string $id
+     * @param  string $citationKey citation key
      */
-    public function createFromId ($id) {
+    public static function createFromId ($id, $citationKey = "") {
 
         $id = trim($id);
 
         // arvix
         if (strpos($id, "arXiv:") === 0)
-            $bibtex = $this->bibTexFromArXiv($id);
+            $bibtex = self::bibTexFromArXiv($id);
         elseif (strpos($id, "doi:") === 0)
-            $bibtex = $this->bibTexFromDOI($id);
+            $bibtex = self::bibTexFromDOI($id);
         else
             throw new \Exception("ID not supported");
 
-        $this->createFromBibTex($bibtex);
+        return self::createFromBibTex($bibtex, $citationKey);
+    }
+
+    /**
+     * Create papers entry from a bibtex
+     * @param  string $bibtexData  bibtex
+     * @param  string $citationKey citation key to override bibtex
+     * @return array              success keys and error messages
+     */
+    public static function createFromBibTex ($bibtexData, $citationKey = "") {
+
+        // parse bibtex
+        $bibtex = new \models\BibTex(array('removeCurlyBraces' => true, 'extractAuthors' => false));
+        $bibtex->content = $bibtexData;
+        $bibtex->parse();
+
+        // init
+        $successKeys = array();
+        $errors = array();
+
+        // if bibtex invalid
+        if (!is_array($bibtex->data) || count($bibtex->data) == 0)
+            throw new \Exception("Invalid bibtex data");
+
+        // loop through bibtex entries
+        foreach ($bibtex->data as $data) {
+            $key = ($citationKey && count($bibtex->data) == 1) ? $citationKey : $data["cite"];
+
+            // try to create paper, if not catch and record error
+            try {
+                $paper = new \models\Paper($key);
+                $paper->createFromBibTexData($data);
+                $successKeys[] = $key;
+            }
+            catch (\Exception $e) {
+                $errors[] = "Error for paper with key ".$key.": ".$e->getMessage();
+            }
+        }
+
+        // return
+        if (count($successKeys) == 0)
+            throw new \Exception(implode("\n", $errors));
+        else
+            return array("keys" => $successKeys, "errors" => $errors);
     }
 
     /**
      * Create the paper entry in the repository from the bibtex
      * @param  string $bibtexRaw      Bibtex record of the paper
      */
-    public function createFromBibTex ($bibtexRaw) {
-        $bibtex = new \models\BibTex(array('removeCurlyBraces' => true, 'extractAuthors' => false));
-        $bibtex->content = $bibtexRaw;
-        $bibtex->parse();
+    public function createFromBibTexData ($data) {
 
-        // if bibtex invalid
-        if (!is_array($bibtex->data) || count($bibtex->data) == 0)
-            throw new \Exception("Invalid bibtex data");
-
-        // extract data
-        $data = $bibtex->data[0];
+        // check key
         if (!$this->key)
             $this->key = $data["cite"];
         else
-            $bibtex->data[0]["cite"] = $this->key;
+            $data["cite"] = $this->key;
 
         // check key, title, author
         if (!preg_match("/^[a-zA-Z0-9]+$/", $this->key))
@@ -198,6 +234,8 @@ class Paper {
             throw new \Exception("Failed to write JSON file");
 
         // save bibtex
+        $bibtex = new \models\BibTex(array('removeCurlyBraces' => true, 'extractAuthors' => false));
+        $bibtex->addEntry($data);
         if (file_put_contents($this->path."/".$this->key.".bib", $bibtex->toBibTex()) === false)
             throw new \Exception("Failed to write bibtex file");
     }

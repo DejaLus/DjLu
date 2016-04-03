@@ -311,16 +311,18 @@ $(document).ready(function() {
         $("#js_add_modal_wait").show();
 
         $.post("/api/paper/add", $("#js_add_modal_input").serialize(), function (data) {
-            if (data.success) {
+            if (data.success == true || data.success == "partial") {
                 $("#js_add_modal").modal("hide");
-                $("#papers-table-header").after(data.tr);
+                $("#papers-table tbody").prepend(data.html);
                 initPapersTableStuff();
-                $.notify({ message: "Paper added successfully" }, { type: "success" });
+                $.notify({ message: "Paper(s) added successfully" }, { type: "success" });
+                if (data.success == "partial")
+                    $.notify({ message: "But also failed to add some papers:<br>"+data.message }, { type: "danger", z_index: 1051 });
             }
             else {
                 $("#js_add_modal_input").show();
                 $("#js_add_modal_wait").hide();
-                $.notify({ message: "Fail to add paper: "+data.message }, { type: "danger",  z_index: 1051 });
+                $.notify({ message: "Fail to add paper(s): "+data.message }, { type: "danger",  z_index: 1051 });
             }
         }, "json");
     });

@@ -111,14 +111,20 @@ class Papers {
      * Parse a bibtex to extract basic infos
      */
     public function apiPaperAdd ($f3) {
-        $paper = new \models\Paper($f3->get("POST.citationKey"));
-        try {
-            if (!empty($f3->get("POST.id")))
-                $paper->createFromID($f3->get("POST.id"));
-            else
-                $paper->createFromBibTex($f3->get("POST.bibtex"));
 
-            $out = array("success" => true, "tr" => "");
+        try {
+            // save the paper(s) and get success keys
+            if (!empty($f3->get("POST.id")))
+                $output = \models\Paper::createFromID($f3->get("POST.id"), $f3->get("POST.citationKey"));
+            else
+                $output = \models\Paper::createFromBibTex($f3->get("POST.bibtex"), $f3->get("POST.citationKey"));
+
+            // init output
+            $out = array("success" => true, "html" => "");
+            if ($output["errors"]) {
+                $out["success"] = "partial";
+                $out["message"] = implode("<br>", $output["errors"]);
+            }
 
             // TODO optimize this...
             $papers = $this->model->getPapers();
@@ -127,16 +133,17 @@ class Papers {
             $this->f3->set("tags", $this->model->getTags($papers));
 
             // get the right paper and get HTML
-            $key = $paper->getKey();
-            $this->f3->set("paper", $papers[$key]);
-            $out["tr"] .= '<tr class="paper" data-paper-key="'.$key.'" id="paper-row-'.$key.'">';
-            $out["tr"] .= \Template::instance()->render("paper.htm", "text/html");
-            $out["tr"] .= '</tr>';
+            foreach ($output["keys"] as $key) {
+                $this->f3->set("paper", $papers[$key]);
+                $out["html"] .= '<tr class="paper" data-paper-key="'.$key.'" id="paper-row-'.$key.'">';
+                $out["html"] .= \Template::instance()->render("paper.htm", "text/html");
+                $out["html"] .= '</tr>';
+            }
 
             echo json_encode($out);
         }
         catch (\Exception $e) {
-            echo json_encode(array("success" => false, "message" => $e->getMessage()));
+            echo json_encode(array("success" => false, "message" => nl2br($e->getMessage())));
         }
     }
 
