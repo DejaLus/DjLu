@@ -13,6 +13,8 @@ $(document).ready(function() {
         {name: "save", action: saveNotes, className: "fa fa-save", title: "Save"}]
     });
 
+    new Tablesort($("#papers-table")[0]);
+
     // RIGHT COLUMN RESIZE
     function pointerX (e) {
         return (e.type.indexOf('touch') === 0) ?

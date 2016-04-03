@@ -15,9 +15,9 @@
     </span>
 </td>
 <td><span data-toggle="tooltip" data-placement="top" title="{{ \lib\Formatting::formatAuthors(@paper.authors, 'full') }}">{{ \lib\Formatting::formatAuthors(@paper.authors) }}</span></td>
-<td class="text-right">{{ @paper.in }} {{ @paper.year }}</td>
-<td class="text-right">{{ \lib\Formatting::formatDate(@paper.date_added) }}</td>
-<td>
+<td class="text-right" data-sort="{{ @paper.year }} {{ @paper.in }}">{{ @paper.in }}&nbsp;{{ @paper.year }}</td>
+<td class="text-right" data-sort="{{ @paper.date_added }}">{{ \lib\Formatting::formatDate(@paper.date_added) }}</td>
+<td data-sort="{{ @paper.rating }}">
     <check if="{{ !empty(@paper.url) }}">
     <a href="{{ @paper.url }}" class="pdf" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
     </check>

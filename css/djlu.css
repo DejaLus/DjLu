@@ -74,6 +74,7 @@
 
 #papers-table th {
     padding: 9px 0px 9px 8px;
+    vertical-align: top;
 }
 
 #papers-table td {
@@ -136,6 +137,44 @@
 
 #papers-table .pdf {
     color: inherit;
+}
+
+/* Table sort */
+
+th.sort-header {
+    cursor:pointer;
+}
+
+table th.sort-header:after {
+    content:'';
+    float:right;
+    margin-top:7px;
+    border-width:0 4px 4px;
+    border-style:solid;
+    border-color:#404040 transparent;
+    visibility:hidden;
+}
+
+table th.sort-header:last-child:after {
+    margin-right: 4px;
+}
+
+table th.sort-header.text-right:after {
+    margin-left: 5px;
+}
+
+table th.sort-header:hover:after {
+    visibility:visible;
+}
+
+table th.sort-up:after, table th.sort-down:after, table th.sort-down:hover:after {
+    visibility:visible;
+    opacity:0.4;
+}
+
+table th.sort-up:after {
+    border-bottom:none;
+    border-width:4px 4px 0;
 }
 
 /******* RIGHT COLUMN (PAPER DETAILS) ******/

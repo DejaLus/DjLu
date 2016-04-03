@@ -95,7 +95,7 @@ class Formatting {
     public static function formatDate($date) {
         return '<span class="date" title="'.$date.'" data-toggle="tooltip" data-placement="top">'.
             preg_replace_callback('#^[0-9]+-([0-9]+)-([0-9]+)[^0-9]+([0-9]+)\:[0-9]+$#', function ($els) {
-                return $els[2].' '.self::$MONTHS[(int) $els[1]].' '.$els[3].'h';
+                return $els[2].'&nbsp;'.self::$MONTHS[(int) $els[1]].'&nbsp;'.$els[3].'h';
             }, $date).'</span>';
     }
 

@@ -31,18 +31,22 @@
     </div>
     <div id="papers-col-middle">
         <table class="table table-striped table-hover" id="papers-table">
+            <thead>
             <tr id="papers-table-header">
                 <th>Title</th>
                 <th>Author</th>
                 <th class="text-right">Publication</th>
                 <th class="text-right">Added</th>
-                <th></th>
+                <th data-toggle="tooltip" data-placement="top" title="Rating"></th>
             </tr>
+            </thead>
+            <tbody>
             <repeat group="{{ @papers }}" value="{{ @paper }}">
             <tr class="paper" data-paper-key="{{ @paper.key }}" id="paper-row-{{ @paper.key }}">
                 <include href="paper.htm" />
             </tr>
             </repeat>
+            </tbody>
         </table>
     </div>
     <div id="papers-col-right">
