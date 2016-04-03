@@ -1,5 +1,16 @@
 /***** SET GENERAL PAPERS PAGE LAYOUT *****/
 
+.navbar-brand {
+    padding: 8px 15px;
+    line-height: 34px;
+}
+
+.navbar-brand img {
+    height: 32px;
+    display: inline-block;
+    vertical-align: top;
+}
+
 #papers-navbar {
     margin: 0;
     z-index: 100;
