@@ -69,8 +69,11 @@ class Papers extends \Prefab {
     }
 
     public function getTags ($papers) {
-
-        $palette = explode("-", $this->f3->get("TAGS_PALETTE"));
+        $preferences = \models\User::instance()->getPreferences();
+        if (is_array($preferences["palette"]))
+            $palette = $preferences["palette"];
+        else
+            $palette = explode("-", $this->f3->get("TAGS_PALETTE"));
         $i = 0;
         $n = count($palette);
 
