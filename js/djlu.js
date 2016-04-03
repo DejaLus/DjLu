@@ -13,6 +13,84 @@ $(document).ready(function() {
         {name: "save", action: saveNotes, className: "fa fa-save", title: "Save"}]
     });
 
+    // RIGHT COLUMN RESIZE
+    function pointerX (e) {
+        return (e.type.indexOf('touch') === 0) ?
+            (e.originalEvent.touches[0] || e.originalEvent.changedTouches[0]).pageX : e.pageX;
+    }
+    $("#papers-col-right-handle").on("mousedown touchstart", function (e) {
+
+        var left = $("#papers-col-left");
+        var middle = $("#papers-col-middle");
+        var right = $("#papers-col-right");
+        var handle = $("#papers-col-right-handle");
+        var middleWidth = middle.width();
+        var rightWidth = right.width();
+        var totalWidth = left.width() + middleWidth + rightWidth;
+        var middleWidthPercent = middleWidth / totalWidth * 100.0;
+        var rightWidthPercent = rightWidth / totalWidth * 100.0;
+
+        e.preventDefault();
+        var startPos = pointerX(e);
+
+        $(document).on("mousemove touchmove", function (e) {
+            var endPos = pointerX(e);
+            var differencePercent = (endPos - startPos) / totalWidth * 100.0;
+            var newMiddle = middleWidthPercent + differencePercent;
+            var newRight  =  rightWidthPercent - differencePercent;
+
+            // apply min limits (right > 10%, middle > 30%)
+            if (newRight < 10) {
+                newMiddle -= 10 - newRight;
+                newRight = 10;
+            }
+            if (newMiddle < 30) {
+                newRight -= 30 - newMiddle;
+                newMiddle = 30;
+            }
+
+            middle[0].style.width = "" + newMiddle.toFixed(2) + "%";
+            right [0].style.width = "" + newRight.toFixed(2) + "%";
+            handle[0].style.right = "" + newRight.toFixed(2) + "%";
+        });
+
+        $(document).on("mouseup touchend", function (e) {
+            $(document).unbind("mousemove touchmove mouseup touchend");
+        });
+    });
+    $("#papers-col-right-close").on("click", function () {
+        var left = $("#papers-col-left");
+        var middle = $("#papers-col-middle");
+        var right = $("#papers-col-right");
+        var handle = $("#papers-col-right-handle");
+        var totalWidth = left.width() + middle.width() + right.width();
+
+        var newMiddle = (middle.width() + right.width()) / totalWidth * 100.0;
+        var newRight  =  0;
+
+        middle[0].style.width = "" + newMiddle.toFixed(2) + "%";
+        right [0].style.width = "" + newRight.toFixed(2) + "%";
+        handle[0].style.right = "" + newRight.toFixed(2) + "%";
+
+        $("#papers-col-right-open").show();
+    });
+    $("#papers-col-right-open").on("click", function () {
+        var left = $("#papers-col-left");
+        var middle = $("#papers-col-middle");
+        var right = $("#papers-col-right");
+        var handle = $("#papers-col-right-handle");
+        var totalWidth = left.width() + middle.width() + right.width();
+
+        var newMiddle = (middle.width() + right.width()) / totalWidth * 75.0;
+        var newRight  = (middle.width() + right.width()) / totalWidth * 25.0;
+
+        middle[0].style.width = "" + newMiddle.toFixed(2) + "%";
+        right [0].style.width = "" + newRight.toFixed(2) + "%";
+        handle[0].style.right = "" + newRight.toFixed(2) + "%";
+
+        $("#papers-col-right-open").hide();
+    });
+
     // TOOLTIPS
 
     function getOrElse(map, key, elseVal, join) {

@@ -9,7 +9,7 @@
     font-size: 95%;
 }
 
-#papers-col-left, #papers-col-middle, #papers-col-right {
+#papers-col-left, #papers-col-middle, #papers-col-right, #papers-col-right-handle {
     position: absolute;
     top: 51px;
     bottom: 0;
@@ -36,6 +36,27 @@
     box-shadow: -1px 1px 5px rgba(0,0,0,.075);
     border-left: 1px solid #ddd;
     z-index: 10;
+}
+
+#papers-col-right-handle {
+    right: 19%;
+    margin-right: -4px;
+    width: 7px;
+    cursor: ew-resize;
+    z-index: 1000;
+}
+
+#papers-col-right-open {
+    position: absolute;
+    top: 58px;
+    right: 0;
+    font-size: 13px;
+    padding: 3px 5px;
+    background: #7B7B7B;
+    color: #FFF;
+    border-radius: 5px 0 0 5px;
+    cursor: pointer;
+    z-index: 100;
 }
 
 /***** LEFT COLUMN (TAGS) *****/
@@ -117,6 +138,16 @@
     color: inherit;
 }
 
+/******* RIGHT COLUMN (PAPER DETAILS) ******/
+
+
+#papers-col-right-close {
+    float: right;
+    color: #A5A5A5;
+    margin: 8px 10px 5px 5px;
+    cursor: pointer;
+}
+
 #paper-wait {
     padding: 60px 20px 0;
     font-size: 37px;
@@ -155,6 +186,10 @@
 
 #paper-bibtex-content {
     font-size: 80%;
+}
+
+#paper-details h4 {
+    margin-top: 0;
 }
 
 #paper-details .title {
