@@ -130,6 +130,7 @@ $(document).ready(function() {
             $.get("/api/paper/"+key, function (data) {
 
                 $("#paper-details").attr("data-key", key);
+                $("#paper-details .citationKey").html(key);
                 displayPaperInfo(data);
 
                 // bibtex
