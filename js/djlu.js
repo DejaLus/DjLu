@@ -39,8 +39,6 @@ $(document).ready(function() {
 
             $.get("/api/paper/"+key, function (data) {
 
-                alert(1);
-
                 $("#paper-details").attr("data-key", key);
                 displayPaperInfo(data);
 
@@ -92,30 +90,29 @@ $(document).ready(function() {
     }
 
     function searchPapers() {
-        var groups = {};
-        $(".group-filter-active").each(function(){
-            var group = $(this).attr("group-key");
-            var grtag = $(this).attr("group-tag");
-            if(groups[group]) {
-                groups[group].push(grtag);
-            } else {
-                groups[group] = [grtag];
-            }
+        $(".paper").each(function(){
+            $(this).show();
         });
-        var keys = Object.keys(groups);
-        var getargs = "";
-        for(var i = 0; i < keys.length; ++i) {
-            getargs = getargs.concat(keys[i]).concat("=").concat(groups[keys[i]]).concat(";");
-        }
-
-        alert(3);
-
-        $.get("/api/filtergroups", groups, function (data) {
-
-            alert(2);
-            // alert(data);
-
-        }, "json");
+        $(".labels-list").each(function(){
+            var children = $(this).children(".labels-sublist");
+            var element = $(this).parent().parent();
+            $(".group-filter-active").each(function(){
+                var group = $(this).attr("group-key");
+                var grtag = $(this).attr("group-tag");
+                var found = false;
+                children.each(function(){
+                    $(this).children().each(function(){
+                        if($(this).attr("group-key") == group && $(this).attr("group-tag") == grtag){
+                            found = true;
+                        }
+                    });
+                });
+                if(!found) {
+                    element.hide();
+                }
+            });
+        });
+        
     }   
 
     initPapersTableStuff();

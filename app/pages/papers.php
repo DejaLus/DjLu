@@ -44,47 +44,6 @@ class Papers {
     }
 
     /**
-     * Show list of papers for the authed user
-     */
-    public function filterGroups ($f3) {
-        
-        // check if logged in
-        if (!$this->user->isLoggedIn()) {
-            \lib\Flash::instance()->addMessage("You need to be logged in to access your library", "danger");
-            $this->f3->reroute("@home");
-        }
-
-        // get papers list
-        $papers = $this->model->getPapers();
-        $addDates = array_map(function ($x) { return $x["date_added"]; }, $papers);
-        array_multisort($addDates, SORT_DESC, $papers);
-
-        // gather tags
-        $tags = $this->model->getTags($papers);
-
-        // apply filter
-        $filteredPapers = [];
-        foreach($papers as $paper) {
-            $pass_1 = $pass_2 = true;
-            if(!is_null($f3["REQUEST"][0])) {
-                $pass_1 = sizeof(array_intersect($paper["tags_content"], $f3["REQUEST"][0])) == sizeof($f3["REQUEST"][0]);
-            }
-            if(!is_null($f3["REQUEST"][1])) {
-                $pass_2 = sizeof(array_intersect($paper["tags_reading"], $f3["REQUEST"][1])) == sizeof($f3["REQUEST"][1]);
-            }
-            if($pass_1 && $pass_2) {
-                array_push($filteredPapers, $paper);
-            }
-        }
-
-        $this->f3->set("papers", $filteredPapers);
-        $this->f3->set("tags", $tags);
-        $this->f3->set("js", "djlu.js");
-        $this->f3->set("content", "papers.htm");
-        echo \Template::instance()->render("layout.htm");
-    }
-
-    /**
      * API call to pull the repo
      */
     public function apiPull () {

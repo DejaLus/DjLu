@@ -44,13 +44,14 @@
 }
 
 #papers-col-middle {
-    left: 30px;
-    width: 68%;
+    left: 0px;
+    padding-left: 30px;
+    width: 75%;
 }
 
 #papers-col-right {
     right: 0;
-    width: 19%;
+    width: 25%;
     box-shadow: -1px 1px 5px rgba(0,0,0,.075);
     border-left: 1px solid #ddd;
     z-index: 10;
@@ -102,7 +103,7 @@
     height: 1.45em;
     width: 100%;
     margin-left: -8px;
-    padding: 0 8px;
+    padding: 0 38px 0 8px;
 }
 
 #papers-table .labels-sublist {
