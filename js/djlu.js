@@ -66,6 +66,24 @@ $(document).ready(function() {
                 $(this).addClass("active");
             }
         });
+
+        $(".no-groups").on("click", function () {
+            var group = "." + $(this).attr("group-key");
+            $(group).each(function(){
+                if($(this).hasClass("active")) {
+                    $(this).removeClass("active");
+                }
+            });
+        });
+
+        $(".all-groups").on("click", function () {
+            var group = "." + $(this).attr("group-key");
+            $(group).each(function(){
+                if(!$(this).hasClass("active")) {
+                    $(this).addClass("active");
+                }
+            });
+        });
     }
 
     initPapersTableStuff();

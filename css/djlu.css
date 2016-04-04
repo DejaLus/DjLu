@@ -19,14 +19,32 @@
 
 #papers-col-left {
     left: 0;
-    width: 13%;
+    width: 30px;
     box-shadow: 1px 1px 5px rgba(0,0,0,.075);
     border-right: 1px solid #ddd;
+    background: white;
     z-index: 10;
 }
 
+#papers-col-left:hover {
+    left: 0;
+    width: auto;
+}
+
+#papers-col-left:hover ul {
+    -webkit-transition: max-width 0.3s ease-in;
+    -moz-transition: max-width 0.3s ease-in;
+    -o-transition: max-width 0.3s ease-in;
+    -ms-transition: max-width 0.3s ease-in;
+    transition: max-width 0.3s ease-in; 
+}
+
+#papers-col-left:hover .label-small {
+    display: none;
+}
+
 #papers-col-middle {
-    left: 13%;
+    left: 30px;
     width: 68%;
 }
 
@@ -40,10 +58,15 @@
 
 /***** LEFT COLUMN (TAGS) *****/
 
+.all-groups, .no-groups {
+    cursor: pointer;
+    font-weight: bold;
+}
+
 #papers-col-left .group-link {
     cursor: pointer;
-    opacity: 0.6;
-    filter: alpha(opacity=60);
+    opacity: 0.3;
+    filter: alpha(opacity=30);
 }
 
 #papers-col-left ul li.active {
