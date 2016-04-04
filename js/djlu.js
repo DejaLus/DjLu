@@ -39,6 +39,8 @@ $(document).ready(function() {
 
             $.get("/api/paper/"+key, function (data) {
 
+                alert(1);
+
                 $("#paper-details").attr("data-key", key);
                 displayPaperInfo(data);
 
@@ -60,31 +62,61 @@ $(document).ready(function() {
         $(".group-link").on("click", function () {
             // $("#papers-table").hide();
             // $("#group-wait").show();
-            if($(this).hasClass("active")) {
-                $(this).removeClass("active");
+            if($(this).hasClass("group-filter-active")) {
+                $(this).removeClass("group-filter-active");
             } else {
-                $(this).addClass("active");
+                $(this).addClass("group-filter-active");
             }
+            searchPapers();
         });
 
         $(".no-groups").on("click", function () {
             var group = "." + $(this).attr("group-key");
             $(group).each(function(){
-                if($(this).hasClass("active")) {
-                    $(this).removeClass("active");
+                if($(this).hasClass("group-filter-active")) {
+                    $(this).removeClass("group-filter-active");
                 }
             });
+            searchPapers();
         });
 
         $(".all-groups").on("click", function () {
             var group = "." + $(this).attr("group-key");
             $(group).each(function(){
-                if(!$(this).hasClass("active")) {
-                    $(this).addClass("active");
+                if(!$(this).hasClass("group-filter-active")) {
+                    $(this).addClass("group-filter-active");
                 }
             });
+            searchPapers();
         });
     }
+
+    function searchPapers() {
+        var groups = {};
+        $(".group-filter-active").each(function(){
+            var group = $(this).attr("group-key");
+            var grtag = $(this).attr("group-tag");
+            if(groups[group]) {
+                groups[group].push(grtag);
+            } else {
+                groups[group] = [grtag];
+            }
+        });
+        var keys = Object.keys(groups);
+        var getargs = "";
+        for(var i = 0; i < keys.length; ++i) {
+            getargs = getargs.concat(keys[i]).concat("=").concat(groups[keys[i]]).concat(";");
+        }
+
+        alert(3);
+
+        $.get("/api/filtergroups", groups, function (data) {
+
+            alert(2);
+            // alert(data);
+
+        }, "json");
+    }   
 
     initPapersTableStuff();
 

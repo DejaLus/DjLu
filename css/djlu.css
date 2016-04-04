@@ -69,7 +69,7 @@
     filter: alpha(opacity=30);
 }
 
-#papers-col-left ul li.active {
+#papers-col-left ul li.group-filter-active {
     opacity: 1;
     filter: alpha(opacity=100);
 }

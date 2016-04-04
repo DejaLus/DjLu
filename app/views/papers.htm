@@ -24,7 +24,7 @@
             <ul class="nav" style="width: 200px;">
                 <li style="text-align: center; white-space: nowrap;"><h3>{{ \models\Papers::$TAGS_GROUPS_LABELS[@i] }}</h3></li>
                 <repeat group="{{ @tags[\models\Papers::$TAGS_GROUPS[@i]] }}" key="{{ @tag }}" value="{{ @color }}">
-                    <li class="group-link active group_{{ @i }}" group-key="{{ @tag }}" style="text-align: left;"><span class="label label-default label-small" style="background: {{ @color }}; width: 20px; height: 20px;">&nbsp;&nbsp;&nbsp;</span><span class="label label-default" style="background: {{ @color }}; color: {{ \lib\Formatting::textColorFromBgColor(@color); }}">{{ @tag }}</span></li>
+                    <li class="group-link group_{{ @i }}" group-key="{{ @i }}" group-tag="{{ @tag }}" style="text-align: left;"><span class="label label-default label-small" style="background: {{ @color }}; width: 20px; height: 20px;">&nbsp;&nbsp;&nbsp;</span><span class="label label-default" style="background: {{ @color }}; color: {{ \lib\Formatting::textColorFromBgColor(@color); }}">{{ @tag }}</span></li>
                 </repeat>
                 <li style="text-align: right; white-space: nowrap;"><span class="all-groups" group-key="group_{{ @i }}">All</span> | <span class="no-groups" group-key="group_{{ @i }}">None</span></li>
             </ul>
