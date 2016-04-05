@@ -89,7 +89,7 @@ class User extends \Prefab {
         $sid = $this->f3->get("COOKIE.PHPSESSID");
         // auth ok
         if (count($dbpass) < 1 || !password_verify($dbpass[0]['password'] . $sid, $password))
-            throw new \Exception("Bad account or password for " . $dbpass[0]['username'] . " : " . $sid);
+            throw new \Exception("Bad account or password for '" . $username . "'");
 
         // set session and cookies
         $this->f3->set("SESSION.username", $username);
