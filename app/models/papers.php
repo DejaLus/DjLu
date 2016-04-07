@@ -99,7 +99,7 @@ class Papers extends \Prefab {
                 if (is_array($paper["tags_".$group]))
                     foreach ($paper["tags_".$group] as $tag)
                         if (!isset($tags[$group][$tag]))
-                            $tags[$group][$tag] = "#".$palette[$i++ % $n];
+                            $tags[$group][$tag] = $palette[$i++ % $n];
 
         return $tags;
     }

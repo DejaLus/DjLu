@@ -106,15 +106,15 @@ class Formatting {
      * @param  array  $tagsDB associative array (key = tag, value = hex color)
      * @return string         formated string
      */
-    public static function formatTags($tags, $key_index, $tagsDB = array()) {
+    public static function formatTags($tags, $tagsGroup, $tagsDB = array()) {
 
         $out = "";
 
         if (is_array($tags)) {
             foreach ($tags as $tag) {
-                $bg = isset($tagsDB[$tag]) ? $tagsDB[$tag] : "#777";
-                $fg = isset($tagsDB[$tag]) ? self::textColorFromBgColor($tagsDB[$tag]) : "#fff";
-                $out .= '<span class="label label-default" group-tag="'.$tag.'" group-key="'.$key_index.'" style="background: '.$bg.'; color: '.$fg.'">'.$tag.'</span> ';
+                $bg = isset($tagsDB[$tag]) ? $tagsDB[$tag] : "777";
+                $fg = isset($tagsDB[$tag]) ? self::textColorFromBgColor($tagsDB[$tag]) : "FFF";
+                $out .= '<span class="label label-default" data-tag="'.$tag.'" data-tag-group="'.$tagsGroup.'" style="background: #'.$bg.'; color: #'.$fg.'">'.$tag.'</span> ';
             }
         }
 
@@ -145,7 +145,7 @@ class Formatting {
     public static function textColorFromBgColor ($hexBgColor) {
 
         // extract components
-        list($r, $g, $b) = sscanf($hexBgColor, "#%02x%02x%02x");
+        list($r, $g, $b) = sscanf($hexBgColor, "%02x%02x%02x");
 
         // fix sRGB to RGB
         $r /= 255;
@@ -159,7 +159,7 @@ class Formatting {
         $L = 0.2126 * $r + 0.7152 * $g + 0.0722 * $b;
 
         // decide
-        return ($L > 0.33) ? "#000000" : "#ffffff";
+        return ($L > 0.33) ? "000000" : "FFFFFF";
     }
 
 }

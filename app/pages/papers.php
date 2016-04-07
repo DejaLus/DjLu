@@ -21,7 +21,6 @@ class Papers {
      * Show list of papers for the authed user
      */
     public function listAll () {
-
         // check if logged in
         if (!$this->user->isLoggedIn()) {
             \lib\Flash::instance()->addMessage("You need to be logged in to access your library", "danger");
@@ -41,45 +40,6 @@ class Papers {
         $this->f3->set("js", array("simplemde.min.js", "highlight.min.js", "tablesort.min.js", "djlu.js"));
         $this->f3->set("content", "papers.htm");
         echo \Template::instance()->render("layout.htm");
-    }
-
-    /**
-     * API call to pull the repo
-     */
-    public function apiPull () {
-        if (!$this->user->isLoggedIn()) {
-            echo '{"success": false, "message": "User not logged in"}';
-            return;
-        }
-
-        $out = \models\Git::instance()->pull();
-        echo json_encode($out);
-    }
-
-    /**
-     * API call to get the status of the repo
-     */
-    public function apiStatus () {
-        if (!$this->user->isLoggedIn()) {
-            echo '{"success": false, "message": "User not logged in"}';
-            return;
-        }
-
-        echo \models\Git::instance()->status();
-    }
-
-    /**
-     * API call to commit and push the changes in the repo
-     */
-    public function apiPush () {
-        if (!$this->user->isLoggedIn()) {
-            echo '{"success": false, "message": "User not logged in"}';
-            return;
-        }
-
-        $message = $this->f3->get("POST.message");
-        $out = \models\Git::instance()->commitPush($message);
-        echo json_encode($out);
     }
 
     /**
@@ -174,5 +134,4 @@ class Papers {
             echo json_encode(array("success" => false, "message" => nl2br($e->getMessage())));
         }
     }
-
 }

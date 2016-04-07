@@ -79,10 +79,11 @@ class User extends \Prefab {
 
     public function setGit ($command) {
         if (empty($command) || $command == $this->getGit())
-            return;
+            return false;
         Git::instance()->cloneRepo($command);
         $this->setUserdata("git", $command);
         $this->saveUserdata();
+        return true;
     }
 
     /**
@@ -106,6 +107,38 @@ class User extends \Prefab {
             return json_decode(file_get_contents($filePath), true);
         else
             return array();
+    }
+
+    /**
+     * Save new user's preferences
+     * @param arrat $preferences
+     */
+    public function setPreferences ($preferences) {
+        $filePath = $this->f3->get("DATA_PATH").$this->getUsername()."/preferences.json";
+        if (file_put_contents($filePath, json_encode($preferences, JSON_PRETTY_PRINT)) === false)
+            throw new \Exception("Failed to save user preferences");
+    }
+
+    /**
+     * Helper to set the fixed color of a tag in preferences
+     * @param string $tag
+     * @param string $group
+     * @param string $color hex value without the #
+     */
+    public function setTagColor ($tag, $group, $color) {
+        if (!in_array($group, \models\Papers::$TAGS_GROUPS))
+            throw new \Exception("Unknown tag group");
+        if (empty($tag))
+            throw new \Exception("Empty tag");
+        if (!preg_match("/^[0-9A-F]{3,6}$/", $color))
+            throw new \Exception("Invalid color");
+
+        $preferences = $this->getPreferences();
+        if (!is_array($preferences["tags_".$group]))
+            $preferences["tags_".$group] = array();
+        $preferences["tags_".$group][$tag] = $color;
+
+        $this->setPreferences($preferences);
     }
 
     /**
