@@ -11,12 +11,12 @@
         <div class="collapse navbar-collapse" id="navbar">
             <ul class="nav navbar-nav navbar-right">
                 <check if="{{ @user->getGit() }}">
-                    <li><a href="#" id="js_pull"><i class="fa fa-refresh"></i> Pull</a></li>
-                    <li><a href="#" id="js_push"><i class="fa fa-cloud-upload"></i> Commit &amp; push</a></li>
+                    <li><a href="#" id="pull-btn"><i class="fa fa-refresh"></i> Pull</a></li>
+                    <li><a href="#" id="modal-push-btn"><i class="fa fa-cloud-upload"></i> Commit &amp; push</a></li>
                 </check>
-                <li><a href="#" id="js_add"><i class="fa fa-plus"></i> Add a paper</a></li>
-                <li><a href="#" id="js_settings" data-toggle="modal" data-target="#js_settings_modal"><i class="fa fa-cog"></i> Settings</a></li>
-                <li><a href="{{ 'logout' | alias }}" id="js_logout"><i class="fa fa-sign-out"></i> Logout</a></li>
+                <li><a href="#" data-toggle="modal" data-target="#modal-paper-add"><i class="fa fa-plus"></i> Add a paper</a></li>
+                <li><a href="#" data-toggle="modal" data-target="#modal-settings"><i class="fa fa-cog"></i> Settings</a></li>
+                <li><a href="{{ 'logout' | alias }}"><i class="fa fa-sign-out"></i> Logout</a></li>
             </ul>
         </div>
     </div>
@@ -24,15 +24,24 @@
 
 <div id="papers-container">
     <div id="papers-col-left">
+        <div id="colorpicker" style="display: none;">
+            <div class="popover colorpicker" role="tooltip">
+                <div class="arrow"></div>
+                <repeat group="{{ explode('-', @TAGS_PALETTE) }}" value="{{ @color }}"><span data-color="{{ @color }}" style="background: #{{ @color }}"></span></repeat>
+            </div>
+        </div>
         <div id="papers-col-left-container">
             <loop from="{{ @i=0 }}" to="{{ @i < count(\models\Papers::$TAGS_GROUPS) }}" step="{{ @i++ }}">
-                <ul class="nav">
-                    <h3>{{ \models\Papers::$TAGS_GROUPS_LABELS[@i] }}</h3>
+                <h3>{{ \models\Papers::$TAGS_GROUPS_LABELS[@i] }}</h3>
+                <ul class="nav" data-tag-group="{{ \models\Papers::$TAGS_GROUPS[@i] }}">
                     <repeat group="{{ @tags[\models\Papers::$TAGS_GROUPS[@i]] }}" key="{{ @tag }}" value="{{ @color }}">
-                        <li class="group-link group_{{ @i }}" group-key="{{ @i }}" group-tag="{{ @tag }}"><span class="label label-default label-small" style="background: {{ @color }};">&nbsp;</span><span class="label label-default" style="background: {{ @color }}; color: {{ \lib\Formatting::textColorFromBgColor(@color); }}">{{ @tag }}</span></li>
+                        <li class="tag" data-tag="{{ @tag }}">
+                            <a class="tag-colorpicker label label-default" tabindex="0" role="button" style="background: #{{ @color }}"><i class="fa fa-caret-down"></i></a>
+                            <span class="tag-label label label-default" style="background: #{{ @color }}; color: #{{ \lib\Formatting::textColorFromBgColor(@color); }}"><span>{{ @tag }}</span></span>
+                        </li>
                     </repeat>
                 </ul>
-                <p class="text-right"><span class="all-groups" group-key="group_{{ @i }}">All</span> | <span class="no-groups" group-key="group_{{ @i }}">None</span></p>
+                <p class="text-right"><a href="#" class="btn btn-default btn-xs tags-reset" data-tag-group="{{ \models\Papers::$TAGS_GROUPS[@i] }}">Reset filtering</a></p>
             </loop>
         </div>
     </div>
@@ -103,138 +112,120 @@
 </div>
 
 <!-- Modals -->
-<div id="papers_modals">
-    <div class="modal fade" id="js_pull_modal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title"><i class="fa fa-cloud-download"></i> Git pull</h4>
-                </div>
-                <div class="modal-body" id="js_pull_modal_content"></div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" id="js_pull_modal_close" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="js_pull_modal_reload">Reload</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="js_push_modal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title"><i class="fa fa-cloud-upload"></i> Git commit &amp; push</h4>
-                </div>
-                <div class="modal-body">
-                    <div id="js_push_modal_status">
-                        <p><strong>The following changes will be commited</strong></p>
-                        <div id="js_push_modal_status_content"></div>
-                    </div>
-                    <div id="js_push_modal_message" class="form-group">
-                        <label for="i_commit">Commit message</label>
-                        <textarea class="form-control" rows="4" id="i_commit"></textarea>
-                    </div>
-                    <div id="js_push_modal_result">
-                        <p class="text-center spinner"><i class="fa fa-refresh faa-spin animated"></i></p>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" id="js_push_modal_close" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="js_push_modal_send">Commit &amp; push</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="js_edit_modal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title"><i class="fa fa-pencil"></i> Edit a paper</h4>
-                </div>
-                <div class="modal-body">
-                    <div id="js_edit_modal_form">
-                        <div class="form-group">
-                            <label for="i_edit" id="i_edit_label"></label>
-                            <textarea class="form-control" rows="4" id="i_edit"></textarea>
-                        </div>
-                    </div>
-                    <div id="js_edit_modal_wait">
-                        <p class="text-center spinner"><i class="fa fa-refresh faa-spin animated"></i></p>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" id="js_edit_modal_close" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="js_edit_modal_send">Edit</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <div class="modal fade" id="js_add_modal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title"><i class="fa fa-plus"></i> Add a paper</h4>
-                </div>
-                <div class="modal-body">
-                    <form id="js_add_modal_input">
-                        <div class="form-group">
-                            <label for="i_citation_key">Citation key</label>
-                            <input type="text" class="form-control" rows="9" id="i_citation_key" name="citationKey" />
-                        </div>
-                        <div class="form-group">
-                            <label for="i_id">ID (arXiv ID or DOI)</label>
-                            <input type="text" class="form-control" id="i_id" name="id" />
-                        </div>
-                        <div class="form-group">
-                            <label for="i_bibtex">BibTex entry</label>
-                            <textarea class="form-control" rows="9" id="i_bibtex" name="bibtex"></textarea>
-                        </div>
-                    </form>
-                    <div id="js_add_modal_wait">
-                        <p class="text-center spinner"><i class="fa fa-refresh faa-spin animated"></i></p>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="js_add_modal_send">Add</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="js_settings_modal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title"><i class="fa fa-cog"></i> Settings</h4>
-                </div>
-                    <form class="form-horizontal" id="js_add_modal_input" method="POST" action="{{ "settings" | alias }}">
-                    <div class="modal-body">
-                        <check if="{{ @user->hasRight('git') }}">
-                        <div class="form-group">
-                            <label for="i_git" class="col-sm-2 control-label"> Git repo</label>
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control" id="i_git" placeholder="Git repo SSH command (e.g. git@github.com:DejaLus/demoLibrary.git)" name="git" value="{{ @user->getGit(); }}">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label"> SSH key <sup>*</sup></label>
-                            <div class="col-sm-10 text-center">
-                                <pre id="ssh-key">{{ @user->getPubkey(); }}</pre>
-                            </div>
-                        </div>
-                        <p><sup>*</sup> The server needs to be able to read and write on the git repository of your library through SSH. Therefore, you need to grant the server's SSH public key access to your repository. On GitHub, we suggest you use the <a href="https://developer.github.com/guides/managing-deploy-keys/#deploy-keys">Deploy Key</a> feature.</p>
-                        </check>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+<div class="modal fade" id="modal-spinner" tabindex="-1" role="dialog">
+    <div class="content text-center">
+        <p><i class="fa fa-refresh fa-4x fa-spin"></i></p>
+        <p id="modal-spinner-desc"></p>
     </div>
 </div>
+
+<form class="modal fade" id="modal-push" tabindex="-1" role="dialog" method="POST" action="{{ "gitPush" | alias }}">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"><i class="fa fa-cloud-upload"></i> Git commit &amp; push</h4>
+            </div>
+            <div class="modal-body">
+                <p><strong>The following changes will be commited:</strong></p>
+                <div id="modal-push-status"></div>
+                <div class="form-group">
+                    <label for="i_commit">Commit message</label>
+                    <textarea class="form-control" rows="4" name="message" id="i_commit"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Commit &amp; push</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form class="modal fade" id="modal-paper-edit" tabindex="-1" role="dialog" method="POST" action="#" data-base-url="{{ "paperEdit" | alias }}">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"><i class="fa fa-pencil"></i> Edit a paper</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="modal-paper-edit-value" id="modal-paper-edit-label"></label>
+                    <input type="hidden" name="field" value="" />
+                    <input type="hidden" name="file" value="json" />
+                    <input class="form-control" rows="4" name="value" id="modal-paper-edit-value" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Edit</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form class="modal fade" id="modal-paper-add" tabindex="-1" role="dialog" method="POST" action="{{ "paperAdd" | alias }}">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"><i class="fa fa-plus"></i> Add a paper</h4>
+            </div>
+            <div class="modal-body">
+                <p>Add a paper using one of the fields below.</p>
+                <div class="form-group">
+                    <label for="i_id">ID (arXiv ID or DOI) <small>Must start with <code>arXiv:</code> or <code>doi:</code></small></label>
+                    <input type="text" class="form-control" id="i_id" name="id" />
+                </div>
+                <div class="form-group">
+                    <label for="i_bibtex">BibTex entry</label>
+                    <textarea class="form-control" rows="9" id="i_bibtex" name="bibtex"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="i_citation_key">Custom citation key <small>(optionnal, if not set, will be author name &amp; year)</small></label>
+                    <input type="text" class="form-control" rows="9" id="i_citation_key" name="citationKey" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary">Add</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form class="modal fade" id="modal-settings" tabindex="-1" role="dialog" method="POST" action="{{ "settings" | alias }}">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"><i class="fa fa-cog"></i> Settings</h4>
+            </div>
+            <div class="modal-body">
+                <h5>Git repository</h5>
+                <hr>
+                <check if="{{ @user->hasRight('git') }}">
+                <true>
+                <div class="form-group">
+                    <label for="i_git" class="control-label"> Git repo</label>
+                    <input type="text" class="form-control" id="i_git" placeholder="Git repo SSH command (e.g. git@github.com:DejaLus/demoLibrary.git)" name="git" value="{{ @user->getGit(); }}">
+                </div>
+                <div class="form-group">
+                    <label class="control-label"> SSH key <sup>*</sup></label>
+                    <pre id="ssh-key">{{ @user->getPubkey(); }}</pre>
+                </div>
+                <p><sup>*</sup> The server needs to be able to read and write on the git repository of your library through SSH. Therefore, you need to grant the server's SSH public key access to your repository. On GitHub, we suggest you use the <a href="https://developer.github.com/guides/managing-deploy-keys/#deploy-keys">Deploy Key</a> feature.</p>
+                </true>
+                <false>
+                <p>Git feature is disabled for your account. Ask your DjLu administrator to enable it if your want to use it.</p>
+                </false>
+                </check>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+</form>

@@ -144,39 +144,52 @@ a { transition: all .35s; }
     z-index: 100;
 }
 
+#modal-spinner .content {
+    position: absolute;
+    top: 30%;
+    transform: translateY(-50%);
+    width: 100%;
+    color: #fff;
+    font-size: 25px;
+}
+
+#modal-settings h5 {
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    color: #717171;
+    margin-top: 40px;
+}
+
+#modal-settings h5:first-child {
+    margin-top: 10px;
+}
+
+#modal-settings hr {
+    width: 50px;
+    border-width: 3px;
+    border-color: #D4D4D4;
+}
+
 /***** LEFT COLUMN (TAGS) *****/
 
-.all-groups, .no-groups {
-    cursor: pointer;
-    font-weight: bold;
+#papers-col-left {
+    transition: width .35s;
 }
 
 #papers-col-left-container, #papers-col-left:hover {
     width: 200px;
 }
 
-#papers-col-left .label-small {
-    display: inline;
-    padding-left: 40px;
-}
-
-#papers-col-left:hover .label-small {
-    display: none;
-}
-
-#papers-col-left .group-link {
-    cursor: pointer;
-    opacity: 0.3;
-}
-
-#papers-col-left ul li.group-filter-active {
-    opacity: 1;
-}
-
 #papers-col-left h3 {
     margin: 7px 0 5px 7px;
     font-size: 17px;
     text-align: center;
+    visibility: hidden;
+}
+
+#papers-col-left:hover h3 {
+    visibility: visible;
 }
 
 #papers-col-left li {
@@ -185,6 +198,45 @@ a { transition: all .35s; }
 
 #papers-col-left p {
     padding: 4px 10px;
+}
+
+#papers-col-left .tag-label > span {
+    transition: opacity .5s;
+    opacity: 0;
+}
+
+#papers-col-left:hover .tag-label > span {
+    opacity: 1;
+}
+
+#papers-col-left .tag-label {
+    transition: opacity .35s;
+    cursor: pointer;
+    opacity: 0.3;
+    margin-right: 25px;
+}
+
+#papers-col-left .tag-active .tag-label {
+    opacity: 1;
+}
+
+#papers-col-left .tag-colorpicker {
+    float: right;
+    padding: 0.2em .6em .3em;
+}
+
+.colorpicker {
+    padding: 9px 7px 9px 9px;
+    line-height: 15px;
+}
+
+.colorpicker span {
+    display: inline-block;
+    height: 15px;
+    width: 15px;
+    margin: 2px;
+    border-radius: 3px;
+    cursor: pointer;
 }
 
 /***** TABLE OF PAPERS *****/

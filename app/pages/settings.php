@@ -16,8 +16,25 @@ class Settings {
      */
     public function settings ($f3) {
         try {
-            $this->user->setGit($f3->get("POST.git"));
-            echo '{"success" : true, "message" : "Settings saved successfully"}';
+            $gitChanged = $this->user->setGit($f3->get("POST.git"));
+            echo json_encode(array("success" => true, "message" => "Settings saved successfully", "reload" => $gitChanged));
+        }
+        catch (\Exception $e) {
+            echo json_encode(array("success" => false, "message" => $e->getMessage()));
+        }
+    }
+
+    /**
+     * Set a fixed color to a tag
+     */
+    public function tagColor ($f3) {
+        try {
+            $tag = $f3->get("POST.tag");
+            $group = $f3->get("POST.group");
+            $color = $f3->get("POST.color");
+
+            $this->user->setTagColor($tag, $group, $color);
+            echo '{"success" : true}';
         }
         catch (\Exception $e) {
             echo json_encode(array("success" => false, "message" => $e->getMessage()));

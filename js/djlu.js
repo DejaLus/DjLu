@@ -1,6 +1,40 @@
-'use strict';
-
 $(document).ready(function() {
+
+    'use strict';
+
+    ///////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+    /////////////// RIGHT COLUMN
+    ///////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+
+
+
+    ////////////////////////////////////////
+    /////// MARKDOWN EDITOR
+    ////////////////////////////////////////
+
+    function renderWithMath (txt) {
+        txt = txt.replace(/(^|[^\\])\$\$/g, "$1`eq2");
+        txt = txt.replace(/(^|[^\\])\$/g, "$1`eq");
+        var html = markdownEditor.markdown(txt);
+        html = html.replace(/<\/?code>eq2/g, "$$$$");
+        html = html.replace(/<\/?code>eq/g, "$$");
+        html = html_entity_decode(html, "ENT_QUOTES");
+        setTimeout(function() { MathJax.Hub.Typeset(); }, 300);
+        return html;
+    }
+
+    function mdeEditMode () {
+        if (markdownEditor.isPreviewActive()) {
+            // we need not to use our renderer because it is called when we
+            // switch to edit mode, and produce double call to mathjax and
+            // double rendering of equations
+            markdownEditor.options.previewRender = markdownEditor.markdown;
+            markdownEditor.togglePreview();
+            markdownEditor.options.previewRender = renderWithMath;
+        }
+    }
 
     var markdownEditor = new SimpleMDE({
         element: $("#paper-notes-editor")[0],
@@ -9,18 +43,23 @@ $(document).ready(function() {
         renderingConfig: {codeSyntaxHighlighting: true, singleLineBreaks: false},
         status: false,
         tabSize: 4,
+        previewRender: renderWithMath,
         toolbar: ["link", "table", "|", "preview", "side-by-side", "fullscreen", "|",
-        {name: "save", action: saveNotes, className: "fa fa-save", title: "Save"}]
+        {name: "save", action: paperSaveNotes, className: "fa fa-save", title: "Save"}]
     });
 
-    new Tablesort($("#papers-table")[0]);
 
-    // RIGHT COLUMN RESIZE
+
+    ////////////////////////////////////////
+    /////// RESIZE COLUMN
+    ////////////////////////////////////////
+
     function pointerX (e) {
-        return (e.type.indexOf('touch') === 0) ?
+        return (e.type.indexOf("touch") === 0) ?
             (e.originalEvent.touches[0] || e.originalEvent.changedTouches[0]).pageX : e.pageX;
     }
-    $("#papers-col-right-handle").on("mousedown touchstart", function (e) {
+
+    function rightColumnResizeHandler (e) {
 
         var middle = $("#papers-col-middle");
         var right = $("#papers-col-right");
@@ -58,8 +97,9 @@ $(document).ready(function() {
         $(document).on("mouseup touchend", function (e) {
             $(document).unbind("mousemove touchmove mouseup touchend");
         });
-    });
-    $("#papers-col-right-close").on("click", function () {
+    }
+
+    function rightColumnClose () {
         var middle = $("#papers-col-middle");
         var right = $("#papers-col-right");
         var handle = $("#papers-col-right-handle");
@@ -73,8 +113,9 @@ $(document).ready(function() {
         handle[0].style.right = "" + newRight.toFixed(2) + "%";
 
         $("#papers-col-right-open").show();
-    });
-    $("#papers-col-right-open").on("click", function () {
+    }
+
+    function rightColumnOpen () {
         var middle = $("#papers-col-middle");
         var right = $("#papers-col-right");
         var handle = $("#papers-col-right-handle");
@@ -88,17 +129,25 @@ $(document).ready(function() {
         handle[0].style.right = "" + newRight.toFixed(2) + "%";
 
         $("#papers-col-right-open").hide();
-    });
+    }
 
-    // TOOLTIPS
+    // register events
+    $("#papers-col-right-handle").on("mousedown touchstart", rightColumnResizeHandler);
+    $("#papers-col-right-close").on("click", rightColumnClose);
+    $("#papers-col-right-open").on("click", rightColumnOpen);
+
+
+
+    ////////////////////////////////////////
+    /////// SHOW PAPER INFO
+    ////////////////////////////////////////
 
     function getOrElse(map, key, elseVal, join) {
         var el = map[key] ? map[key] : elseVal;
         return join ? el.join(join) : el;
     }
 
-    // DISPLAY PAPER INFOS
-    function displayPaperInfo (data) {
+    function paperDisplayInfo (data) {
         $("#paper-details .title").html(getOrElse(data.json, "title", ""));
         $("#paper-details .authors").html(getOrElse(data.json, "authors", [], "; "));
         $("#paper-details .in").html(getOrElse(data.json, "in", ""));
@@ -111,164 +160,104 @@ $(document).ready(function() {
         $("#paper-details .rating").html(getOrElse(data.json, "rating", ""));
     }
 
-    function initPapersTableStuff () {
-        $('[data-toggle="tooltip"]').tooltip({ container: 'body' });
+    function paperDisplay () {
 
-        $("#papers-table .paper").on("click", function () {
+        $("#paper-placeholder").hide();
+        $("#paper-details").hide();
+        $("#paper-bibtex").hide();
+        $("#paper-notes").hide();
+        $("#paper-wait").show();
+        $("#papers-table .paper").removeClass("active");
+        $(this).addClass("active");
 
-            $("#paper-placeholder").hide();
-            $("#paper-details").hide();
-            $("#paper-bibtex").hide();
-            $("#paper-notes").hide();
-            $("#paper-wait").show();
-            $("#papers-table .paper").removeClass("active");
-            $(this).addClass("active");
+        var key = $(this).data("paper-key");
 
-            var key = $(this).attr("data-paper-key");
+        $.get("/api/paper/"+key, function (data) {
 
-            $.get("/api/paper/"+key, function (data) {
+            $("#paper-details").data("key", key);
+            $("#paper-details .citationKey").html(key);
+            paperDisplayInfo(data);
 
-                $("#paper-details").attr("data-key", key);
-                $("#paper-details .citationKey").html(key);
-                displayPaperInfo(data);
-
-                // bibtex
-                if (data.bibRaw != undefined) {
-                    $("#paper-bibtex-content").html(data.bibRaw);
-                    $("#paper-bibtex").show();
-                }
-
-                // display all
-                $("#paper-wait").hide();
-                $("#paper-details").show();
-                $("#paper-notes-add").hide();
-                $("#paper-notes-content").hide();
-                $("#paper-notes").show();
-
-                // notes
-                if (data.md != undefined) {
-                    $("#paper-notes-content").show();
-                    if (markdownEditor.isPreviewActive()) // needs to be in edit mode
-                        markdownEditor.togglePreview();
-                    markdownEditor.value(data.md);
-                    markdownEditor.codemirror.refresh();
-                    markdownEditor.togglePreview();
-                }
-                else {
-                    $("#paper-notes-add").show();
-                    markdownEditor.value("");
-                }
-
-            }, "json");
-        });
-
-        $(".group-link").on("click", function () {
-            if($(this).hasClass("group-filter-active")) {
-                $(this).removeClass("group-filter-active");
-            } else {
-                $(this).addClass("group-filter-active");
+            // bibtex
+            if (data.bibRaw != undefined) {
+                $("#paper-bibtex-content").html(data.bibRaw);
+                $("#paper-bibtex").show();
             }
-            searchPapers();
-        });
 
-        $(".no-groups").on("click", function () {
-            var group = "." + $(this).attr("group-key");
-            $(group).each(function(){
-                if($(this).hasClass("group-filter-active")) {
-                    $(this).removeClass("group-filter-active");
-                }
-            });
-            searchPapers();
-        });
+            // display all
+            $("#paper-wait").hide();
+            $("#paper-details").show();
+            $("#paper-notes-add").hide();
+            $("#paper-notes-content").hide();
+            $("#paper-notes").show();
 
-        $(".all-groups").on("click", function () {
-            var group = "." + $(this).attr("group-key");
-            $(group).each(function(){
-                if(!$(this).hasClass("group-filter-active")) {
-                    $(this).addClass("group-filter-active");
-                }
-            });
-            searchPapers();
-        });
+            // notes
+            if (data.md != undefined) {
+                $("#paper-notes-content").show();
+                mdeEditMode(); // needs to be in edit mode
+                markdownEditor.value(data.md);
+                markdownEditor.codemirror.refresh();
+                markdownEditor.togglePreview();
+            }
+            else {
+                $("#paper-notes-add").show();
+                markdownEditor.value("");
+            }
+
+        }, "json");
     }
 
-    function searchPapers() {
-        $(".paper").each(function(){
-            $(this).show();
-        });
-        $(".labels-list").each(function(){
-            var children = $(this).children(".labels-sublist");
-            var element = $(this).parent().parent();
-            $(".group-filter-active").each(function(){
-                var group = $(this).attr("group-key");
-                var grtag = $(this).attr("group-tag");
-                var found = false;
-                children.each(function(){
-                    $(this).children().each(function(){
-                        if($(this).attr("group-key") == group && $(this).attr("group-tag") == grtag){
-                            found = true;
-                        }
-                    });
-                });
-                if(!found) {
-                    element.hide();
-                }
-            });
-        });
-        
-    }   
 
-    initPapersTableStuff();
 
-    // EDIT PAPER FIELD
-    $("#paper-details > *:has(span[data-key])").on("dblclick", function () {
+    ////////////////////////////////////////
+    /////// PAPER EDIT
+    ////////////////////////////////////////
+
+    function paperEditShow () {
 
         // get info element
         var el = $(this).children("span[data-key]");
-        var key = $("#paper-details").attr("data-key");
-        var field = el.attr("data-key");
+        var form = $("#modal-paper-edit");
 
-        $("#js_edit_modal_form").show();
-        $("#js_edit_modal_wait").hide();
+        form.attr("action", form.data("base-url").replace("@key", $("#paper-details").data("key")));
+        form.find('[name="field"]').val(el.data("key"));
+        form.find('[name="value"]').val(el.html());
+        $("#modal-paper-edit-label").html(el.data("title"));
 
-        $("#i_edit").val(el.html());
-        $("#i_edit_label").html(el.attr("data-title"));
+        form.modal();
+    }
 
-        // on click send
-        $("#js_edit_modal_send").unbind("click").on("click", function () {
+    function paperEditForm () {
+        $(this).modal("hide");
+        showSpinner("Saving modifications...");
 
-            // send request
-            $.post("/api/paper/"+key,
-                {"file" : "json", "field" : field, "value" : $("#i_edit").val()},
-                function (data) {
-                    $("#js_edit_modal").modal("hide");
-                    if (data.success) {
-                        displayPaperInfo(data);
-                        $("#paper-row-"+key).html(data.tr);
-                        $.notify({ message: "Paper edited successfully" }, { type: "success" });
-                    }
-                    else
-                        $.notify({ message: "Failed to edit paper: "+data.message }, { type: "danger" });
+        ajaxFormProcess($(this), function (data) {
+            hideSpinner();
 
-                }, "json");
+            if (data.success) {
+                paperDisplayInfo(data);
+                $("#paper-row-"+$("#paper-details").data("key")).html(data.tr);
+                $.notify({ message: "Paper edited successfully" }, { type: "success" });
+            }
+            else
+                $.notify({ message: "Failed to edit paper: "+data.message }, { type: "danger" });
         });
 
-        $("#js_edit_modal").modal();
-    });
+        return false;
+    }
 
-    // ADD / SAVE PAPER NOTES
-    $("#paper-notes-add-btn").on("click", function () {
+    function paperAddNotes () {
         $("#paper-notes-add").hide();
         $("#paper-notes-content").show();
         markdownEditor.codemirror.refresh();
-        if (markdownEditor.isPreviewActive())
-            markdownEditor.togglePreview();
-    });
-    function saveNotes() {
+        mdeEditMode();
+    }
+
+    function paperSaveNotes() {
         if (!markdownEditor.isPreviewActive())
             markdownEditor.togglePreview();
 
-        $.post("/api/paper/"+$("#paper-details").attr("data-key"),
+        $.post("/api/paper/"+$("#paper-details").data("key"),
             {"file" : "md", "field" : "", "value" : markdownEditor.value()},
             function (data) {
                 if (data.success) {
@@ -279,7 +268,17 @@ $(document).ready(function() {
             }, "json");
     }
 
-    // GOOGLE DRIVE
+    // register events
+    $("#paper-details > *:has(span[data-key])").on("dblclick", paperEditShow);
+    $("#paper-notes-add-btn").on("click", paperAddNotes);
+    $("#modal-paper-edit").on("submit", paperEditForm);
+
+
+
+
+    ////////////////////////////////////////
+    /////// GOOGLE DRIVE
+    ////////////////////////////////////////
 
     var loopCount = 0;
 
@@ -290,7 +289,7 @@ $(document).ready(function() {
                              ",location=yes,toolbar=no,menubar=no";
         var popupWindow = window.open(url, "oauth2_popup", windowFeatures);
 
-        if (!popupWindow || popupWindow.closed || typeof popupWindow.closed == 'undefined') {
+        if (!popupWindow || popupWindow.closed || typeof popupWindow.closed == "undefined") {
             $.notify({ message: "You must login with your Google account, please unblock the popups for the domain and try again" }, { type: "danger" });
             return;
         }
@@ -333,18 +332,19 @@ $(document).ready(function() {
         });
     }
 
+    // register events
     $("#js_drive_fetch").on("click", function () {
-        var key = $("#paper-details").attr("data-key");
+        var key = $("#paper-details").data("key");
         driveAjaxPDF ("fetch", key, "GET");
     });
 
     $("#js_drive_import").on("click", function () {
-        var key = $("#paper-details").attr("data-key");
+        var key = $("#paper-details").data("key");
         driveAjaxPDF ("upload/url", key, "GET");
     });
 
     $(document).on("change", "#js_drive_upload :file", function(e) {
-        var key = $("#paper-details").attr("data-key");
+        var key = $("#paper-details").data("key");
         var file = e.target.files[0];
         var formData = new FormData();
         formData.append("pdf", file);
@@ -353,105 +353,139 @@ $(document).ready(function() {
         }
      });
 
-    // GIT PULL
-    $("#js_pull_modal_reload").on("click", function () { location.reload(); });
-    $("#js_pull").on("click", function () {
-
-        // show stuff
-        $("#js_pull_modal_content").html('<p>We are currently pulling your git repository, please wait...</p>'+
-            '<p class="text-center spinner"><i class="fa fa-refresh faa-spin animated"></i></p>');
-        $("#js_pull_modal").modal({ "backdrop": "static", "keyboard": false });
-        $("#js_pull_modal_close").attr("disabled", true);
-        $("#js_pull_modal_reload").attr("disabled", true);
-
-        // call API
-        $.get("/api/pull", function (data) {
-
-            // show result
-            $("#js_pull_modal_content").html('<p>Git pull '+(data.success ? 'finished with success' : 'failed')+'.</p>'+
-                '<p><strong>Git output log:</strong></p>'+
-                '<pre>'+data.log+'</pre>');
-
-            // activate the right button
-            if (data.success)
-                $("#js_pull_modal_reload").removeAttr("disabled");
-            else
-                $("#js_pull_modal_close").removeAttr("disabled");
-
-        }, "json");
-    });
 
 
-    // GIT PUSH
-    $("#js_push").on("click", function () {
 
-        // show stuff
-        $("#js_push_modal_send").unbind("click").attr("disabled", true);
-        $("#js_push_modal_close").removeAttr("disabled");
-        $("#js_push_modal_status_content").html('<p class="text-center spinner"><i class="fa fa-refresh faa-spin animated"></i></p>');
-        $("#js_push_modal_status").show();
-        $("#js_push_modal_message").show();
-        $("#js_push_modal_result").hide();
-        $("#js_push_modal").modal({ "backdrop": "static", "keyboard": false });
 
-        // get status
-        $.get("/api/status", function (data) {
 
-            // show status & enable send
-            $("#js_push_modal_status_content").html('<pre>'+data+'</pre>');
-            $("#js_push_modal_send").removeAttr("disabled");
 
-            // on send
-            $("#js_push_modal_send").on("click", function () {
 
-                // disable send, init result div
-                $("#js_push_modal_close").attr("disabled", true);
-                $("#js_push_modal_send").unbind("click").attr("disabled", true);
-                $("#js_push_modal_status").hide();
-                $("#js_push_modal_message").hide();
-                $("#js_push_modal_result").html('<p class="text-center spinner"><i class="fa fa-refresh faa-spin animated"></i></p>').show();
 
-                // send request
-                $.post("/api/push", {"message" : $("#i_commit").val()}, function (data) {
+    ///////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+    /////////////// MIDDLE COLUMN - PAPERS TABLE
+    ///////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
 
-                    // show result
-                    $("#i_commit").val("");
-                    $("#js_push_modal_result").html('<p>Git push '+(data.success ? 'finished with success' : 'failed')+'.</p>'+
-                        '<p><strong>Git output log:</strong></p>'+
-                        '<pre>'+data.log+'</pre>');
-                }, "json");
 
-                $("#js_push_modal_send").removeAttr("disabled");
+
+    ////////////////////////////////////////
+    /////// TABLE SORT
+    ////////////////////////////////////////
+
+    new Tablesort($("#papers-table")[0]);
+
+
+
+    ////////////////////////////////////////
+    /////// PAPER TABLE BIND EVENTS
+    ////////////////////////////////////////
+
+    function initPapersTableStuff () {
+        $('[data-toggle="tooltip"]').tooltip({ container: "body" });
+        $("#papers-table .paper").on("click", paperDisplay);
+    }
+
+    initPapersTableStuff();
+
+
+
+
+
+
+
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+    /////////////// TAGS FILTERING
+    ///////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+
+    function getTags(group, tag) {
+        return $('.paper .label[data-tag="'+tag+'"][data-tag-group="'+group+'"]')
+    }
+
+    function resetFilters (tagGroup) {
+        $("#papers-col-left").find('ul[data-tag-group="'+tagGroup+'"] .tag').removeClass("tag-active");
+    }
+
+    function syncFilters() {
+        $(".paper").each(function() {
+            var paper = $(this);
+
+            // check if paper possess each filtered tags, if not hide paper
+            var hide = false;
+            $(".tag-active").each(function() {
+                var tag = $(this).data("tag");
+                var group = $(this).parent().data("tag-group");
+                if (paper.find('.label[data-tag="'+tag+'"][data-tag-group="'+group+'"]').length == 0) {
+                    hide = true;
+                    return false; // break;
+                }
             });
+
+            hide ? paper.hide() : paper.show();
         });
+    }
+
+    function colorpickerHandler () {
+        var leftTagLabels = $(this).parent().find(".label"); // tag and colorpicker label els
+        var tag = $(this).parent().data("tag");
+        var tagGroup = $(this).parent().parent().data("tag-group");
+
+        $(".colorpicker span").unbind("click").on("click", function() {
+            var color = $(this).data("color");
+            leftTagLabels.css("backgroundColor", "#"+color);
+            getTags(tagGroup, tag).css("backgroundColor", "#"+color);
+
+            $.post("/api/settings/tag", {group: tagGroup, tag: tag, color: color}, function (data) {
+                if (data.success)
+                    $.notify({ message: "Tag color saved successfully" }, { type: "success" });
+                else
+                    $.notify({ message: "Failed to save tag color" }, { type: "danger" });
+            }, "json");
+        })
+    }
+
+    // tags toogle
+    $(".tag .tag-label").on("click", function () {
+        $(this).parent().toggleClass("tag-active");
+        syncFilters();
     });
 
-    // ADD A PAPER
-    $("#js_add").on("click", function () {
-        $("#js_add_modal_input").show();
-        $("#js_add_modal_wait").hide();
-        $("#js_add_modal").modal();
+    // tags reset
+    $("#papers-col-left .tags-reset").on("click", function () {
+        resetFilters($(this).data("tag-group"));
+        syncFilters();
     });
-    $("#js_add_modal_send").on("click", function () {
-        $("#js_add_modal_input").hide();
-        $("#js_add_modal_wait").show();
 
-        $.post("/api/paper/add", $("#js_add_modal_input").serialize(), function (data) {
-            if (data.success == true || data.success == "partial") {
-                $("#js_add_modal").modal("hide");
-                $("#papers-table tbody").prepend(data.html);
-                initPapersTableStuff();
-                $.notify({ message: "Paper(s) added successfully" }, { type: "success" });
-                if (data.success == "partial")
-                    $.notify({ message: "But also failed to add some papers:<br>"+data.message }, { type: "danger", z_index: 1051 });
-            }
-            else {
-                $("#js_add_modal_input").show();
-                $("#js_add_modal_wait").hide();
-                $.notify({ message: "Fail to add paper(s): "+data.message }, { type: "danger",  z_index: 1051 });
-            }
-        }, "json");
-    });
+    // colorpicker
+    $("#papers-col-left").mouseleave(function() { $(".tag-colorpicker").popover("hide") });
+    $(".tag-colorpicker").popover({ container: $("#papers-col-left"), trigger: "focus", template: $("#colorpicker").html(), content:" ", placement: "bottom" });
+    $(".tag-colorpicker").on("shown.bs.popover", colorpickerHandler);
+
+
+
+
+
+
+
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+    /////////////// NAVBAR ACTIONS
+    ///////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+
+
+
+
+    ////////////////////////////////////////
+    /////// UTILITY FUNCTIONS
+    ////////////////////////////////////////
+
 
     function ajaxFormProcess(formEl, callback) {
         $.ajax({
@@ -463,14 +497,111 @@ $(document).ready(function() {
         });
     }
 
-    // SETTINGS
-    $("#js_settings_modal form").on("submit", function (e) {
-        $("#js_settings_modal").modal("hide");
+    function showSpinner (message) {
+        $("#modal-spinner").modal({
+            keyboard: false,
+            backdrop: "static",
+            show: true
+        });
+        $("#modal-spinner-desc").html("");
+        $("#modal-spinner-desc").html(message);
+    }
+
+    function hideSpinner () {
+        $("#modal-spinner").modal("hide");
+    }
+
+
+
+    ////////////////////////////////////////
+    /////// MODALS HANDING
+    ////////////////////////////////////////
+
+    function gitPull () {
+        showSpinner("Pulling your repository...");
+
+        $.get("/api/git/pull", function (data) {
+            if (data.success)
+                location.reload();
+            else {
+                hideSpinner();
+                $.notify({ message: "Pull failed: "+data.message }, { type: "danger" });
+            }
+        }, "json");
+    }
+
+    function gitPushModal () {
+        $("#modal-push-status").html('<p class="text-center spinner"><i class="fa fa-refresh fa-spin"></i></p>');
+        $("#modal-push").modal();
+
+        // show status
+        $.get("/api/git/status", function (data) {
+            if (data.success)
+                $("#modal-push-status").html("<pre>"+data.message+"</pre>");
+            else {
+                $("#modal-push-status").html("<p>Failed to get git status: "+data.message+"</p>");
+                $.notify({ message: "Failed to get git status: "+data.message }, { type: "danger", z_index: 1051 });
+            }
+        }, "json");
+    }
+
+    function gitPushForm () {
+
+        $(this).modal("hide");
+
         ajaxFormProcess($(this), function (data) {
+            if (data.success)
+                $.notify({ message: "Commited & pushed with success" }, { type: "success" });
+            else
+                $.notify({ message: "Commit & push failed: "+data.message }, { type: "danger" });
+        });
+
+        return false;
+    }
+
+    function paperAdd () {
+        var form = $(this);
+        form.modal("hide");
+        showSpinner("Adding your paper...");
+
+        ajaxFormProcess(form, function (data) {
+            hideSpinner();
+            if (data.success == true || data.success == "partial") {
+                $("#papers-table tbody").prepend(data.html);
+                initPapersTableStuff();
+                $.notify({ message: "Paper(s) added successfully" }, { type: "success" });
+                if (data.success == "partial")
+                    $.notify({ message: "But also failed to add some papers:<br>"+data.message }, { type: "danger", z_index: 1051 });
+                else
+                    form[0].reset();
+            }
+            else
+                $.notify({ message: "Fail to add paper(s): "+data.message }, { type: "danger",  z_index: 1051 });
+        });
+
+        return false;
+    }
+
+    function settings () {
+        $(this).modal("hide");
+        showSpinner("Saving your settings...");
+
+        ajaxFormProcess($(this), function (data) {
+            hideSpinner();
+            if (data.reload)
+                location.reload();
             $.notify({ message: data.message }, { type: data.success ? "success" : "danger" });
         });
+
         return false;
-    });
+    }
+
+    // register events
+    $("#pull-btn").on("click", gitPull);
+    $("#modal-push-btn").on("click", gitPushModal);
+    $("#modal-push").on("submit", gitPushForm);
+    $("#modal-paper-add").on("submit", paperAdd);
+    $("#modal-settings").on("submit", settings);
 
 });
 

@@ -2,6 +2,11 @@
     <script src="{{@BASE}}/js/jquery.min.js"></script>
     <script src="{{@BASE}}/js/bootstrap.min.js"></script>
     <script src="{{@BASE}}/js/bootstrap-notify.min.js"></script>
+    <script src="{{@BASE}}/js/djluUtils.js"></script>
+    <script src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <script type='text/x-mathjax-config'>
+    MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['$$','$$'], ['\\(','\\)']], processEscapes: true}});
+    </script>
 
     <check if="{{ is_array(@js) }}">
     <repeat group="{{ @js }}" value="{{ @jsFile }}">
