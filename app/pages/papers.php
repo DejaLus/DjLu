@@ -47,6 +47,11 @@ class Papers {
      * API call to pull the repo
      */
     public function apiPull () {
+        if (!$this->user->isLoggedIn()) {
+            echo '{"success": false, "message": "User not logged in"}';
+            return;
+        }
+
         $out = \models\Git::instance()->pull();
         echo json_encode($out);
     }
@@ -55,6 +60,11 @@ class Papers {
      * API call to get the status of the repo
      */
     public function apiStatus () {
+        if (!$this->user->isLoggedIn()) {
+            echo '{"success": false, "message": "User not logged in"}';
+            return;
+        }
+
         echo \models\Git::instance()->status();
     }
 
@@ -62,6 +72,11 @@ class Papers {
      * API call to commit and push the changes in the repo
      */
     public function apiPush () {
+        if (!$this->user->isLoggedIn()) {
+            echo '{"success": false, "message": "User not logged in"}';
+            return;
+        }
+
         $message = $this->f3->get("POST.message");
         $out = \models\Git::instance()->commitPush($message);
         echo json_encode($out);
@@ -71,6 +86,11 @@ class Papers {
      * API call to get detail infos about a paper
      */
     public function apiPaperInfo ($f3, $args) {
+        if (!$this->user->isLoggedIn()) {
+            echo '{"success": false, "message": "User not logged in"}';
+            return;
+        }
+
         $paper = new \models\Paper($args['key']);
         echo json_encode($paper->getFiles());
     }
@@ -79,6 +99,10 @@ class Papers {
      * API call to edit details of a paper
      */
     public function apiPaperEdit ($f3, $args) {
+        if (!$this->user->isLoggedIn()) {
+            echo '{"success": false, "message": "User not logged in"}';
+            return;
+        }
 
         $paper = new \models\Paper($args["key"]);
         try {
@@ -111,6 +135,10 @@ class Papers {
      * Parse a bibtex to extract basic infos
      */
     public function apiPaperAdd ($f3) {
+        if (!$this->user->isLoggedIn()) {
+            echo '{"success": false, "message": "User not logged in"}';
+            return;
+        }
 
         try {
             // save the paper(s) and get success keys
