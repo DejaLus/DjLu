@@ -26,6 +26,13 @@ class User extends \Prefab {
     }
 
     /**
+     * Get current googleToken
+     */
+    public function getGoogleToken () {
+        return $this->f3->get("SESSION.googleToken");
+    }
+
+    /**
      * Return user's preferences
      * @return array preferences as an array
      */
@@ -50,6 +57,22 @@ class User extends \Prefab {
     }
 
     /**
+     * Get current googleToken
+     */
+    public function setGoogleToken ($token) {
+        if (!$this->isLoggedIn())
+            return;
+
+        $userdata = $this->dbMapper->load(array("@username=?", $this->getUsername()));
+        if (!$userdata)
+            return;
+
+        $userdata->googleToken = $token;
+        $userdata->update();
+        $this->f3->set("SESSION.googleToken", $token);
+    }
+
+    /**
      * Do auto-login based on cookie
      * TODO improve the security of the autologin
      */
@@ -64,6 +87,7 @@ class User extends \Prefab {
 
             // try auth
             if ($userdata && sha1($this->f3->get("APP_SALT").$userdata->password) == $token) {
+                $this->f3->set("SESSION.googleToken", $userdata['googleToken']);
                 $this->f3->set("SESSION.username", $username);
                 return true;
             }
@@ -82,17 +106,18 @@ class User extends \Prefab {
      */
     public function login ($username, $password) {
 
-        $dbpass = $this->dbMapper->find(array("@username=?", $username));
-        if (count($dbpass) > 1)
+        $userdata = $this->dbMapper->load(array("@username=?", $username));
+        if (count($userdata) > 1)
             throw new \Exception("Internal auth error #ABDErr1");
 
         $sid = $this->f3->get("COOKIE.PHPSESSID");
         // auth ok
-        if (count($dbpass) < 1 || !password_verify($dbpass[0]['password'] . $sid, $password))
+        if (count($userdata) < 1 || !password_verify($userdata['password'] . $sid, $password))
             throw new \Exception("Bad account or password for '" . $username . "'");
 
         // set session and cookies
         $this->f3->set("SESSION.username", $username);
+        $this->f3->set("SESSION.googleToken", $userdata['googleToken']);
         $this->f3->set("COOKIE.username", $username);
         $this->f3->set("COOKIE.token", sha1($this->f3->get("APP_SALT").$password), 60*60*24*14);
     }
@@ -102,6 +127,7 @@ class User extends \Prefab {
      */
     public function logout () {
         $this->f3->clear("SESSION.username");
+        $this->f3->clear("SESSION.googleToken");
         $this->f3->set("COOKIE.username", "", -1);
         $this->f3->set("COOKIE.token", "", -1);
     }
@@ -135,6 +161,7 @@ class User extends \Prefab {
         $this->dbMapper->username = $username;
         $this->dbMapper->password = $password;
         $this->dbMapper->git = $git;
+        $this->dbMapper->googleToken = "";
         $this->dbMapper->insert();
     }
 

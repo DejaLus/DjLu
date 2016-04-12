@@ -4,3 +4,4 @@ tmp/*
 data/*
 !tmp/.gitkeep
 !data/.gitkeep
+googleAPI.json

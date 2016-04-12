@@ -188,6 +188,10 @@ body {
     color: inherit;
 }
 
+#papers-table .pdf[href=""] {
+    display: none;
+}
+
 /* Table sort */
 
 th.sort-header {
@@ -294,6 +298,30 @@ table th.sort-up:after {
     font-weight: 400;
     font-size: 103%;
     line-height: 1.1;
+}
+
+#paper-url-actions {
+    float: right;
+}
+
+#js_drive_upload {
+    position: relative;
+    overflow: hidden;
+}
+
+#js_drive_upload input {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
 }
 
 #papers_modals .spinner {

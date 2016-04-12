@@ -279,6 +279,80 @@ $(document).ready(function() {
             }, "json");
     }
 
+    // GOOGLE DRIVE
+
+    var loopCount = 0;
+
+    function driveLogin (url, callback) {
+        var left = window.screenX + (window.outerWidth / 2) - (400 / 2);
+        var top = window.screenY + (window.outerHeight / 2) - (500 / 2);
+        var windowFeatures = "width=400,height=500,top=" + top + ",left=" + left +
+                             ",location=yes,toolbar=no,menubar=no";
+        var popupWindow = window.open(url, "oauth2_popup", windowFeatures);
+
+        if (!popupWindow || popupWindow.closed || typeof popupWindow.closed == 'undefined') {
+            $.notify({ message: "You must login with your Google account, please unblock the popups for the domain and try again" }, { type: "danger" });
+            return;
+        }
+
+        var oauthInterval = window.setInterval(function() {
+            if (popupWindow.closed) {
+                window.clearInterval(oauthInterval);
+                callback();
+            }
+        }, 800);
+    }
+
+    function driveAjaxPDF (type, paper, ajaxMethod, formData) {
+        $.ajax({
+            type: ajaxMethod,
+            url: "/api/drive/"+type+"/"+paper,
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType: "json",
+            success: function (data) {
+
+                if (data.success == false && data.reason == "auth") {
+                    loopCount++;
+                    if (loopCount < 3)
+                        driveLogin(data.url, function () { return driveAjaxPDF (type, paper, ajaxMethod, formData); });
+                    return;
+                }
+
+                if (data.success == false) {
+                    $.notify({ message: data.message }, { type: "danger" });
+                    return;
+                }
+
+                $("#paper-details .url").html(data.url);
+                $(".paper.active a.pdf").attr("href", data.url);
+                $.notify({ message: data.message }, { type: "success" });
+
+            }
+        });
+    }
+
+    $("#js_drive_fetch").on("click", function () {
+        var key = $("#paper-details").attr("data-key");
+        driveAjaxPDF ("fetch", key, "GET");
+    });
+
+    $("#js_drive_import").on("click", function () {
+        var key = $("#paper-details").attr("data-key");
+        driveAjaxPDF ("upload/url", key, "GET");
+    });
+
+    $(document).on("change", "#js_drive_upload :file", function(e) {
+        var key = $("#paper-details").attr("data-key");
+        var file = e.target.files[0];
+        var formData = new FormData();
+        formData.append("pdf", file);
+        if (file != undefined) {
+            driveAjaxPDF ("upload/post", key, "POST", formData);
+        }
+     });
+
     // GIT PULL
     $("#js_pull_modal_reload").on("click", function () { location.reload(); });
     $("#js_pull").on("click", function () {
