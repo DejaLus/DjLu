@@ -19,18 +19,18 @@
                     <label for="i_username" class="col-sm-2 control-label">Username</label>
                     <div class="col-sm-10">
                         <input type="text" class="form-control" id="i_username" placeholder="Username" name="username">
-                        <input type="text" id="s_sid" style="display: none;" value="<?php echo session_id(); ?>">
+                        <input type="hidden" id="s_sid" value="<?php echo session_id(); ?>">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="i_password" class="col-sm-2 control-label">Password</label>
                     <div class="col-sm-10">
                         <input type="password" class="form-control" id="i_password" placeholder="Password">
-                        <input type="text" id="i_password4" name="password" style="display: none;">
+                        <input type="hidden" id="i_password4" name="password">
                     </div>
                 </div>
                 <div class="form-group">
-                    <div class="col-sm-offset-2 col-sm-10">
+                    <div class="col-sm-offset-2 col-sm-10 text-center">
                         <button type="submit" class="btn btn-primary">Login</button>
                     </div>
                 </div>
@@ -49,25 +49,31 @@
                     <label for="i_password2" class="col-sm-2 control-label">Password</label>
                     <div class="col-sm-10">
                         <input type="password" class="form-control" id="i_password2" placeholder="Password">
-                        <input type="text" style="display:none;" id="i_password3" name="password">
+                        <input type="hidden" id="i_password3" name="password">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="i_git" class="col-sm-2 control-label">Git</label>
+                    <label for="i_git" class="col-sm-2 control-label"> Git</label>
                     <div class="col-sm-10">
                         <input type="text" class="form-control" id="i_git" placeholder="Git repo SSH command (e.g. git@github.com:DejaLus/demoLibrary.git)" name="git">
                     </div>
                 </div>
                 <div class="form-group">
-                    <div class="col-sm-offset-2 col-sm-10">
-                        <button type="submit" class="btn btn-primary">Register</button>
+                    <label class="col-sm-2 control-label"> SSH key <sup>*</sup></label>
+                    <div class="col-sm-10 text-center">
+                        <a id="sshBtn" class="btn btn-default">Generate an SSH key</a>
+                        <pre id="sshKey" style="display: none;"></pre>
+                        <input type="hidden" id="sshId" name="sshId">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10 text-center">
+                        <button type="submit" id="registerBtn" disabled="disabled" class="btn btn-primary">Register</button>
                     </div>
                 </div>
             </form>
-            <p>The server needs to be able to read and write on the git repository of your library through SSH. Therefore, you need to grant the server's SSH public key (see below) access to your repository. On GitHub, we suggest you use the <a href="https://developer.github.com/guides/managing-deploy-keys/#deploy-keys">Deploy Key</a> feature.</p>
+            <p><sup>*</sup> The server needs to be able to read and write on the git repository of your library through SSH. Therefore, you need to grant the server's SSH public key access to your repository. On GitHub, we suggest you use the <a href="https://developer.github.com/guides/managing-deploy-keys/#deploy-keys">Deploy Key</a> feature.</p>
             <p>You can test the app by cloning our <a href="https://github.com/DejaLus/demoLibrary">demo library</a> or initialize you own library with our <a href="https://github.com/DejaLus/baseLibrary">base library</a>.</p>
-            <p>The server's public key is:</p>
-            <pre>{{ exec("cat ~/.ssh/id_rsa.pub"); }}</pre>
         </div>
     </div>
 </section>

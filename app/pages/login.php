@@ -50,9 +50,10 @@ class Login {
             // get post
             $username = $f3->get("POST.username");
             $password = $f3->get("POST.password");
+            $sshId = $f3->get("POST.sshId");
             $git = $f3->get("POST.git");
 
-            \models\User::instance()->register($username, $password, $git);
+            \models\User::instance()->register($username, $password, $sshId, $git);
 
             \lib\Flash::instance()->addMessage("Hi ".$username."! You account has been created. You can now login.", "success");
             $f3->reroute("@home");
@@ -61,5 +62,16 @@ class Login {
             \lib\Flash::instance()->addMessage($e->getMessage(), "danger");
             $f3->reroute("@home");
         }
+    }
+
+    /**
+     * Generate an SSH key
+     */
+    public function sshKeygen ($f3) {
+        $id = sha1(rand());
+        $path = $f3->get("ROOT")."/".$f3->get("DATA_PATH").'_tempKeys/'.$id;
+        exec('ssh-keygen -t rsa -b 4096 -N "" -f '.escapeshellcmd($path));
+        $key = file_get_contents($path.".pub");
+        echo json_encode(array("key" => $key, "id" => $id));
     }
 }

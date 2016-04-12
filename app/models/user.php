@@ -135,24 +135,40 @@ class User extends \Prefab {
     /**
      * Register a new user in the DB
      */
-    public function register ($username, $password, $git) {
+    public function register ($username, $password, $sshId, $git) {
 
         // check input
-        if (!preg_match("/^[a-zA-Z0-9-_.]{3,50}$/", $username))
-            throw new \Exception("Invalid username, regex to match is [a-zA-Z0-9-_.]{3,50}");
+        if (!preg_match("/^[a-zA-Z0-9]{3,50}$/", $username))
+            throw new \Exception("Invalid username, regex to match is [a-zA-Z0-9]{3,50}");
         if (strlen($password) < 5)
             throw new \Exception("Password too short");
-        if (!preg_match("#^(git@([\w\.]+))(:(//)?)([\w\.@\:/\-~]+)(\.git)(/)?$#", $git, $match))
-            throw new \Exception("Invalid git SSH clone path, regex to match is (git@[\w\.]+)(:(//)?)([\w\.@\:/\-~]+)(\.git)(/)?");
+        if (!preg_match("/^[a-f0-9]{3,50}$/", $sshId))
+            throw new \Exception("Invalid SSH key");
+        if (!preg_match("#^(git://|ssh://)?([\w\.]+)@([\w\.]+):([0-9]*)([\w\.@\:/\-~]+)\.git/?$#", $git, $match))
+            throw new \Exception("Invalid git SSH clone path, regex to match is (git://|ssh://)?([\w\.]+)@([\w\.]+):([0-9]*)([\w\.@\:/\-~]+\.git/?)");
         if ($this->dbMapper->count(array("@username=?", $username)) > 0)
             throw new \Exception("Username already exists");
 
+        // save ssh key
+        $sshPath = $this->f3->get("ROOT")."/".$this->f3->get("DATA_PATH").'_tempKeys/'.$sshId;
+        $sshNewPath = $this->f3->get("ROOT")."/".$this->f3->get("DATA_PATH").'_keys/'.$username;
+        rename($sshPath, $sshNewPath);
+        rename($sshPath.".pub", $sshNewPath.".pub");
+
+        // set ssh config to use key
+        exec("echo \"Host djlu-".$username."\n".
+        "\tHostName ".$match[3]."\n".
+        "\tUser ".$match[2]."\n".
+        ($match[4] ? "\t".$match[4]."\n" : "").
+        "\tIdentityFile ".$sshNewPath."\n\n\" >> ~/.ssh/config");
+        $clonePath = "djlu-".$username.":".$match[5];
+
         // clone git
-        $host = escapeshellarg($match[2]);
+        $host = escapeshellarg($match[3]);
         exec("grep ".$host." ~/.ssh/known_hosts", $dummy, $knownHost);
         if ($knownHost != 0)
             exec("ssh-keyscan ".$host." >> ~/.ssh/known_hosts");
-        exec("git clone ".escapeshellarg($git)." ".escapeshellarg($this->f3->get("DATA_PATH").$username)." 2>&1", $gitOut, $gitOutCode);
+        exec("git clone ".escapeshellarg($clonePath)." ".escapeshellarg($this->f3->get("DATA_PATH").$username)." 2>&1", $gitOut, $gitOutCode);
 
         if ($gitOutCode != 0)
             throw new \Exception("Git clone failed. Output:\n\n".implode("\n", $gitOut));
