@@ -1,79 +1,216 @@
-<header class="jumbotron">
+<nav id="navbar-home" class="navbar navbar-default navbar-fixed-top affix-top">
     <div class="container">
-        <h1>DjLu <small>DéjàLu</small></h1>
-        <p>DéjàLu is a simple and free tool to organize research papers.</p>
+        <div class="navbar-header">
+            <a class="navbar-brand page-scroll" href="#page-top">{{ file_get_contents("img/logo.svg"); }}</a>
+        </div>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a class="page-scroll" href="#features">Features</a></li>
+                <li><a class="page-scroll" href="#howitworks">How it works</a></li>
+                <check if="{{ \models\User::instance()->isLoggedIn() }}">
+                <true>
+                <li><a href="{{ 'papers' | alias }}">Your library</a></li>
+                </true>
+                <false>
+                <li><a href="#" id="login-btn" data-toggle="modal" data-target="#login"><i class="fa fa-sign-in"></i> Login</a></li>
+                <li><a href="#" id="register-btn"><i class="fa fa-pencil-square-o"></i> Register</a></li>
+                </false>
+                </check>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<header id="home-header" class="fullscreen">
+    <div class="header-content">
+        <div class="header-content-inner">
+            <div class="container">
+                <h1><img src="img/logoHome.svg" alt="DéjàLu" /></h1>
+                <hr>
+                <div class="text-center">
+                    <p class="subtitle">DjLu (pronounce <em>DéjàLu</em>, with a French accent) is a simple and free tool to organize research papers.</p>
+                    <p class="subsubtitle">Our core principle is to keep your library simple, flexible and open. We want the user to be as independent as possible from DjLu by using simple open formats and solutions.</p>
+                    <p class="button">
+                        <a class="page-scroll" href="#features">
+                        <span class="btn-circle page-scroll" href="#features"><i class="fa fa-angle-down"></i></span><br>Learn more</a>
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
 </header>
 
-<section id="login">
+<section id="features">
     <div class="container">
-        <repeat group="{{ \lib\Flash::instance()->getMessages() }}" value="{{ @msg }}">
-        <div class="alert alert-{{ @msg.status }}">
-            {{ nl2br(@msg.text) }}
+        <h2>Features</h2>
+
+        <div class="feature col-md-4">
+            <div class="icon icon-1"><i class="fa fa-files-o"></i></div>
+            <h3>Add papers in your library from BibTex, arXiv or DOI</h3>
+            <p>You can add papers to your library from BibTex snippets or with standard identifiers such as arXiv or DOI. DjLu will gather the information for you.</p>
         </div>
-        </repeat>
-        <div class="col-sm-6">
-            <h2 class="col-sm-offset-2">Login</h2>
-            <form class="form-horizontal" id="djlogin" method="POST" action="{{ 'login' | alias }}">
-                <div class="form-group">
-                    <label for="i_username" class="col-sm-2 control-label">Username</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" id="i_username" placeholder="Username" name="username">
-                        <input type="hidden" id="s_sid" value="<?php echo session_id(); ?>">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="i_password" class="col-sm-2 control-label">Password</label>
-                    <div class="col-sm-10">
-                        <input type="password" class="form-control" id="i_password" placeholder="Password">
-                        <input type="hidden" id="i_password4" name="password">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-sm-offset-2 col-sm-10 text-center">
-                        <button type="submit" class="btn btn-primary">Login</button>
-                    </div>
-                </div>
-            </form>
+
+        <div class="feature col-md-4">
+            <div class="icon icon-2"><i class="fa fa-desktop"></i></div>
+            <h3>Organize your library from anywhere with a simple web app</h3>
+            <p>Access your library from anywhere through the DjLu web application.</p>
         </div>
-        <div class="col-sm-6">
-            <h2 class="col-sm-offset-2">Register</h2>
-            <form class="form-horizontal" id="djregister" method="POST" action="{{ 'register' | alias }}">
-                <div class="form-group">
-                    <label for="i_username2" class="col-sm-2 control-label">Username</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" id="i_username2" placeholder="Username" name="username">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="i_password2" class="col-sm-2 control-label">Password</label>
-                    <div class="col-sm-10">
-                        <input type="password" class="form-control" id="i_password2" placeholder="Password">
-                        <input type="hidden" id="i_password3" name="password">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="i_git" class="col-sm-2 control-label"> Git</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" id="i_git" placeholder="Git repo SSH command (e.g. git@github.com:DejaLus/demoLibrary.git)" name="git">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-2 control-label"> SSH key <sup>*</sup></label>
-                    <div class="col-sm-10 text-center">
-                        <a id="sshBtn" class="btn btn-default">Generate an SSH key</a>
-                        <pre id="sshKey" style="display: none;"></pre>
-                        <input type="hidden" id="sshId" name="sshId">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-sm-offset-2 col-sm-10 text-center">
-                        <button type="submit" id="registerBtn" disabled="disabled" class="btn btn-primary">Register</button>
-                    </div>
-                </div>
-            </form>
-            <p><sup>*</sup> The server needs to be able to read and write on the git repository of your library through SSH. Therefore, you need to grant the server's SSH public key access to your repository. On GitHub, we suggest you use the <a href="https://developer.github.com/guides/managing-deploy-keys/#deploy-keys">Deploy Key</a> feature.</p>
-            <p>You can test the app by cloning our <a href="https://github.com/DejaLus/demoLibrary">demo library</a> or initialize you own library with our <a href="https://github.com/DejaLus/baseLibrary">base library</a>.</p>
+
+        <div class="feature col-md-4">
+            <div class="icon icon-3"><i class="fa fa-refresh"></i></div>
+            <h3>Sync in the cloud and with your computer</h3>
+            <p>Your library is stored in the cloud to be accessible from anywhere and can be synced on your computer to work offline or with your favorite tools.</p>
+        </div>
+
+        <div class="clearfix visible-md-block visible-lg-block"></div>
+
+        <div class="feature col-md-4">
+            <div class="icon icon-4"><i class="fa fa-tags"></i></div>
+            <h3>Organize yourself with tags</h3>
+            <p>Organize your papers using colorful tags about the content of the paper, its reading status or to take super-short super-important notes about it.</p>
+        </div>
+
+        <div class="feature col-md-4">
+            <div class="icon icon-5"><i class="fa fa-pencil-square-o"></i></div>
+            <h3>Take notes in Markdown</h3>
+            <p>You can take long notes about the paper using the Markdown language. Markdown is a language to format text with a very simple and intuitive syntax. <a href="https://guides.github.com/features/mastering-markdown/">Check it out!</a></p>
+        </div>
+
+        <div class="feature col-md-4">
+            <div class="icon icon-6"><i class="fa fa-folder-open-o"></i></div>
+            <h3>Stay in charge of your library</h3>
+            <p>DjLu only uses your own cloud storage, and uses very simple formats and mechanisms to store your library. This means you are not stuck with our solution. Moreover, everything we do is open source!</p>
+        </div>
+
+        {* Store your PDFs in the cloud *}
+        {* Annotate your PDFs your way *}
+
+    </div>
+</section>
+
+<section id="howitworks">
+    <div class="container">
+        <h2>How it works</h2>
+
+        <div id="howitworksImg" class="text-center">
+            <img src="img/howItWorks.png" style="max-width: 100%; width: 700px; max-width: 100%;" />
+        </div>
+
+        <div class="col-md-6">
+            <h3><img src="img/git.svg" height="35" /> You library on Git</h3>
+
+            <p>Your paper's library will be stored in your own git repository. If you don't know git, it is a powerful tool to save, sync and track versions of files. You can see it as a geeky version of Google Drive.</p>
+
+            <p>Each paper of your library is a folder containing the BibTex of the paper for citations, a JSON to store your information on the paper and a Markdown file to take notes.</p>
+        </div>
+
+        <div class="col-md-6">
+            <h3><img src="img/cloud.svg" height="35" /> Your PDFs on your cloud storage</h3>
+
+            <p>The PDFs of your papers are stored on your own cloud file hosting account (Google Drive only for now). This means we are not handling the file storage ourselves, and are therefore not limiting your PDF storage in any way.</p>
+
+            <p>This also means your papers' PDFs are available from anywhere for reading and annotation.</p>
+        </div>
+
+        <div class="clearfix visible-md-block visible-lg-block"></div>
+
+        <div class="col-md-6">
+            <h3><img src="img/ui.png" height="35" /> Manage everything on the web app</h3>
+
+            <p>To manage your library easily, we propose a lightweight web application. The interface will allow you to simply browse and edit your library.</p>
+
+            <p>For this, the interface will read and write on your Git repository and will also be linked to your cloud storage account to save PDFs for your.</p>
+
+            <p>The Web UI is available as an open source project. You can host it yourself on your server or your computer. You can also fork it and make your own version. In that case, feel free to send back pull request of interesting features.</p>
+        </div>
+
+        <div class="col-md-6">
+            <h3><img src="img/computer.png" height="35" /> Sync and edit on your computer</h3>
+
+            <p>If you decide to sync your git library and your cloud storage on your computer, you will be able to work on your library without going through the UI. Of course, any change you make on your computer and send back to the cloud will reflect on the UI.</p>
+
+            <p>This allows you to work offline and with your favorite tools and sync everything back to the cloud seamlessly.</p>
         </div>
     </div>
 </section>
+
+
+<div class="modal fade" id="login" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"><i class="fa fa-sign-in"></i> Login</h4>
+            </div>
+            <form class="form-horizontal" id="login-form" method="POST" action="{{ 'login' | alias }}">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="i_username" class="col-sm-2 control-label">Username</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="i_username" placeholder="Username" name="username">
+                            <input type="hidden" id="s_sid" value="<?php echo session_id(); ?>">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="i_password" class="col-sm-2 control-label">Password</label>
+                        <div class="col-sm-10">
+                            <input type="password" class="form-control" id="i_password" placeholder="Password">
+                            <input type="hidden" id="i_password4" name="password">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <input type="submit" class="btn btn-primary" value="Login">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="register" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"><i class="fa fa-pencil-square-o"></i> Register</a></h4>
+            </div>
+            <form class="form-horizontal" id="register-form" method="POST" action="{{ 'register' | alias }}">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="i_username2" class="col-sm-2 control-label">Username</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="i_username2" placeholder="Username" name="username">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="i_password2" class="col-sm-2 control-label">Password</label>
+                        <div class="col-sm-10">
+                            <input type="password" class="form-control" id="i_password2" placeholder="Password">
+                            <input type="hidden" id="i_password3" name="password">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="i_git" class="col-sm-2 control-label"> Git</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="i_git" placeholder="Git repo SSH command (e.g. git@github.com:DejaLus/demoLibrary.git)" name="git">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label"> SSH key <sup>*</sup></label>
+                        <div class="col-sm-10 text-center">
+                            <pre id="ssh-key">Please wait for an SSH public key...</pre>
+                            <input type="hidden" id="ssh-id" name="sshId">
+                        </div>
+                    </div>
+                    <p><sup>*</sup> The server needs to be able to read and write on the git repository of your library through SSH. Therefore, you need to grant the server's SSH public key access to your repository. On GitHub, we suggest you use the <a href="https://developer.github.com/guides/managing-deploy-keys/#deploy-keys">Deploy Key</a> feature.</p>
+                    <p>You can test the app by cloning our <a href="https://github.com/DejaLus/demoLibrary">demo library</a> or initialize you own library with our <a href="https://github.com/DejaLus/baseLibrary">base library</a>.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <input type="submit" class="btn btn-primary" id="register-submit" value="Register">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

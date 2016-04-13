@@ -2,14 +2,23 @@
     <script src="{{@BASE}}/js/jquery.min.js"></script>
     <script src="{{@BASE}}/js/bootstrap.min.js"></script>
     <script src="{{@BASE}}/js/bootstrap-notify.min.js"></script>
-    <script src="{{@BASE}}/js/bcrypt.min.js"></script>
-    <script src="{{@BASE}}/js/simplemde.min.js"></script>
-    <script src="{{@BASE}}/js/highlight.min.js"></script>
-    <script src="{{@BASE}}/js/djsecurise.js"></script>
-    <script src="{{@BASE}}/js/tablesort.min.js"></script>
-    <check if="{{ @js }}">
-    <script src="{{@BASE}}/js/{{ @js }}"></script>
+
+    <check if="{{ is_array(@js) }}">
+    <repeat group="{{ @js }}" value="{{ @jsFile }}">
+    <script src="{{@BASE}}/js/{{ @jsFile }}"></script>
+    </repeat>
     </check>
+
+    <check if="{{ \lib\Flash::instance()->hasMessages() }}">
+    <script type="text/javascript">
+        $(document).ready(function() {
+        <repeat group="{{ \lib\Flash::instance()->getMessages() }}" value="{{ @msg }}">
+            $.notify({ message: "{{ nl2br(str_replace('"', '\\"', @msg.text)) }}" }, { type: "{{ @msg.status }}" });
+        </repeat>
+        });
+    </script>
+    </check>
+
 
 </body>
 
