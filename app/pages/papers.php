@@ -134,4 +134,20 @@ class Papers {
             echo json_encode(array("success" => false, "message" => nl2br($e->getMessage())));
         }
     }
+
+    /**
+     * Delete one paper
+     */
+    public function apiPaperDel ($f3, $args) {
+        if (!$this->user->isLoggedIn()) {
+            echo '{"success": false, "message": "User not logged in"}';
+            return;
+        }
+        $paper = new \models\Paper($args["key"]);
+        if ($paper->delete()) {
+            echo '{"success": true, "message": "'.$args['key'].' has been deleted."}';
+        } else {
+            echo '{"success": false, "message": "Failed to delete '.$args['key'].'"}';
+        }
+    }
 }

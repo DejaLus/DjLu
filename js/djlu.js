@@ -167,6 +167,7 @@ $(document).ready(function() {
         $("#paper-bibtex").hide();
         $("#paper-notes").hide();
         $("#paper-wait").show();
+        $("#paper-delete").hide();
         $("#papers-table .paper").removeClass("active");
         $(this).addClass("active");
 
@@ -190,6 +191,7 @@ $(document).ready(function() {
             $("#paper-notes-add").hide();
             $("#paper-notes-content").hide();
             $("#paper-notes").show();
+            $("#paper-delete").show();
 
             // notes
             if (data.md != undefined) {
@@ -268,12 +270,34 @@ $(document).ready(function() {
             }, "json");
     }
 
+    function deletePaper(key) {
+        $.get("/api/paper/"+key+"/delete",
+            {},
+            function (data) {
+                if (data.success) {
+                    $("#papers-table tr.active").remove();
+                    $("#paper-details").hide();
+                    $("#paper-bibtex").hide();
+                    $("#paper-notes").hide();
+                    $("#paper-delete").hide();
+                    $("#paper-placeholder").show();
+                    $.notify({ message: data.message }, { type: "success" });
+                }
+                else
+                    $.notify({ message: data.message }, { type: "danger" });
+            }, "json");
+    }
+
+
     // register events
     $("#paper-details > *:has(span[data-key])").on("dblclick", paperEditShow);
     $("#paper-notes-add-btn").on("click", paperAddNotes);
     $("#modal-paper-edit").on("submit", paperEditForm);
-
-
+    $("#paper-delete-btn").on("click", function () {
+        if (confirm('Are you sure you want to delete this paper ?')) {
+            deletePaper($("#paper-details").data("key"));
+        }
+    });
 
 
     ////////////////////////////////////////

@@ -369,4 +369,10 @@ class Paper {
     public function writeJSON ($json) {
         return file_put_contents($this->path."/".$this->key.".json", json_encode($json, JSON_PRETTY_PRINT));
     }
+
+    public function delete () {
+        if (!$this->exists())
+            return true;
+        return \lib\Utils::rrmdir($this->path);
+    }
 }
