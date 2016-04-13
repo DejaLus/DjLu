@@ -143,10 +143,26 @@ class Papers {
             echo '{"success": false, "message": "User not logged in"}';
             return;
         }
+
         $paper = new \models\Paper($args["key"]);
+
         if ($paper->delete()) {
-            echo '{"success": true, "message": "'.$args['key'].' has been deleted."}';
-        } else {
+
+            $prefs = $this->user->getPreferences();
+            $drive = new \models\GoogleDrive($prefs["googleDriveRoot"]);
+
+            try {
+                if ($drive->isLoggedIn()) {
+                    $drive->deletePaper($args['key']);
+                } 
+                echo '{"success": true, "message": "'.$args['key'].' has been deleted."}';
+            }
+            catch (\Exception $e) {
+                echo '{"success": false, "message": "Failed to delete on google drive '.$args['key'].'"}';
+            }
+
+        }
+        else {
             echo '{"success": false, "message": "Failed to delete '.$args['key'].'"}';
         }
     }

@@ -288,4 +288,20 @@ class GoogleDrive extends \Prefab {
                 "name" => $file->name,
                 "link" => $file->webViewLink);
     }
+
+    /**
+     * Delete a paper directory containing the PDF from Drive for a given paper
+     * @param string $paperKey citation key of the paper (for the pdf name)
+     */
+    public function deletePaper ($paperKey) {
+        try {
+            $paperId = $this->getPaperId($paperKey);
+        }
+        catch (\Exception $e) {
+            return true; // paperId doesn't exist
+        }
+        $newMetadata = new \Google_Service_Drive_DriveFile(array("trashed" => true));
+        $this->drive->files->update($paperId, $newMetadata, array("fields" => "id"));
+        return true;
+    }
 }
