@@ -59,6 +59,22 @@ class Papers extends \Prefab {
         return $keys;
     }
 
+    public function getNextAvailableKey ($prefix) {
+        $sufixes = array();
+        foreach ($this->getKeys() as $key)
+            if (strpos($key, $prefix) === 0)
+                $sufixes[] = substr($key, strlen($prefix));
+
+        if (count($sufixes) == 0)
+            return $prefix;
+
+        $sufixCandidate = "a";
+        while (in_array($sufixCandidate, $sufixes))
+            $sufixCandidate++;
+
+        return $prefix.$sufixCandidate;
+    }
+
     public function getDeclaredTags () {
         $preferences = \models\User::instance()->getPreferences();
         $tags = array("content" => array(), "reading" => array());

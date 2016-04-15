@@ -171,7 +171,19 @@ class Paper {
 
         // loop through bibtex entries
         foreach ($bibtex->data as $data) {
-            $key = ($citationKey && count($bibtex->data) == 1) ? $citationKey : $data["cite"];
+            $authors = $bibtex->_extractAuthors($data["author"]);
+            if ($citationKey && count($bibtex->data) == 1)
+                $key = $citationKey;
+            elseif (!empty($authors[0]["last"])) {
+                $key = $authors[0]["last"];
+                if ($data["year"])
+                    $key .= $data["year"];
+            }
+            else {
+                $key = $data["cite"];
+            }
+            $key = preg_replace("[^a-zA-Z0-9]", "", \lib\Utils::remove_accents($key));
+            $key = \models\Papers::instance()->getNextAvailableKey($key);
 
             // try to create paper, if not catch and record error
             try {
