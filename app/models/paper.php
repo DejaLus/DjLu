@@ -95,7 +95,7 @@ class Paper {
             "archivePrefix" => "arXiv",
             "arxivId" => $id,
             "eprint" => $id,
-            "url" => trim($xml["entry"]["id"]),
+            "url" => call_user_func(function($links) {foreach ($links as $y) { if($y["@attributes"]["title"] == "pdf") { return $y["@attributes"]["href"]; } }}, $xml["entry"]["link"]),
             "abstract" => trim($xml["entry"]["summary"])
             );
 
