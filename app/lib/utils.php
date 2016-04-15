@@ -1,9 +1,43 @@
 <?php
+
 namespace lib;
+
 class Utils {
 
-    public static function seems_utf8($str)
-    {
+    public static function rrmdir($dir) {
+        if (is_file($dir))
+            return unlink($dir);
+        if (is_dir($dir)) {
+            $objects = scandir($dir);
+            foreach ($objects as $object) {
+                if ($object != "." && $object != "..")
+                    self::rrmdir($dir."/".$object);
+            }
+            return rmdir($dir);
+        }
+        return false;
+    }
+
+    public static function mv_merge($src, $dest) {
+
+        // src and dest are folders, we need to go deeper!
+        if (is_dir($src) && is_dir($dest)) {
+            $objects = scandir($src);
+            foreach ($objects as $object) {
+                if ($object != "." && $object != "..")
+                    self::mv_merge($src."/".$object, $dest."/".$object);
+            }
+            return rmdir($src);
+        }
+
+        // incompatible type, delete dest to make room
+        elseif (is_file($src) && is_dir($dest) || is_dir($src) && is_file($dest))
+            self::rrmdir($dest);
+
+        return rename($src, $dest);
+    }
+
+    public static function seems_utf8($str) {
         $length = strlen($str);
         for ($i=0; $i < $length; $i++) {
             $c = ord($str[$i]);

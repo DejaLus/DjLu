@@ -63,15 +63,4 @@ class Login {
             $f3->reroute("@home");
         }
     }
-
-    /**
-     * Generate an SSH key
-     */
-    public function sshKeygen ($f3) {
-        $id = sha1(rand());
-        $path = $f3->get("ROOT")."/".$f3->get("DATA_PATH").'_tempKeys/'.$id;
-        exec('ssh-keygen -t rsa -b 4096 -N "" -f '.escapeshellcmd($path));
-        $key = file_get_contents($path.".pub");
-        echo json_encode(array("key" => $key, "id" => $id));
-    }
 }

@@ -10,26 +10,87 @@ class User extends \Prefab {
     private $f3;
     private $db;
     private $dbMapper;
+    private $userdata;
 
     function __construct() {
 
         $this->f3 = \Base::instance();
         $this->db = new \DB\Jig($this->f3->get("DATA_PATH"), \DB\Jig::FORMAT_JSON);
         $this->dbMapper = new \DB\Jig\Mapper($this->db, "users.json");
+        if ($this->f3->exists("SESSION.userdata"))
+            $this->userdata = $this->f3->get("SESSION.userdata");
+        else
+            $this->userdata = array();
+    }
+
+    /**
+     * Return an elemet from user data (username, git, etc.)
+     * @param  string $key     array key
+     * @param  string $default default value if does not exist
+     * @return mixed          content of the key
+     */
+    private function getUserdata($key, $default = "") {
+        if (!isset($this->userdata[$key]))
+            return $default;
+        return $this->userdata[$key];
+    }
+
+    /**
+     * Edit a field of userdata array
+     * @param string $key
+     * @param string $value
+     */
+    private function setUserdata($key, $value) {
+        $this->userdata[$key] = $value;
+        $this->f3->set("SESSION.userdata", $this->userdata);
+    }
+
+    /**
+     * Save current userdata in the DB
+     */
+    private function saveUserdata() {
+        $userdata = $this->dbMapper->load(array("@username=?", $this->getUsername()));
+        foreach ($this->userdata as $key => $val) {
+            $userdata[$key] = $val;
+        }
+        $userdata->update();
     }
 
     /**
      * Get current username
      */
     public function getUsername () {
-        return $this->f3->get("SESSION.username");
+        return $this->getUserdata("username");
     }
 
     /**
      * Get current googleToken
      */
     public function getGoogleToken () {
-        return $this->f3->get("SESSION.googleToken");
+        return $this->getUserdata("googleToken");
+    }
+
+    /**
+     * Get current git clone command
+     */
+    public function getGit () {
+        return $this->getUserdata("git");
+    }
+
+    public function setGit ($command) {
+        if (empty($command) || $command == $this->getGit())
+            return;
+        Git::instance()->cloneRepo($command);
+        $this->setUserdata("git", $command);
+        $this->saveUserdata();
+    }
+
+    /**
+     * Get current googleToken
+     */
+    public function hasRight ($right) {
+        $rights = $this->getUserdata("rights", array());
+        return in_array($right, $rights);
     }
 
     /**
@@ -51,7 +112,7 @@ class User extends \Prefab {
      * Check if the user is logged in
      */
     public function isLoggedIn () {
-        if ($this->f3->exists("SESSION.username"))
+        if ($this->getUsername())
             return true;
         return $this->autologin();
     }
@@ -78,7 +139,7 @@ class User extends \Prefab {
      */
     public function autologin () {
 
-        if (!$this->f3->exists("SESSION.username") && $this->f3->exists("COOKIE.username") && $this->f3->exists("COOKIE.token")) {
+        if (!$this->getUsername() && $this->f3->exists("COOKIE.username") && $this->f3->exists("COOKIE.token")) {
 
             // get info
             $username = $this->f3->get("COOKIE.username");
@@ -87,8 +148,10 @@ class User extends \Prefab {
 
             // try auth
             if ($userdata && sha1($this->f3->get("APP_SALT").$userdata->password) == $token) {
-                $this->f3->set("SESSION.googleToken", $userdata['googleToken']);
-                $this->f3->set("SESSION.username", $username);
+                $this->setUserdata("username", $username);
+                $this->setUserdata("googleToken", $userdata['googleToken']);
+                $this->setUserdata("git", $userdata["git"]);
+                $this->setUserdata("rights", $userdata["rights"]);
                 return true;
             }
 
@@ -116,8 +179,10 @@ class User extends \Prefab {
             throw new \Exception("Bad account or password for '" . $username . "'");
 
         // set session and cookies
-        $this->f3->set("SESSION.username", $username);
-        $this->f3->set("SESSION.googleToken", $userdata['googleToken']);
+        $this->setUserdata("username", $username);
+        $this->setUserdata("git", $userdata["git"]);
+        $this->setUserdata("rights", $userdata["rights"]);
+        $this->setUserdata("googleToken", $userdata['googleToken']);
         $this->f3->set("COOKIE.username", $username);
         $this->f3->set("COOKIE.token", sha1($this->f3->get("APP_SALT").$password), 60*60*24*14);
     }
@@ -126,8 +191,7 @@ class User extends \Prefab {
      * Do logout processing
      */
     public function logout () {
-        $this->f3->clear("SESSION.username");
-        $this->f3->clear("SESSION.googleToken");
+        $this->f3->clear("SESSION.userdata");
         $this->f3->set("COOKIE.username", "", -1);
         $this->f3->set("COOKIE.token", "", -1);
     }
@@ -135,50 +199,42 @@ class User extends \Prefab {
     /**
      * Register a new user in the DB
      */
-    public function register ($username, $password, $sshId, $git) {
+    public function register ($username, $password, $sshId) {
 
         // check input
         if (!preg_match("/^[a-zA-Z0-9]{3,50}$/", $username))
-            throw new \Exception("Invalid username, regex to match is [a-zA-Z0-9]{3,50}");
+            throw new \Exception("Invalid username, it must contain 3 to 50 letters or numbers only");
         if (strlen($password) < 5)
-            throw new \Exception("Password too short");
-        if (!preg_match("/^[a-f0-9]{3,50}$/", $sshId))
-            throw new \Exception("Invalid SSH key");
-        if (!preg_match("#^(git://|ssh://)?([\w\.]+)@([\w\.]+):([0-9]*)([\w\.@\:/\-~]+)\.git/?$#", $git, $match))
-            throw new \Exception("Invalid git SSH clone path, regex to match is (git://|ssh://)?([\w\.]+)@([\w\.]+):([0-9]*)([\w\.@\:/\-~]+\.git/?)");
+            throw new \Exception("Password must be 5 characters at least");
         if ($this->dbMapper->count(array("@username=?", $username)) > 0)
             throw new \Exception("Username already exists");
 
-        // save ssh key
-        $sshPath = $this->f3->get("ROOT")."/".$this->f3->get("DATA_PATH").'_tempKeys/'.$sshId;
-        $sshNewPath = $this->f3->get("ROOT")."/".$this->f3->get("DATA_PATH").'_keys/'.$username;
-        rename($sshPath, $sshNewPath);
-        rename($sshPath.".pub", $sshNewPath.".pub");
-
-        // set ssh config to use key
-        exec("echo \"Host djlu-".$username."\n".
-        "\tHostName ".$match[3]."\n".
-        "\tUser ".$match[2]."\n".
-        ($match[4] ? "\t".$match[4]."\n" : "").
-        "\tIdentityFile ".$sshNewPath."\n\n\" >> ~/.ssh/config");
-        $clonePath = "djlu-".$username.":".$match[5];
-
-        // clone git
-        $host = escapeshellarg($match[3]);
-        exec("grep ".$host." ~/.ssh/known_hosts", $dummy, $knownHost);
-        if ($knownHost != 0)
-            exec("ssh-keyscan ".$host." >> ~/.ssh/known_hosts");
-        exec("git clone ".escapeshellarg($clonePath)." ".escapeshellarg($this->f3->get("DATA_PATH").$username)." 2>&1", $gitOut, $gitOutCode);
-
-        if ($gitOutCode != 0)
-            throw new \Exception("Git clone failed. Output:\n\n".implode("\n", $gitOut));
+        // create directory and SSH key
+        mkdir($this->f3->get("DATA_PATH").$username);
+        $this->getPubkey(true);
 
         // insert in DB
         $this->dbMapper->username = $username;
         $this->dbMapper->password = $password;
-        $this->dbMapper->git = $git;
+        $this->dbMapper->rights = array();
+        $this->dbMapper->git = "";
         $this->dbMapper->googleToken = "";
         $this->dbMapper->insert();
     }
 
+    /**
+     * Generates if needed and return the public SSH key assigned to the user
+     * @param  boolean $forceGenerate force to generate a new key
+     * @return string                 public ssh key
+     */
+    public function getPubkey ($forceGenerate = false) {
+        if (!$this->isLoggedIn())
+            return false;
+
+        $path = $this->f3->get("ROOT")."/".$this->f3->get("DATA_PATH").'_keys/'.$this->getUsername();
+        if (!is_file($path) || $forceGenerate)
+            exec('yes | ssh-keygen -t rsa -b 4096 -N "" -f '.escapeshellcmd($path));
+
+        return file_get_contents($path.".pub");
+    }
 }

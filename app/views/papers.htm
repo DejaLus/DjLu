@@ -1,17 +1,21 @@
+<set user="{{ \models\User::instance() }}" />
 <nav id="papers-navbar" class="navbar navbar-default">
     <div class="container-fluid">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
                 <span class="sr-only">Toggle navigation</span>
             </button>
-            <a class="navbar-brand page-scroll" href="#page-top"><img src="/img/logo.svg" height="34" title="" alt="DjLu" /> - {{ \models\User::instance()->getUsername() }}'s library</a>
+            <a class="navbar-brand page-scroll" href="#page-top"><img src="/img/logo.svg" height="34" title="" alt="DjLu" /> - {{ @user->getUsername() }}'s library</a>
         </div>
 
         <div class="collapse navbar-collapse" id="navbar">
             <ul class="nav navbar-nav navbar-right">
-                <li><a href="#" id="js_pull"><i class="fa fa-refresh"></i> Pull</a></li>
-                <li><a href="#" id="js_push"><i class="fa fa-cloud-upload"></i> Commit &amp; push</a></li>
+                <check if="{{ @user->getGit() }}">
+                    <li><a href="#" id="js_pull"><i class="fa fa-refresh"></i> Pull</a></li>
+                    <li><a href="#" id="js_push"><i class="fa fa-cloud-upload"></i> Commit &amp; push</a></li>
+                </check>
                 <li><a href="#" id="js_add"><i class="fa fa-plus"></i> Add a paper</a></li>
+                <li><a href="#" id="js_settings" data-toggle="modal" data-target="#js_settings_modal"><i class="fa fa-cog"></i> Settings</a></li>
                 <li><a href="{{ 'logout' | alias }}" id="js_logout"><i class="fa fa-sign-out"></i> Logout</a></li>
             </ul>
         </div>
@@ -197,6 +201,39 @@
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-primary" id="js_add_modal_send">Add</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="js_settings_modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title"><i class="fa fa-cog"></i> Settings</h4>
+                </div>
+                    <form class="form-horizontal" id="js_add_modal_input" method="POST" action="{{ "settings" | alias }}">
+                    <div class="modal-body">
+                        <check if="{{ @user->hasRight('git') }}">
+                        <div class="form-group">
+                            <label for="i_git" class="col-sm-2 control-label"> Git repo</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="i_git" placeholder="Git repo SSH command (e.g. git@github.com:DejaLus/demoLibrary.git)" name="git" value="{{ @user->getGit(); }}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"> SSH key <sup>*</sup></label>
+                            <div class="col-sm-10 text-center">
+                                <pre id="ssh-key">{{ @user->getPubkey(); }}</pre>
+                            </div>
+                        </div>
+                        <p><sup>*</sup> The server needs to be able to read and write on the git repository of your library through SSH. Therefore, you need to grant the server's SSH public key access to your repository. On GitHub, we suggest you use the <a href="https://developer.github.com/guides/managing-deploy-keys/#deploy-keys">Deploy Key</a> feature.</p>
+                        </check>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

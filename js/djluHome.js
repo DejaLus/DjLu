@@ -38,26 +38,8 @@ $(document).ready(function () {
         return bcrypt.hashSync(text, djkey);
     }
 
-    $("#register-btn").on("click", function () {
-        $("#register").modal("show");
-        if ($("#ssh-id").val().length == 0) {
-            $.get("/api/sshkey", function (data) {
-                $("#ssh-key").html(data.key).show();
-                $("#ssh-id").val(data.id);
-                $("#register-submit").removeAttr("disabled");
-                $.notify({ message: "You must give access to your repository for this key." }, { type: "info", z_index: 1051 });
-            }, "json");
-        }
-        else
-            $.notify({ message: "You must give access to your repository for the key." }, { type: "info", z_index: 1051 });
-    })
-
     // REGISER
     $("#register-form").on("submit", function () {
-        if ($("#ssh-id").val().length == 0) {
-            $.notify({ message: "You must generate an SSH key and add it to your repository." }, { type: "danger", z_index: 1051 });
-            return false;
-        }
         if($("#i_password2").val().length < 8 || $("#i_password2").val().length > 16) {
             $.notify({ message: "Password must have at least 8 and at most 16 characters." }, { type: "danger", z_index: 1051 });
             return false;

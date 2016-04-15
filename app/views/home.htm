@@ -13,7 +13,7 @@
                 </true>
                 <false>
                 <li><a href="#" id="login-btn" data-toggle="modal" data-target="#login"><i class="fa fa-sign-in"></i> Login</a></li>
-                <li><a href="#" id="register-btn"><i class="fa fa-pencil-square-o"></i> Register</a></li>
+                <li><a href="#" id="register-btn" data-toggle="modal" data-target="#register"><i class="fa fa-pencil-square-o"></i> Register</a></li>
                 </false>
                 </check>
             </ul>
@@ -190,21 +190,6 @@
                             <input type="hidden" id="i_password3" name="password">
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="i_git" class="col-sm-2 control-label"> Git</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="i_git" placeholder="Git repo SSH command (e.g. git@github.com:DejaLus/demoLibrary.git)" name="git">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label"> SSH key <sup>*</sup></label>
-                        <div class="col-sm-10 text-center">
-                            <pre id="ssh-key">Please wait for an SSH public key...</pre>
-                            <input type="hidden" id="ssh-id" name="sshId">
-                        </div>
-                    </div>
-                    <p><sup>*</sup> The server needs to be able to read and write on the git repository of your library through SSH. Therefore, you need to grant the server's SSH public key access to your repository. On GitHub, we suggest you use the <a href="https://developer.github.com/guides/managing-deploy-keys/#deploy-keys">Deploy Key</a> feature.</p>
-                    <p>You can test the app by cloning our <a href="https://github.com/DejaLus/demoLibrary">demo library</a> or initialize you own library with our <a href="https://github.com/DejaLus/baseLibrary">base library</a>.</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>

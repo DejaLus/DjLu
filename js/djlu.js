@@ -453,6 +453,25 @@ $(document).ready(function() {
         }, "json");
     });
 
+    function ajaxFormProcess(formEl, callback) {
+        $.ajax({
+            type: formEl.attr("method"),
+            url: formEl.attr("action"),
+            data: formEl.serialize(),
+            dataType: "json",
+            success: callback
+        });
+    }
+
+    // SETTINGS
+    $("#js_settings_modal form").on("submit", function (e) {
+        $("#js_settings_modal").modal("hide");
+        ajaxFormProcess($(this), function (data) {
+            $.notify({ message: data.message }, { type: data.success ? "success" : "danger" });
+        });
+        return false;
+    });
+
 });
 
 
