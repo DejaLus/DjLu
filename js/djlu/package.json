@@ -1,0 +1,22 @@
+{
+  "name": "djlu",
+  "version": "0.1.0",
+  "devDependencies": {
+    "emu": "~0.0.2",
+    "grunt": "~0.4.1",
+    "grunt-cli": "~0.1.9",
+    "grunt-includes": "~0.4.0",
+    "grunt-contrib-connect": "~0.7.1",
+    "grunt-contrib-copy": "~0.4.1",
+    "grunt-contrib-jshint": "~0.6.4",
+    "grunt-contrib-uglify": "~0.2.4",
+    "grunt-contrib-jasmine": "~0.8.0",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-template-jasmine-istanbul": "~0.3.0",
+    "grunt-lib-phantomjs": "~0.6.0",
+    "grunt-markdown": "~0.5.0",
+    "grunt-sed": "~0.1.1",
+    "uglify-js": "2.4.x",
+    "marked": "~0.2.10"
+  }
+}
