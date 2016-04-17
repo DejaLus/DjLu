@@ -7,6 +7,7 @@
             <ul class="nav navbar-nav navbar-right">
                 <li><a class="page-scroll" href="#features">Features</a></li>
                 <li><a class="page-scroll" href="#howitworks">How it works</a></li>
+                <li><a class="page-scroll" href="#about">About</a></li>
                 <check if="{{ \models\User::instance()->isLoggedIn() }}">
                 <true>
                 <li><a href="{{ 'papers' | alias }}">Your library</a></li>
@@ -131,6 +132,56 @@
 
             <p>This allows you to work offline and with your favorite tools and sync everything back to the cloud seamlessly.</p>
         </div>
+    </div>
+</section>
+
+
+<section id="about">
+    <div class="container">
+        <h2>About DjLu</h2>
+
+        <div class="row description">
+            <div class="col-xs-12 col-md-8 col-md-offset-2">
+                <p>DjLu is an open-source software developed by Rémi Cadène, Micael Carvalho and Thomas Robert, 3 PhD students in Artificial Intelligence &amp; Deep Learning from the Pierre and Marie Curie University in Paris, France.</p>
+
+                <p>We chose the name DjLu as a nod to <a target="_blank" href="http://djvu.org/">DjVu</a>, a digital document format developed by Yann LeCun, because he is one of the great researcher in our field.</p>
+
+                <p class="text-center link"><a class="btn btn-primary btn-lg" target="_blank" href="https://www.github.com/DejaLus/DjLu"><i class="fa fa-github"></i> DjLu on GitHub</a></p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="author col-xs-12 col-sm-4">
+                <p class="photo"><img class="img-circle" src="img/remi.jpg" height="150" alt="" /></p>
+                <p class="name">Rémi Cadène</p>
+                <p class="profiles">
+                    <a target="_blank" href="http://remicadene.com/"><i class="fa fa-link"></i></a>
+                    <a target="_blank" href="https://github.com/Cadene"><i class="fa fa-github"></i></a>
+                    <a target="_blank" href="https://twitter.com/RemiCadene"><i class="fa fa-twitter"></i></a>
+                    <a target="_blank" href="https://fr.linkedin.com/in/remi-cadene-6527509b"><i class="fa fa-linkedin"></i></a>
+                </p>
+            </div>
+            <div class="author col-xs-12 col-sm-4">
+                <p class="photo"><img class="img-circle" src="img/micael.jpg" height="150" alt="" /></p>
+                <p class="name">Micael Carvalho</p>
+                <p class="profiles">
+                    <a target="_blank" href="http://webia.lip6.fr/~carvalho/"><i class="fa fa-link"></i></a>
+                    <a target="_blank" href="https://github.com/MicaelCarvalho"><i class="fa fa-github"></i></a>
+                    <a target="_blank" href="https://plus.google.com/+MicaelCarvalho"><i class="fa fa-google-plus"></i></a>
+                </p>
+            </div>
+            <div class="author col-xs-12 col-sm-4">
+                <p class="photo"><img class="img-circle" src="img/thomas.jpg" height="150" alt="" /></p>
+                <p class="name">Thomas Robert</p>
+                <p class="profiles">
+                    <a target="_blank" href="http://www.thomas-robert.fr"><i class="fa fa-link"></i></a>
+                    <a target="_blank" href="https://www.github.com/ThomasRobertFr"><i class="fa fa-github"></i></a>
+                    <a target="_blank" href="https://www.twitter.com/ThomasR_Fr"><i class="fa fa-twitter"></i></a>
+                    <a target="_blank" href="https://www.linkedin.com/in/ThomasRobertFr"><i class="fa fa-linkedin"></i></a>
+                </p>
+            </div>
+        </div>
+
     </div>
 </section>
 

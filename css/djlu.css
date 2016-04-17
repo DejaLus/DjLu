@@ -48,12 +48,19 @@ a { transition: all .35s; }
     #home-header.fullscreen .header-content { position: absolute; top: 50%; padding: 0 50px; transform: translateY(-50%); }
 }
 
-#howitworks, #features { padding: 45px 0 100px; }
-#howitworks h2, #features h2 { text-align: center; margin: 0 0 35px; font-weight: 300; font-size: 37px; }
+#howitworks, #features, #about { padding: 45px 0 100px; }
+#howitworks h2, #features h2, #about h2 { text-align: center; margin: 0 0 35px; font-weight: 300; font-size: 37px; }
 
 #howitworks { text-align: justify; }
 #howitworksImg { margin: 45px 0 35px; }
 #howitworks h3 img { margin-right: 13px; }
+#about { background: #eee; }
+#about .author { text-align: center; }
+#about .name { font-size: 23px; }
+#about .description { font-size: 1.3em; font-weight: 300; text-align: justify; margin-bottom: 60px; }
+#about .link { margin-top: 30px; }
+#about .profiles a { display: inline-block; background: #fff; border: 1px solid #ccc; border-radius: 100%; width: 33px; height: 33px; font-size: 16px; color: #333; padding: 5px 0 0 0; text-align: center; }
+#about .profiles a:hover { background: #e6e6e6; border-color: #adadad; color: #333; }
 
 #features { background: #EFEFEF; }
 #features { text-align: center; }
