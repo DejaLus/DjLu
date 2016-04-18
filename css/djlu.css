@@ -10,7 +10,7 @@ a { transition: all .35s; }
 #navbar-home .navbar-header .navbar-brand { padding: 5px 15px; }
 #navbar-home .navbar-header .navbar-brand svg { height: 39px; }
 #navbar-home .navbar-header .navbar-brand svg .st0 { fill: #444; }
-#navbar-home .navbar-header .navbar-brand:hover svg .st0, #navbar-home .navbar-header .navbar-brand:focus svg .st0 { fill: #eb3812; }
+#navbar-home .navbar-header .navbar-brand:hover svg .st0, #navbar-home .navbar-header .navbar-brand:focus svg .st0 { fill: #1E68B3; }
 #navbar-home .nav > li>a, #navbar-home .nav>li>a:focus { text-transform: uppercase; color: #222; }
 #navbar-home .nav > li>a:hover, #navbar-home .nav>li>a:focus:hover { color: #1E68B3; }
 #navbar-home .nav > li.active>a, #navbar-home .nav>li.active>a:focus { color: #1E68B3!important; background-color: transparent; }
@@ -55,7 +55,7 @@ a { transition: all .35s; }
 #howitworksImg { margin: 45px 0 35px; }
 #howitworks h3 img { margin-right: 13px; }
 #about { background: #eee; }
-#about .author { text-align: center; }
+#about .author { text-align: center; margin-bottom: 35px; }
 #about .name { font-size: 23px; }
 #about .description { font-size: 1.3em; font-weight: 300; text-align: justify; margin-bottom: 60px; }
 #about .link { margin-top: 30px; }
