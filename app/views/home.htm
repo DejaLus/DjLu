@@ -51,49 +51,87 @@
     <div class="container">
         <h2>Features</h2>
 
-        <div class="feature col-md-4">
-            <div class="icon icon-1"><i class="fa fa-files-o"></i></div>
-            <h3>Add papers in your library from BibTex, arXiv or DOI</h3>
-            <p>You can add papers to your library from BibTex snippets or with standard identifiers such as arXiv or DOI. DjLu will gather the information for you.</p>
+        <div id="features-block">
+            <div id="features-block-mobile">
+                <img src="img/features.png" />
+
+                <a class="feature-icon visible-xs-block visible-sm-block page-scroll" href="#feature-add" id="feature-add-icon"><i class="fa fa-files-o"></i></a>
+                <a class="feature-icon visible-xs-block visible-sm-block page-scroll" href="#feature-web-app" id="feature-web-app-icon"><i class="fa fa-desktop"></i></a>
+                <a class="feature-icon visible-xs-block visible-sm-block page-scroll" href="#feature-sync" id="feature-sync-icon"><i class="fa fa-refresh"></i></a>
+                <a class="feature-icon visible-xs-block visible-sm-block page-scroll" href="#feature-tags" id="feature-tags-icon"><i class="fa fa-tags"></i></a>
+                <a class="feature-icon visible-xs-block visible-sm-block page-scroll" href="#feature-notes" id="feature-notes-icon"><i class="fa fa-pencil-square-o"></i></a>
+                <a class="feature-icon visible-xs-block visible-sm-block page-scroll" href="#feature-open-source" id="feature-open-source-icon"><i class="fa fa-github"></i></a>
+                <a class="feature-icon visible-xs-block visible-sm-block page-scroll" href="#feature-pdf-cloud" id="feature-pdf-cloud-icon"><i class="fa fa-cloud"></i></a>
+            </div>
+
+            <div class="col-xs-12 col-sm-6 feature left" id="feature-web-app">
+                <div class="icon"><i class="fa fa-desktop"></i></div>
+                <div class="content">
+                    <h3>Organize your library from anywhere with a simple web app</h3>
+                    <p>Access your library from anywhere through the DjLu web application.</p>
+                </div>
+            </div>
+
+            <div class="col-xs-12 col-sm-6 feature left" id="feature-add">
+                <div class="icon"><i class="fa fa-files-o"></i></div>
+                <div class="content">
+                    <h3>Add papers in your library from BibTex, arXiv or DOI</h3>
+                    <p>You can add papers to your library from BibTex snippets or with standard identifiers such as arXiv or DOI. DjLu will gather the information for you.</p>
+                </div>
+            </div>
+
+            <div class="clearfix visible-sm-block"></div>
+
+            <div class="col-xs-12 col-sm-6 feature right" id="feature-sync">
+                <div class="icon"><i class="fa fa-refresh"></i></div>
+                <div class="content">
+                    <h3>Sync in the cloud and with your computer</h3>
+                    <p>Your library is stored in the cloud to be accessible from anywhere and can be synced on your computer to work offline or with your favorite tools.</p>
+                </div>
+            </div>
+
+            <div class="col-xs-12 col-sm-6 feature left" id="feature-tags">
+                <div class="icon"><i class="fa fa-tags"></i></div>
+                <div class="content">
+                    <h3>Organize your library with different kind of tags</h3>
+                    <p>Organize your papers using colorful tags about the content of the paper, its reading status or to take super-short super-important notes about it.</p>
+                </div>
+            </div>
+
+            <div class="clearfix visible-sm-block"></div>
+
+            <div class="col-xs-12 col-sm-6 feature right bottom" id="feature-notes">
+                <div class="icon"><i class="fa fa-pencil-square-o"></i></div>
+                <div class="content">
+                    <h3 class="visible-xs-block visible-sm-block">Take and format notes on your papers using Markdown</h3>
+                    <p>You can take long notes about the paper using the Markdown language. Markdown is a language to format text with a very simple and intuitive syntax. <a href="https://guides.github.com/features/mastering-markdown/">Check it out!</a> You can even write equations using LaTeX and we will render them.</p>
+                    <h3 class="visible-md-block visible-lg-block">Take and format notes on your papers using Markdown</h3>
+                </div>
+            </div>
+
+            <div class="col-xs-12 col-sm-6 feature left bottom" id="feature-open-source">
+                <div class="icon"><i class="fa fa-github"></i></div>
+                <div class="content">
+                    <h3 class="visible-xs-block visible-sm-block">Remain free and fully in charge of your library</h3>
+                    <p>DjLu only uses your own cloud storage, and uses very simple formats and mechanisms to store your library. This means you are not stuck with our solution. Also everything we do is open source!</p>
+                    <h3 class="visible-md-block visible-lg-block">Remain free and fully in charge of your library</h3>
+                </div>
+            </div>
+
+            <div class="clearfix visible-sm-block"></div>
+
+            <div class="col-xs-12 col-sm-6 col-sm-offset-3 feature right bottom" id="feature-pdf-cloud">
+                <div class="icon"><i class="fa fa-cloud"></i></div>
+                <div class="content">
+                    <h3 class="visible-xs-block visible-sm-block">Your PDFs in the cloud for local and remote reading and annotation</h3>
+                    <p>DjLu helps you store and sort your paper's PDFs in your own favorite cloud storage account. That way, you can sync PDFs on your computer to annotate them with your own software or do it directly in the cloud!</p>
+                    <h3 class="visible-md-block visible-lg-block">Your PDFs in the cloud for local and remote reading and annotation</h3>
+                </div>
+            </div>
         </div>
-
-        <div class="feature col-md-4">
-            <div class="icon icon-2"><i class="fa fa-desktop"></i></div>
-            <h3>Organize your library from anywhere with a simple web app</h3>
-            <p>Access your library from anywhere through the DjLu web application.</p>
-        </div>
-
-        <div class="feature col-md-4">
-            <div class="icon icon-3"><i class="fa fa-refresh"></i></div>
-            <h3>Sync in the cloud and with your computer</h3>
-            <p>Your library is stored in the cloud to be accessible from anywhere and can be synced on your computer to work offline or with your favorite tools.</p>
-        </div>
-
-        <div class="clearfix visible-md-block visible-lg-block"></div>
-
-        <div class="feature col-md-4">
-            <div class="icon icon-4"><i class="fa fa-tags"></i></div>
-            <h3>Organize yourself with tags</h3>
-            <p>Organize your papers using colorful tags about the content of the paper, its reading status or to take super-short super-important notes about it.</p>
-        </div>
-
-        <div class="feature col-md-4">
-            <div class="icon icon-5"><i class="fa fa-pencil-square-o"></i></div>
-            <h3>Take notes in Markdown</h3>
-            <p>You can take long notes about the paper using the Markdown language. Markdown is a language to format text with a very simple and intuitive syntax. <a href="https://guides.github.com/features/mastering-markdown/">Check it out!</a></p>
-        </div>
-
-        <div class="feature col-md-4">
-            <div class="icon icon-6"><i class="fa fa-folder-open-o"></i></div>
-            <h3>Stay in charge of your library</h3>
-            <p>DjLu only uses your own cloud storage, and uses very simple formats and mechanisms to store your library. This means you are not stuck with our solution. Moreover, everything we do is open source!</p>
-        </div>
-
-        {* Store your PDFs in the cloud *}
-        {* Annotate your PDFs your way *}
-
     </div>
 </section>
+
 
 <section id="howitworks">
     <div class="container">
