@@ -29,12 +29,17 @@ $(document).ready(function () {
         }
     });
 
+    function encode_utf8(val) {
+        return unescape(encodeURIComponent(val));
+    }
+
     function hash(text, standard_key) {
         var bcrypt = dcodeIO.bcrypt;
+        var ntext = encode_utf8(text);
         if (standard_key)
-            var djkey = '$2a$12$44TFtfWIeRZ1ih0QpNgM2.';
+            var djkey = '$2a$10$Ex3s.i/XW9efb/61f5mB8e';
         else
-            var djkey = bcrypt.genSaltSync(12);
+            var djkey = bcrypt.genSaltSync(15);
         return bcrypt.hashSync(text, djkey);
     }
 
@@ -56,7 +61,7 @@ $(document).ready(function () {
         }
         else {
             var hash1 = hash($("#i_password").val(), true).substring(29);
-            var hash2 = hash(hash1.concat($("#s_sid").val()), false)
+            var hash2 = hash(hash1.concat($("#s_sid").val()), false);
             $("#i_password4").val(hash2);
             return true;
         }
