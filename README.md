@@ -1,9 +1,6 @@
 # DjLu
 
-Progress:
-
-||||| 5%
-
+Still under development. Feel free to send pull requests.
 
 ## Usefull links
 
