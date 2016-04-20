@@ -216,8 +216,8 @@ class User extends \Prefab {
         $this->setUserdata("git", $userdata["git"]);
         $this->setUserdata("rights", $userdata["rights"]);
         $this->setUserdata("googleToken", $userdata['googleToken']);
-        $this->f3->set("COOKIE.username", $username);
-        $this->f3->set("COOKIE.token", sha1($this->f3->get("APP_SALT").$password), 60*60*24*14);
+        $this->f3->set("COOKIE.username", $username, 60*60*24*14);
+        $this->f3->set("COOKIE.token", sha1($this->f3->get("APP_SALT").$userdata['password']), 60*60*24*14);
     }
 
     /**
