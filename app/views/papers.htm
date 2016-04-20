@@ -77,22 +77,22 @@
             <i class="fa fa-refresh faa-spin animated"></i>
         </div>
         <div id="paper-details" data-key="" style="display: none;">
-            <h4 class="compact"><span class="title" data-key="title" data-title="Title"></span></h4>
-            <p class="authorsContainer"><span class="authors" data-key="authors" data-title="Authors (semicolon separated)"></span></p>
+            <h4 class="editable compact"><span class="title" data-key="title" data-title="Title"></span></h4>
+            <p class="editable authorsContainer"><span class="authors" data-key="authors" data-title="Authors (semicolon separated)"></span></p>
             <p><strong>Citation key: </strong><span class="citationKey"></span></p>
-            <p><strong>Pub. in: </strong><span class="in" data-key="in" data-title="Published in"></span></p>
-            <p><strong>Year: </strong><span class="year" data-key="year" data-title="Year"></span></p>
+            <p class="editable"><strong>Pub. in: </strong><span class="in" data-key="in" data-title="Published in"></span></p>
+            <p class="editable"><strong>Year: </strong><span class="year" data-key="year" data-title="Year"></span></p>
             <p class="compact"><strong>Tags:</strong></p>
-            <p class="compact"><em><abbr title="Content tags">C</abbr>: </em><span class="tags_content" data-key="tags_content" data-title="Tags about the content of the paper (semicolon separated)"></span></p>
-            <p class="compact"><em><abbr title="Reading status tags">R</abbr>: </em><span class="tags_reading" data-key="tags_reading" data-title="Tags about the reading status (semicolon separated)"></span></p>
-            <p><em><abbr title="Additional notes tags">N</abbr>: </em><span class="tags_notes" data-key="tags_notes" data-title="Tags to take super-short notes (semicolon separated)"></span></p>
-            <p><strong>Added on: </strong><span class="date_added" data-key="date_added" data-title="Added on (YYYY-MM-DD HH:MM format)"></span></p>
-            <p><strong>URL: </strong><span class="url" data-key="url" data-title="URL to the PDF"></span> <span id="paper-url-actions">
+            <p class="editable compact indent"><em><abbr title="Content tags">C</abbr>: </em><span class="tags_content" data-key="tags_content" data-title="Tags about the content of the paper (semicolon separated)"></span></p>
+            <p class="editable compact indent"><em><abbr title="Reading status tags">R</abbr>: </em><span class="tags_reading" data-key="tags_reading" data-title="Tags about the reading status (semicolon separated)"></span></p>
+            <p class="editable indent"><em><abbr title="Additional notes tags">N</abbr>: </em><span class="tags_notes" data-key="tags_notes" data-title="Tags to take super-short notes (semicolon separated)"></span></p>
+            <p class="editable"><strong>Added on: </strong><span class="date_added" data-key="date_added" data-title="Added on (YYYY-MM-DD HH:MM format)"></span></p>
+            <p class="editable"><strong>URL: </strong><span id="paper-url-actions">
                 <a href="#" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" title="Discover Google Drive URL" id="js_drive_fetch"><i class="fa fa-refresh"></i></a>
                 <a href="#" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" title="Save PDF to Google Drive from URL"id="js_drive_import"><i class="fa fa-cloud-upload"></i></a>
                 <a href="#" class="btn btn-default btn-xs" id="js_drive_upload" data-toggle="tooltip" data-placement="top" title="Upload PDF to Google Drive"><i class="fa fa-upload"></i><input type="file"></a>
-            </span></p>
-            <p><strong>Rating: </strong><span class="rating" data-key="rating" data-title="Rating (/5)"></span></p>
+            </span> <span class="url" data-key="url" data-title="URL to the PDF"></span></p>
+            <p class="editable"><strong>Rating: </strong><span class="rating" data-key="rating" data-title="Rating (/5)"></span></p>
         </div>
         <div id="paper-notes" style="display: none;">
             <h4>Notes</h4>
@@ -189,7 +189,7 @@
                     <textarea class="form-control" rows="9" id="i_bibtex" name="bibtex"></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="i_citation_key">Custom citation key <small>(optionnal, if not set, will be author name &amp; year)</small></label>
+                    <label for="i_citation_key">Custom citation key <small>(optional, if not set, will be author name &amp; year)</small></label>
                     <input type="text" class="form-control" rows="9" id="i_citation_key" name="citationKey" />
                 </div>
             </div>

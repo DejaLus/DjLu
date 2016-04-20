@@ -175,6 +175,11 @@ $(document).ready(function() {
 
         $.get("/api/paper/"+key, function (data) {
 
+            if (data.success === false) {
+                $.notify({ message: "Failed to get paper's info: "+data.message }, { type: "danger" });
+                return;
+            }
+
             $("#paper-details").data("key", key);
             $("#paper-details .citationKey").html(key);
             paperDisplayInfo(data);
@@ -292,6 +297,7 @@ $(document).ready(function() {
     // register events
     $("#paper-details > *:has(span[data-key])").on("dblclick", paperEditShow);
     $("#paper-notes-add-btn").on("click", paperAddNotes);
+    $("#modal-paper-edit").on("shown.bs.modal", function () { $('#modal-paper-edit-value').focus(); });
     $("#modal-paper-edit").on("submit", paperEditForm);
     $("#paper-delete-btn").on("click", function () {
         if (confirm('Are you sure you want to delete this paper ?')) {
@@ -358,16 +364,19 @@ $(document).ready(function() {
 
     // register events
     $("#js_drive_fetch").on("click", function () {
+        loopCount = 0;
         var key = $("#paper-details").data("key");
         driveAjaxPDF ("fetch", key, "GET");
     });
 
     $("#js_drive_import").on("click", function () {
+        loopCount = 0;
         var key = $("#paper-details").data("key");
         driveAjaxPDF ("upload/url", key, "GET");
     });
 
     $(document).on("change", "#js_drive_upload :file", function(e) {
+        loopCount = 0;
         var key = $("#paper-details").data("key");
         var file = e.target.files[0];
         var formData = new FormData();
@@ -594,6 +603,8 @@ $(document).ready(function() {
                 $("#papers-table tbody").prepend(data.html);
                 initPapersTableStuff();
                 $.notify({ message: "Paper(s) added successfully" }, { type: "success" });
+                if ($("#papers-table .paper").length <= 3)
+                    $.notify({ message: "You can edit the info and tags of a paper by double-clicking on the fields in the right column of the page" }, { type: "info" });
                 if (data.success == "partial")
                     $.notify({ message: "But also failed to add some papers:<br>"+data.message }, { type: "danger", z_index: 1051 });
                 else
