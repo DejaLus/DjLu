@@ -166,4 +166,17 @@ class Papers {
             echo '{"success": false, "message": "Failed to delete '.$args['key'].'"}';
         }
     }
+
+    public function apiUpdateTags ($f3) {
+        
+        // TODO optimize this and make it optional...
+        // get the new tr
+        // we need to get all papers just to be able to compute labels list and colors :(
+        $papers = $this->model->getPapers();
+        $addDates = array_map(function ($x) { return $x["date_added"]; }, $papers);
+        array_multisort($addDates, SORT_DESC, $papers);
+        $this->f3->set("tags", $this->model->getTags($papers));
+
+        echo \Template::instance()->render("tagmenu.htm", "text/html");
+    }
 }

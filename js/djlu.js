@@ -250,6 +250,8 @@ $(document).ready(function() {
                 $.notify({ message: "Failed to edit paper: "+data.message }, { type: "danger" });
         });
 
+        reloadTags();
+
         return false;
     }
 
@@ -612,6 +614,16 @@ $(document).ready(function() {
             }
             else
                 $.notify({ message: "Fail to add paper(s): "+data.message }, { type: "danger",  z_index: 1051 });
+        });
+
+        return false;
+    }
+
+    function reloadTags () {
+        $.ajax({
+            url: "/api/tagmenu",
+            dataType: "html",
+            success: function (data) { $("#papers-col-left").html(data); }
         });
 
         return false;

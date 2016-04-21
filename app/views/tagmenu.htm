@@ -1,0 +1,20 @@
+<div id="colorpicker" style="display: none;">
+    <div class="popover colorpicker" role="tooltip">
+        <div class="arrow"></div>
+        <repeat group="{{ explode('-', @TAGS_PALETTE) }}" value="{{ @color }}"><span data-color="{{ @color }}" style="background: #{{ @color }}"></span></repeat>
+    </div>
+</div>
+<div id="papers-col-left-container">
+    <loop from="{{ @i=0 }}" to="{{ @i < count(\models\Papers::$TAGS_GROUPS) }}" step="{{ @i++ }}">
+        <h3>{{ \models\Papers::$TAGS_GROUPS_LABELS[@i] }}</h3>
+        <ul class="nav" data-tag-group="{{ \models\Papers::$TAGS_GROUPS[@i] }}">
+            <repeat group="{{ @tags[\models\Papers::$TAGS_GROUPS[@i]] }}" key="{{ @tag }}" value="{{ @color }}">
+                <li class="tag" data-tag="{{ @tag }}">
+                    <a class="tag-colorpicker label label-default" tabindex="0" role="button" style="background: #{{ @color }}"><i class="fa fa-caret-down"></i></a>
+                    <span class="tag-label label label-default" style="background: #{{ @color }}; color: #{{ \lib\Formatting::textColorFromBgColor(@color); }}"><span>{{ @tag }}</span></span>
+                </li>
+            </repeat>
+        </ul>
+        <p class="text-right"><a href="#" class="btn btn-default btn-xs tags-reset" data-tag-group="{{ \models\Papers::$TAGS_GROUPS[@i] }}">Reset filters</a></p>
+    </loop>
+</div>
