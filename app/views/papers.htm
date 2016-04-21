@@ -200,7 +200,14 @@
                 </div>
                 <div class="form-group">
                     <label class="control-label"> SSH key <sup>*</sup></label>
-                    <pre id="ssh-key">{{ @user->getPubkey(); }}</pre>
+                    <div class="input-group">
+                        <input id="ssh-key" value="{{ @user->getPubkey(); }}" class="form-control" readonly>
+                        <span class="input-group-btn">
+                            <button type="button" class="clipboard btn btn-default" data-clipboard-target="#ssh-key">
+                                <i class="fa fa-clipboard" aria-hidden="true" alt="Copy to clipboard"></i>&nbsp;&nbsp;Copy
+                            </button>
+                        </span>
+                    </div>
                 </div>
                 <p><sup>*</sup> The server needs to be able to read and write on the git repository of your library through SSH. Therefore, you need to grant the server's SSH public key access to your repository. On GitHub, we suggest you use the <a href="https://developer.github.com/guides/managing-deploy-keys/#deploy-keys">Deploy Key</a> feature.</p>
                 </true>

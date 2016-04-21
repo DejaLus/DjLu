@@ -650,6 +650,9 @@ $(document).ready(function() {
     $("#modal-paper-add").on("submit", paperAdd);
     $("#modal-settings").on("submit", settings);
 
+    // initiate clipboard js
+    new Clipboard('.clipboard');
+
 });
 
 

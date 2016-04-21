@@ -599,3 +599,11 @@ table th.sort-up:after {
 .CodeMirror-fullscreen {
     top: 100px !important;
 }
+
+#ssh-key {
+    background: #F0F0F0;
+}
+
+.full-width {
+    width: 100%;
+}

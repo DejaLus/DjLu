@@ -37,7 +37,7 @@ class Papers {
 
         $this->f3->set("papers", $papers);
         $this->f3->set("tags", $tags);
-        $this->f3->set("js", array("simplemde.min.js", "highlight.min.js", "tablesort.min.js", "djlu.js"));
+        $this->f3->set("js", array("simplemde.min.js", "highlight.min.js", "tablesort.min.js", "djlu.js", "clipboard.min.js"));
         $this->f3->set("content", "papers.htm");
         echo \Template::instance()->render("layout.htm");
     }
