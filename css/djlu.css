@@ -208,6 +208,7 @@ a { transition: all .35s; }
     box-shadow: -1px 1px 5px rgba(0,0,0,.075);
     border-left: 1px solid #ddd;
     z-index: 10;
+    padding-bottom: 35px;
 }
 
 #papers-col-right-handle {
@@ -559,6 +560,27 @@ table th.sort-up:after {
     background: white;
     cursor: inherit;
     display: block;
+}
+
+#paper-notes-content h1 {
+    font-size: 19px;
+}
+
+#paper-notes-content h2 {
+    font-size: 17px;
+}
+
+#paper-notes-content h3 {
+    font-size: 15px;
+}
+
+#paper-notes-content ul {
+    padding-left: 20px;
+}
+
+#paper-notes-content blockquote {
+    font-size: inherit;
+    font-style: italic;
 }
 
 #papers_modals .spinner {
