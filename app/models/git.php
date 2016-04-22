@@ -47,6 +47,9 @@ class Git extends \Prefab {
         $sshPath = $this->f3->get("ROOT")."/".$this->f3->get("DATA_PATH").'_keys/'.$this->username;
 
         $sshConfigPath = getenv("HOME")."/.ssh/config";
+        if(!file_exists($sshConfigPath)) {
+            touch($sshConfigPath);
+        }
         $sshConfig = file_get_contents($sshConfigPath);
 
         // filter out host if already in the file
