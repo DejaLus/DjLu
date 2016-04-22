@@ -8,7 +8,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand page-scroll" href="#page-top"><img src="/img/logo.svg" height="34" title="" alt="DjLu" /> - {{ @user->getUsername() }}'s library</a>
+            <a class="navbar-brand page-scroll" href="#page-top"><img src="/img/logo.svg" height="34" title="" alt="DjLu" /> - {{ \lib\Formatting::formatUsername(@user->getUsername()) }} library</a>
         </div>
 
         <div class="collapse navbar-collapse" id="navbar">

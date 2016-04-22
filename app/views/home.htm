@@ -16,7 +16,7 @@
                 <li><a class="page-scroll" href="#about">About</a></li>
                 <check if="{{ \models\User::instance()->isLoggedIn() }}">
                 <true>
-                <li><a href="{{ 'papers' | alias }}">Your library</a></li>
+                <li><a href="{{ 'papers' | alias }}">{{ \lib\Formatting::formatUsername(\models\User::instance()->getUsername()) }} library</a></li>
                 </true>
                 <false>
                 <li><a href="#" id="login-btn" data-toggle="modal" data-target="#login"><i class="fa fa-sign-in"></i> Login</a></li>

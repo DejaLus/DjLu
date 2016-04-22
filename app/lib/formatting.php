@@ -122,6 +122,24 @@ class Formatting {
     }
 
     /**
+     * Format username to insert possession's "s" at the end.
+     * @param  string $username   username
+     */
+    public static function formatUsername($username) {
+
+        function endsWith($text, $ending) {
+            return $ending === "" || (($temp = strlen($text) - strlen($ending)) >= 0 && strpos($text, $ending, $temp) !== false);
+        }
+
+        $add = "'";
+        if(!(endsWith($username, 's') || endsWith($username, 'S'))) {
+            $add .= "s";
+        }
+
+        return $username . $add;
+    }
+
+    /**
      * Given an hex value of background color, which color should we use for
      * the text?
      *
