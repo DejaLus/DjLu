@@ -163,7 +163,8 @@ class User extends \Prefab {
 
         $userdata->googleToken = $token;
         $userdata->update();
-        $this->f3->set("SESSION.googleToken", $token);
+        $this->setUserdata("googleToken", $token);
+        $this->saveUserdata();
     }
 
     /**
