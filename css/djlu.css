@@ -477,6 +477,15 @@ table th.sort-up:after {
     color: #47597A;
 }
 
+#paper-bibtex h5, #paper-notes h5 {
+    font-size: 15px;
+    text-transform: uppercase;
+    font-weight: 400;
+    text-align: center;
+    margin: 0 0 5px;
+    color: #47597A;
+}
+
 #paper-bibtex hr, #paper-notes hr {
     max-width: 50px;
     border-color: #47597A;
@@ -500,6 +509,19 @@ table th.sort-up:after {
 #paper-details p {
     padding: 1px 6px;
     margin: 0 0 2px 0;
+}
+
+#paper-bibtex .clipboard {
+    float: right;
+    margin-top: -4px;
+}
+
+.bibtex-title {
+    font-weight: bold;
+}
+
+.bibtex-booktitle, .bibtex-jname, .bibtex-publisher {
+    font-style: italic;
 }
 
 #paper-details .editable {

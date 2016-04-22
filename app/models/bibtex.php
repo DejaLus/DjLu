@@ -1111,46 +1111,36 @@ class BibTex
      */
     function html()
     {
-        $ret = "<p>\n";
-        foreach ($this->data as $entry) {
-            $line    = $this->htmlstring;
-            $title   = '';
-            $journal = '';
-            $year    = '';
-            $authors = '';
-            if (array_key_exists('title', $entry)) {
-                $title = $this->_unwrap($entry['title']);
-            }
-            if (array_key_exists('journal', $entry)) {
-                $journal = $this->_unwrap($entry['journal']);
-            }
-            if (array_key_exists('year', $entry)) {
-                $year = $this->_unwrap($entry['year']);
-            }
-            if (array_key_exists('author', $entry)) {
-                if ($this->_options['extractAuthors']) {
-                    $tmparray = array(); //In this array the authors are saved and the joind with an and
-                    foreach ($entry['author'] as $authorentry) {
-                        $tmparray[] = $this->_formatAuthor($authorentry);
-                    }
-                    $authors = join(', ', $tmparray);
-                } else {
-                    $authors = $entry['author'];
-                }
-            }
-            if ((''!=$title) || (''!=$journal) || (''!=$year) || (''!=$authors)) {
-                $line = str_replace("TITLE", $title, $line);
-                $line = str_replace("JOURNAL", $journal, $line);
-                $line = str_replace("YEAR", $year, $line);
-                $line = str_replace("AUTHORS", $authors, $line);
-                $line .= "\n";
-                $ret  .= $line;
-            } else {
-                $this->_generateWarning('WARNING_LINE_WAS_NOT_CONVERTED', '', print_r($entry,1));
-            }
-        }
-        $ret .= "</p>\n";
+        $ret = "";
+        foreach ($this->data as $entry)
+            $ret .= "<p>".self::bibRender($entry)."</p>\n";
         return $ret;
+    }
+
+    public static function bibRender($entry) {
+        $str = '<span class="bibtex-' . $entry['entryType'] . '">';
+        $fullnames = self::authorsStr($entry);
+        $str .= '<span class="bibtex-author">' . ($fullnames[strlen($fullnames)-1] == '.' ? substr($fullnames, 0, -1) : $fullnames) . '.</span> ';
+        $str .= '<span class="bibtex-title">' . $entry['title'] . '</span>. ';
+        $str .= (isset($entry['booktitle']) ? 'In <span class="bibtex-booktitle">' . $entry['booktitle'] . '</span>' : '');
+        $str .= (isset($entry['journal'])?' <span class="bibtex-jname">' . $entry['journal'] . '</span>':'');
+        $str .= (isset($entry['volume'])?', <span class="bibtex-volume">'.$entry['volume'].'</span>':'');
+        $str .= ((isset($entry['volume']) && isset($entry['number'])) ? '<span class="bibtex-number">('.$entry['number'].')</span>':'');
+        $str .= (isset($entry['pages']) ? (isset($entry['number']) || isset($entry['volume']) ? '' : ', ') .'<span class="bibtex-pages">'.(isset($entry['volume'])?':':'pages ').'' . str_replace('--', '-', $entry['pages']) . '</span>' : '');
+        $str .= (isset($entry['publisher']) ? ((isset($entry['booktitle']) || (isset($entry['journal']) || isset($entry['volume'])) ? ', ' : '') . '<span class="bibtex-publisher">' . $entry['publisher'] . '</span>'):'');
+        $str .= (isset($entry['year']) ? ', <span class="bibtex-year">' .$entry['year'] . '</span>.' : '' );
+        $str .= '</span>';
+        return $str;
+    }
+
+    private static function authorsStr($entry) {
+        if(($entry['entryType'] == 'proceedings' || $entry['entryType'] == 'collection' || $entry['entryType'] == 'book') && isset($entry['editor'])) {
+            return \lib\Formatting::formatAuthors(explode(" and ", $entry['editor']), "full") . ' (eds)';
+        } else if(isset($entry['author'])) {
+            return \lib\Formatting::formatAuthors(explode(" and ", $entry['author']), "full");
+        } else {
+            return '(Author missing)';
+        }
     }
 
     /**

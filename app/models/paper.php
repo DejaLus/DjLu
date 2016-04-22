@@ -339,11 +339,13 @@ class Paper {
                     $out["json"] = json_decode(file_get_contents($fpath), true);
                 elseif ($ext == "bib") {
                     $out["bibRaw"] = file_get_contents($fpath);
-                    $bibtex = new \models\BibTex(array('removeCurlyBraces' => true, 'extractAuthors' => true));
+                    $bibtex = new \models\BibTex(array('removeCurlyBraces' => true, 'extractAuthors' => false));
                     $bibtex->content = $out["bibRaw"];
                     $bibtex->parse();
-                    if (is_array($bibtex->data) && count($bibtex->data) > 0)
+                    if (is_array($bibtex->data) && count($bibtex->data) > 0) {
                         $out["bib"] = $bibtex->data[0];
+                        $out["bib"]["html"] = $bibtex->html();
+                    }
                 }
                 else
                     $out[$ext] = file_get_contents($fpath);

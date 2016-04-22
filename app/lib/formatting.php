@@ -48,7 +48,7 @@ class Formatting {
 
         // full format
         if ($format == "full")
-            return implode(", ", array_map("self::formatAuthor", $authors));
+            return implode(", ", array_map(function ($author) { return self::formatAuthor($author); }, $authors));
 
         // short format (X | X & Y | X et al.)
         else {

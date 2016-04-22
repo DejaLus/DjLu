@@ -185,8 +185,12 @@ $(document).ready(function() {
             paperDisplayInfo(data);
 
             // bibtex
-            if (data.bibRaw != undefined) {
+            if (data.bibRaw !== undefined) {
                 $("#paper-bibtex-content").html(data.bibRaw);
+                $("#paper-bibtex").show();
+            }
+            if (data.bib !== undefined && data.bib.html !== undefined) {
+                $("#paper-citation").html(data.bib.html);
                 $("#paper-bibtex").show();
             }
 
@@ -199,7 +203,7 @@ $(document).ready(function() {
             $("#paper-delete").show();
 
             // notes
-            if (data.md != undefined) {
+            if (data.md !== undefined) {
                 $("#paper-notes-content").show();
                 mdeEditMode(); // needs to be in edit mode
                 markdownEditor.value(data.md);
