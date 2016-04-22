@@ -1,6 +1,7 @@
 # DjLu
 
 Still under development. Feel free to send pull requests.
+TO-DO list : https://trello.com/b/6xvhb31I/djlu
 
 ## Usefull links
 
