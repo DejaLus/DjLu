@@ -1,3 +1,5 @@
+<check if="{{ @paper.type == 'full' }}">
+<true>
 <td>{{ @paper.title }}<br/>
     <span class="labels-list">
         <span class="labels-sublist labels-sublist-left">
@@ -18,5 +20,12 @@
 <td class="text-right" data-sort="{{ @paper.year }} {{ @paper.in }}">{{ @paper.in }}&nbsp;{{ @paper.year }}</td>
 <td class="text-right" data-sort="{{ @paper.date_added }}">{{ \lib\Formatting::formatDate(@paper.date_added) }}</td>
 <td data-sort="{{ @paper.rating }}">
-    <a href="{{ !empty(@paper.url) ? @paper.url : "" }}" class="pdf" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
+    <a href="{{ !empty(@paper.url) ? @paper.url : "" }}" class="link" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
 </td>
+</true>
+
+<false>
+<td class="title" colspan="4">{{ nl2br(@paper.str) }}</td>
+<td><a class="link delete" href="#"><i class="fa fa-trash"></i></a></td>
+</false>
+</check>

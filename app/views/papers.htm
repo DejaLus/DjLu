@@ -42,7 +42,7 @@
             </thead>
             <tbody>
             <repeat group="{{ @papers }}" value="{{ @paper }}">
-            <tr class="paper" data-paper-key="{{ @paper.key }}" id="paper-row-{{ @paper.key }}">
+            <tr class="paper paper-{{ @paper.type }}" data-paper-key="{{ @paper.key }}" id="paper-row-{{ @paper.key }}">
                 <include href="paper.htm" />
             </tr>
             </repeat>
@@ -55,7 +55,7 @@
             No paper selected
         </div>
         <div id="paper-wait" style="display: none;">
-            <i class="fa fa-refresh faa-spin animated"></i>
+            <i class="fa fa-refresh fa-spin"></i>
         </div>
         <div id="paper-details" data-key="" style="display: none;">
             <h4 class="editable compact"><span class="title" data-key="title" data-title="Title"></span></h4>
@@ -176,6 +176,11 @@
                     <label for="i_bibtex">BibTex entry</label>
                     <textarea class="form-control" rows="9" id="i_bibtex" name="bibtex"></textarea>
                 </div>
+                <div class="form-group">
+                    <label for="i_raw">Temporary text reference <small>Use this to quickly add a text reference, as a temporary reminder</small></label>
+                    <textarea class="form-control" rows="3" id="i_raw" name="raw"></textarea>
+                </div>
+                <hr>
                 <div class="form-group">
                     <label for="i_citation_key">Custom citation key <small>(optional, if not set, will be author name &amp; year)</small></label>
                     <input type="text" class="form-control" rows="9" id="i_citation_key" name="citationKey" />

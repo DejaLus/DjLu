@@ -253,6 +253,46 @@ class Paper {
     }
 
     /**
+     * Add a raw text reference
+     * @param  string $raw         Raw text
+     * @param  string $citationKey
+     * @return array              success keys and error messages
+     */
+    public static function createFromRawRef ($raw, $citationKey = "") {
+        if (empty(trim($raw)))
+            throw new \Exception("No string reference received");
+
+        // citation key
+        if (!is_string($citationKey))
+            $citationKey = "";
+        $citationKey = preg_replace("[^a-zA-Z0-9]", "", \lib\Utils::remove_accents($citationKey));
+        if (empty($citationKey)) {
+            $words = explode(" ", preg_replace("#[-_;:,./?! ]+#", " ", $raw));
+            preg_match("/(^|[^0-9-])((17|18|19|20|21)[0-9]{2})([^0-9-]|$)/", $raw, $matches);
+            for ($i = 0; $i < min(count($words), 2); $i++)
+                $citationKey .= $words[$i];
+            if (count($matches) > 3)
+                $citationKey .= $matches[2];
+            $citationKey = preg_replace("[^a-zA-Z0-9]", "", \lib\Utils::remove_accents($citationKey));
+        }
+
+        if (empty($citationKey))
+            $citationKey = substr(sha1($raw), 0, 16);
+
+        $f3 = \Base::instance();
+        $user = \models\User::instance();
+        if (!$user->isLoggedIn())
+            throw new \Exception("User not logged in");
+
+        $path = $f3->get("DATA_PATH").$user->getUsername()."/".$citationKey.".txt";
+
+        if (file_put_contents($path, $raw) === false)
+            throw new \Exception("Failed to save reference at ".$path);
+
+        return array("keys" => array("short_".$citationKey), "errors" => array());
+    }
+
+    /**
      * Edit a field in the JSON of the paper
      * @param  string $field
      * @param  string $value

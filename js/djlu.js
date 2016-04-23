@@ -283,10 +283,9 @@ $(document).ready(function() {
 
     function deletePaper(key) {
         $.get("/api/paper/"+key+"/delete",
-            {},
             function (data) {
                 if (data.success) {
-                    $("#papers-table tr.active").remove();
+                    $("#papers-table #paper-row-"+key).remove();
                     $("#paper-details").hide();
                     $("#paper-bibtex").hide();
                     $("#paper-notes").hide();
@@ -305,8 +304,12 @@ $(document).ready(function() {
     $("#paper-notes-add-btn").on("click", paperAddNotes);
     $("#modal-paper-edit").on("shown.bs.modal", function () { $('#modal-paper-edit-value').focus(); });
     $("#modal-paper-edit").on("submit", paperEditForm);
-    $("#paper-delete-btn").on("click", function () {
-        if (confirm('Are you sure you want to delete this paper ?')) {
+    $("#paper-delete-btn").confirmation({
+        btnOkIcon: "",
+        btnCancelIcon: "",
+        btnOkClass: "btn-sm btn-primary",
+        btnCancelClass: "btn-sm btn-default",
+        onConfirm: function () {
             deletePaper($("#paper-details").data("key"));
         }
     });
@@ -422,7 +425,18 @@ $(document).ready(function() {
 
     function initPapersTableStuff () {
         $('[data-toggle="tooltip"]').tooltip({ container: "body" });
-        $("#papers-table .paper").on("click", paperDisplay);
+        $("#papers-table .paper-full").on("click", paperDisplay);
+        $("#papers-table .paper-short .delete").confirmation({
+            container: "body",
+            singleton: true,
+            btnOkIcon: "",
+            btnCancelIcon: "",
+            btnOkClass: "btn-sm btn-primary",
+            btnCancelClass: "btn-sm btn-default",
+            onConfirm: function () {
+                deletePaper($(this).parent().parent().data("paper-key"));
+            }
+        });
     }
 
     initPapersTableStuff();

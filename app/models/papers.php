@@ -32,9 +32,17 @@ class Papers extends \Prefab {
 
             if ($fname != "." && $fname != ".." && is_dir($dirPath) && is_file($jsonPath)) {
                 $paper = json_decode(file_get_contents($jsonPath), true);
+                $paper["type"] = "full";
                 $paper["key"] = $key;
                 $paper["folder"] = $fname;
                 $papers[$key] = $paper;
+            }
+            elseif (is_file($dirPath) && preg_match("/^([a-zA-Z0-9]+)\.txt$/", $fname, $matches)) {
+                $papers["short_".$matches[1]] = array(
+                    "type" => "short",
+                    "key" => "short_".$matches[1],
+                    "str" => file_get_contents($dirPath),
+                    "date_added" => date("Y-m-d H:i", filemtime($dirPath)));
             }
         }
 

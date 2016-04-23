@@ -102,7 +102,9 @@ class Papers {
 
         try {
             // save the paper(s) and get success keys
-            if (!empty($f3->get("POST.id")))
+            if (!empty($f3->get("POST.raw")))
+                $output = \models\Paper::createFromRawRef($f3->get("POST.raw"), $f3->get("POST.citationKey"));
+            elseif (!empty($f3->get("POST.id")))
                 $output = \models\Paper::createFromID($f3->get("POST.id"), $f3->get("POST.citationKey"));
             else
                 $output = \models\Paper::createFromBibTex($f3->get("POST.bibtex"), $f3->get("POST.citationKey"));
@@ -123,7 +125,7 @@ class Papers {
             // get the right paper and get HTML
             foreach ($output["keys"] as $key) {
                 $this->f3->set("paper", $papers[$key]);
-                $out["html"] .= '<tr class="paper" data-paper-key="'.$key.'" id="paper-row-'.$key.'">';
+                $out["html"] .= '<tr class="paper paper-'.$papers[$key]['type'].'" data-paper-key="'.$key.'" id="paper-row-'.$key.'">';
                 $out["html"] .= \Template::instance()->render("paper.htm", "text/html");
                 $out["html"] .= '</tr>';
             }
@@ -139,36 +141,42 @@ class Papers {
      * Delete one paper
      */
     public function apiPaperDel ($f3, $args) {
-        if (!$this->user->isLoggedIn()) {
-            echo '{"success": false, "message": "User not logged in"}';
-            return;
-        }
 
-        $paper = new \models\Paper($args["key"]);
+        try {
+            if (!$this->user->isLoggedIn())
+                throw new \Exception("User not logged in");
 
-        if ($paper->delete()) {
+            // short paper ref
+            if (strpos($args["key"], "short_") === 0) {
+                $path = $this->f3->get("DATA_PATH").$this->user->getUsername()."/".substr($args["key"], 6).".txt";
+                if (!is_file($path))
+                    throw new \Exception("Paper ".$args["key"]." not found");
+                if (!unlink($path))
+                    throw new \Exception("Fail to delete paper ".$args["key"]);
+            }
+            else {
+                $paper = new \models\Paper($args["key"]);
 
-            $prefs = $this->user->getPreferences();
-            $drive = new \models\GoogleDrive($prefs["googleDriveRoot"]);
+                if (!$paper->delete())
+                    throw new \Exception("Fail to delete paper ".$args["key"]);
 
-            try {
-                if ($drive->isLoggedIn()) {
+                $prefs = $this->user->getPreferences();
+                $drive = new \models\GoogleDrive($prefs["googleDriveRoot"]);
+
+                if ($drive->isLoggedIn())
                     $drive->deletePaper($args['key']);
-                } 
-                echo '{"success": true, "message": "'.$args['key'].' has been deleted."}';
-            }
-            catch (\Exception $e) {
-                echo '{"success": false, "message": "Failed to delete on google drive '.$args['key'].'"}';
+
             }
 
+            echo '{"success": true, "message": "'.$args['key'].' has been deleted."}';
         }
-        else {
-            echo '{"success": false, "message": "Failed to delete '.$args['key'].'"}';
+        catch (\Exception $e) {
+            echo json_encode(array("success" => false, "message" => $e->getMessage()));
         }
     }
 
     public function apiUpdateTags ($f3) {
-        
+
         // TODO optimize this and make it optional...
         // get the new tr
         // we need to get all papers just to be able to compute labels list and colors :(
