@@ -156,7 +156,7 @@ $(document).ready(function() {
         $("#paper-details .tags_reading").html(getOrElse(data.json, "tags_reading", [], "; "));
         $("#paper-details .tags_notes").html(getOrElse(data.json, "tags_notes", [], "; "));
         $("#paper-details .date_added").html(getOrElse(data.json, "date_added", ""));
-        $("#paper-details .url").html(getOrElse(data.json, "url", ""));
+        $("#paper-details .url").attr("href", getOrElse(data.json, "url", "")).html(getOrElse(data.json, "url", ""));
         $("#paper-details .rating").html(getOrElse(data.json, "rating", ""));
     }
 
@@ -227,7 +227,7 @@ $(document).ready(function() {
     function paperEditShow () {
 
         // get info element
-        var el = $(this).children("span[data-key]");
+        var el = $(this).children("[data-key]");
         var form = $("#modal-paper-edit");
 
         form.attr("action", form.data("base-url").replace("@key", $("#paper-details").data("key")));
@@ -300,7 +300,7 @@ $(document).ready(function() {
 
 
     // register events
-    $("#paper-details > *:has(span[data-key])").on("dblclick", paperEditShow);
+    $("#paper-details > *:has([data-key])").on("dblclick", paperEditShow);
     $("#paper-notes-add-btn").on("click", paperAddNotes);
     $("#modal-paper-edit").on("shown.bs.modal", function () { $('#modal-paper-edit-value').focus(); });
     $("#modal-paper-edit").on("submit", paperEditForm);
