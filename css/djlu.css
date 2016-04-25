@@ -565,7 +565,31 @@ table th.sort-up:after {
 
 .right-action-buttons {
     float: right;
-    margin-top: -4px;
+    margin-top: -2px;
+}
+
+.right-action-buttons-pre {
+    position: relative;
+}
+
+.right-action-buttons-pre .btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: block;
+    padding: 1px 12px;
+    border-radius: 0 4px 0 4px;
+}
+
+.right-action-buttons .clipboard .fa-clipboard:before, .right-action-buttons-pre .clipboard .fa-clipboard:before {
+    content: "" !important;
+}
+
+.right-action-buttons .clipboard, .right-action-buttons-pre .clipboard {
+    background: url("../img/clippy.svg") white no-repeat;
+    padding: 1px 12px;
+    background-size: 14px;
+    background-position: 50%;
 }
 
 #js_drive_upload {

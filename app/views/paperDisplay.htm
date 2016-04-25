@@ -34,13 +34,17 @@
             <div id="paper-notes">
                 <h4>Notes</h4>
                 <hr>
+
                 <div id="paper-notes-content"></div>
-                <div class="right-action-buttons">
+
+                <h5>Markdown</h5>
+
+                <div class="right-action-buttons-pre">
                     <button type="button" class="clipboard btn btn-default btn-xs" data-clipboard-target="#paper-notes-raw">
                         <i class="fa fa-clipboard" aria-hidden="true" alt="Copy to clipboard"></i>
                     </button>
                 </div>
-                <h5>Markdown</h5>
+
                 <pre id="paper-notes-raw">{{ @paper.md | raw }}</pre>
             </div>
             </check>
@@ -55,14 +59,17 @@
                         <i class="fa fa-clipboard" aria-hidden="true" alt="Copy to clipboard"></i>
                     </button>
                 </div>
+
                 <div id="paper-citation">{{ @paper.bib.html | raw }}</div>
 
-                <div class="right-action-buttons">
+                <h5>BibTex</h5>
+
+                <div class="right-action-buttons-pre">
                     <button type="button" class="clipboard btn btn-default btn-xs" data-clipboard-target="#paper-bibtex-content">
                         <i class="fa fa-clipboard" aria-hidden="true" alt="Copy to clipboard"></i>
                     </button>
                 </div>
-                <h5>BibTex</h5>
+
                 <pre id="paper-bibtex-content">{{ @paper.bibRaw | raw }}</pre>
             </div>
             </check>
