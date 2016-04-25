@@ -78,7 +78,6 @@ class Paper {
      * @return string     bibtex
      */
     private static function bibTexFromArXiv ($id) {
-        $id = preg_replace("#^arXiv:(.+)$#", '\1', $id);
         $xml = @file_get_contents("http://export.arxiv.org/api/query?id_list=".$id);
         if (!$xml)
             throw new \Exception("Error while loading, the ID probably do not exist");
@@ -115,8 +114,6 @@ class Paper {
      * @return string     bibtex
      */
     private static function bibTexFromDOI ($id) {
-        $id = preg_replace("#^doi:(.+)$#", '\1', $id);
-
         $context = stream_context_create(array(
             "http" => array(
                 "method" => "GET",
@@ -124,7 +121,6 @@ class Paper {
             )
         ));
 
-        $id = preg_replace("#^arXiv:(.+)$#", '\1', $id);
         $data = @file_get_contents("http://dx.doi.org/".$id, false, $context);
 
         if (!$data)
@@ -135,18 +131,27 @@ class Paper {
 
     /**
      * Create a paper record from a standard ID (DOI, arXiv)
-     * @param  string $id
+     * @param  string $rawId
      * @param  string $citationKey citation key
      */
-    public static function createFromId ($id, $citationKey = "") {
+    public static function createFromId ($rawId, $citationKey = "") {
 
-        $id = trim($id);
+        $rawId = trim($rawId);
 
-        // arvix
-        if (strpos($id, "arXiv:") === 0)
+        // arXiv
+        if (strpos($rawId, "arXiv:") === 0) {
+            $id = preg_replace("#^arXiv:(.+)$#", '\1', $rawId);
             $bibtex = self::bibTexFromArXiv($id);
-        elseif (strpos($id, "doi:") === 0)
+        }
+        elseif (preg_match("#arxiv\.org/[a-z]{3}/([0-9]+\.?[0-9]+v?[0-9]+)#", $rawId, $match) === 1) {
+            $id = $match[1];
+            $bibtex = self::bibTexFromArXiv($id);
+        }
+        // DOI
+        elseif (strpos($rawId, "doi:") === 0) {
+            $id = preg_replace("#^doi:(.+)$#", '\1', $rawId);
             $bibtex = self::bibTexFromDOI($id);
+        }
         else
             throw new \Exception("ID not supported");
 
