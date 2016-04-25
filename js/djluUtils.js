@@ -1,3 +1,13 @@
+function generateString (length) {
+    var out = "";
+    var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for(var i = 0; i < length; i++)
+        out += chars.charAt(Math.floor(Math.random() * chars.length));
+
+    return out;
+}
+
 function get_html_translation_table (table, quote_style) {
 
     var entities = {}, hash_map = {}, decimal;

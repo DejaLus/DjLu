@@ -323,6 +323,15 @@ $(document).ready(function() {
         }
     });
 
+    $("#js-remove-sharing-key").on("click", function () {
+        $("#paper-details .secret").html("");
+        paperEditShow.call($(this).parent().parent());
+    });
+    $("#js-generate-sharing-key").on("click", function () {
+        $("#paper-details .secret").html(generateString(30));
+        paperEditShow.call($(this).parent().parent());
+    });
+
 
     ////////////////////////////////////////
     /////// GOOGLE DRIVE

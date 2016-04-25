@@ -83,10 +83,8 @@
             </p>
             <p class="editable">
                 <span class="right-action-buttons">
-                    {* TODO
-                    <a href="#" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" title="Stop sharing" id="js_share_rm"><i class="fa fa-close"></i></a>
-                    <a href="#" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" title="Generate sharing key" id="js_share"><i class="fa fa-refresh"></i></a>
-                    *}
+                    <a href="#" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" title="Stop sharing" id="js-remove-sharing-key"><i class="fa fa-close"></i></a>
+                    <a href="#" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" title="Generate sharing key" id="js-generate-sharing-key"><i class="fa fa-refresh"></i></a>
                     <button id="paper-secret-url" type="button" class="clipboard btn btn-default btn-xs" data-clipboard-text="#"><i class="fa fa-clipboard" aria-hidden="true" alt="Copy to clipboard"></i></button>
                 </span>
                 <strong>Sharing secret key: </strong><a href="#" target="_blank" data-base-url="{{ \lib\Utils::getServerUrl() }}{{ 'paperPub', 'user='.@user->getUsername() | alias }}" class="secret" data-key="secret" data-title="Sharing secret key (must be 5 to 50 numbers or letters)"></a></p>
@@ -176,7 +174,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary">Edit</button>
+                <button type="submit" class="btn btn-primary">Save</button>
             </div>
         </div>
     </div>
