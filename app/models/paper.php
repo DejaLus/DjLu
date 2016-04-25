@@ -197,7 +197,7 @@ class Paper {
             else {
                 $key = $data["cite"];
             }
-            $key = preg_replace("[^a-zA-Z0-9]", "", \lib\Utils::remove_accents($key));
+            $key = preg_replace("/[^a-zA-Z0-9]/", "", \lib\Utils::remove_accents($key));
             $key = \models\Papers::instance()->getNextAvailableKey($key);
 
             // try to create paper, if not catch and record error

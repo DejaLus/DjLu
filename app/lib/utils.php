@@ -181,6 +181,7 @@ class Utils {
             chr(197).chr(186) => 'z', chr(197).chr(187) => 'Z',
             chr(197).chr(188) => 'z', chr(197).chr(189) => 'Z',
             chr(197).chr(190) => 'z', chr(197).chr(191) => 's',
+            "Ø" => 'O', "ø" => 'o',
             // Euro Sign
             chr(226).chr(130).chr(172) => 'E',
             // GBP (Pound) Sign
