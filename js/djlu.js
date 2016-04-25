@@ -312,8 +312,12 @@ $(document).ready(function() {
     $("#paper-delete-btn").confirmation({
         btnOkIcon: "",
         btnCancelIcon: "",
-        btnOkClass: "btn-sm btn-primary",
+        popout: true,
+        btnOkClass: "btn-sm btn-danger",
         btnCancelClass: "btn-sm btn-default",
+        btnOkLabel: 'Yes, delete it',
+        btnCancelLabel: 'No, cancel',
+        title: "Are you sure?",
         onConfirm: function () {
             deletePaper($("#paper-details").data("key"));
         }
@@ -433,11 +437,14 @@ $(document).ready(function() {
         $("#papers-table .paper-full").on("click", paperDisplay);
         $("#papers-table .paper-short .delete").confirmation({
             container: "body",
-            singleton: true,
+            popout: true,
             btnOkIcon: "",
             btnCancelIcon: "",
-            btnOkClass: "btn-sm btn-primary",
+            btnOkClass: "btn-sm btn-danger",
             btnCancelClass: "btn-sm btn-default",
+            btnOkLabel: 'Yes, delete it',
+            btnCancelLabel: 'No, cancel',
+            title: "Are you sure?",
             onConfirm: function () {
                 deletePaper($(this).parent().parent().data("paper-key"));
             }

@@ -208,7 +208,6 @@ a { transition: all .35s; }
     box-shadow: -1px 1px 5px rgba(0,0,0,.075);
     border-left: 1px solid #ddd;
     z-index: 10;
-    padding-bottom: 35px;
 }
 
 #papers-col-right-handle {
@@ -658,4 +657,8 @@ table th.sort-up:after {
 
 #paper-display #paper-notes-raw {
     max-height: 250px;
+}
+
+.confirmation .popover-title {
+    text-align: center;
 }
