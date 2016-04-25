@@ -87,12 +87,17 @@ class Paper {
         if ($xml["entry"]["title"] == "Error")
             throw new \Exception("No paper found for arXiv id ".$id);
 
+        if (isset($xml["entry"]["author"]["name"]))
+            $author = $xml["entry"]["author"]["name"];
+        else
+            $author = implode(" and ", array_map(function ($x) { return $x["name"]; }, $xml["entry"]["author"]));
+
         $time = strtotime($xml["entry"]["published"]);
         $bib = array(
             "cite" => $xml["entry"]["author"][0]["name"].date("Y", $time),
             "entryType" => "article",
             "title" => trim($xml["entry"]["title"]),
-            "author" => implode(" and ", array_map(function ($x) { return $x["name"]; }, $xml["entry"]["author"])),
+            "author" => $author,
             "booktitle" => "arXiv",
             "year" => date("Y", $time),
             "month" => date("M", $time),
@@ -143,7 +148,7 @@ class Paper {
             $id = preg_replace("#^arXiv:(.+)$#", '\1', $rawId);
             $bibtex = self::bibTexFromArXiv($id);
         }
-        elseif (preg_match("#arxiv\.org/[a-z]{3}/([0-9]+\.?[0-9]+v?[0-9]+)#", $rawId, $match) === 1) {
+        elseif (preg_match("#arxiv\.org/[a-z]{3}/([0-9]+\.?[0-9]+v?[0-9]*)#", $rawId, $match) === 1) {
             $id = $match[1];
             $bibtex = self::bibTexFromArXiv($id);
         }
