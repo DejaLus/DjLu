@@ -521,11 +521,6 @@ table th.sort-up:after {
     margin: 0 0 2px 0;
 }
 
-#paper-bibtex .clipboard {
-    float: right;
-    margin-top: -4px;
-}
-
 .bibtex-title {
     font-weight: bold;
 }
@@ -569,7 +564,7 @@ table th.sort-up:after {
     line-height: 1.1;
 }
 
-#paper-url-actions {
+.right-action-buttons {
     float: right;
     margin-top: -4px;
 }
@@ -638,4 +633,29 @@ table th.sort-up:after {
 
 .full-width {
     width: 100%;
+}
+
+
+/******* SINGLE PAPER PAGE ******/
+
+#paper-display h1 {
+    font-size: 30px;
+    font-weight: 300;
+}
+
+#paper-display h1 small {
+    font-size: 20px;
+    font-weight: 300;
+}
+
+#paper-display .tags_notes:not(:empty) {
+    padding-left: 100px;
+}
+
+#paper-display .tags_reading {
+    float: right;
+}
+
+#paper-display #paper-notes-raw {
+    max-height: 250px;
 }

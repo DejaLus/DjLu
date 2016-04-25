@@ -28,11 +28,7 @@ class GoogleDrive extends \Prefab {
         $this->client->setApplicationName("DjLu");
         $this->client->setAuthConfigFile("googleAPI.json");
         $this->client->addScope(\Google_Service_Drive::DRIVE);
-        $serverURL = ($this->f3->get("SERVER.HTTPS") == "on") ? "https" : "http";
-        $serverURL .= "://".$this->f3->get("SERVER.SERVER_NAME");
-        if ($this->f3->get("SERVER.SERVER_PORT") != "80")
-            $serverURL .= ":".$this->f3->get("SERVER.SERVER_PORT");
-        $this->client->setRedirectUri($serverURL.$this->f3->alias("driveAuth"));
+        $this->client->setRedirectUri(\lib\Utils::getServerUrl().$this->f3->alias("driveAuth"));
         $this->client->setAccessType("offline"); // offline to get refresh token
 
         $this->drivePath = $drivePath;

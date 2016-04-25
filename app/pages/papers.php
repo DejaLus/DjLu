@@ -187,4 +187,57 @@ class Papers {
 
         echo \Template::instance()->render("tagmenu.htm", "text/html");
     }
+
+    /**
+     * Display info for a specific paper
+     */
+    public function display ($f3, $args) {
+
+        try {
+
+            // paper info
+            if (empty($args["key"]))
+                throw new \Exception("No paper key given");
+
+            $paper = new \models\Paper($args["key"], $args["user"]); // fails here if private access and not logged in
+            $data = $paper->getFiles();
+            $data["key"] = $args["key"];
+
+            if (!$paper->exists())
+                throw new \Exception("Paper does not exist");
+            if (!isset($data["json"]))
+                throw new \Exception("Paper does not seem to exist");
+
+            // check public access
+            if (!empty($args["user"]) &&
+                (!$this->user->isLoggedIn() || $this->user->getUsername() != $args["user"])
+                && (!isset($args["secret"]) || !isset($data["json"]["secret"])
+                || $args["secret"] != $data["json"]["secret"])) {
+                throw new \Exception("You are not allowed to view this");
+            }
+
+            // gather tags
+            $tags = array();
+            if ($this->user->isLoggedIn()) {
+                $papers = $this->model->getPapers();
+                $addDates = array_map(function ($x) { return $x["date_added"]; }, $papers);
+                array_multisort($addDates, SORT_DESC, $papers);
+                $tags = $this->model->getTags($papers);
+            }
+            else {
+                $tags = $this->model->getTags(array($data["json"]));
+            }
+
+            // display
+            $this->f3->set("paper", $data);
+            $this->f3->set("tags", $tags);
+            $this->f3->set("js", array("simplemde.min.js", "highlight.min.js", "clipboard.min.js", "djluPaper.js"));
+            $this->f3->set("content", "paperDisplay.htm");
+            echo \Template::instance()->render("layout.htm");
+        }
+        catch (\Exception $e) {
+            \lib\Flash::instance()->addMessage("Unable to display paper", "danger");
+            $f3->reroute("@home");
+        }
+    }
 }

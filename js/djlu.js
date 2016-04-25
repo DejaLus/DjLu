@@ -158,6 +158,11 @@ $(document).ready(function() {
         $("#paper-details .date_added").html(getOrElse(data.json, "date_added", ""));
         $("#paper-details .url").attr("href", getOrElse(data.json, "url", "")).html(getOrElse(data.json, "url", ""));
         $("#paper-details .rating").html(getOrElse(data.json, "rating", ""));
+        var secret = getOrElse(data.json, "secret", "");
+        $("#paper-details .secret").html(secret)
+            .attr("href", $("#paper-details .secret").data("base-url")
+            .replace("@secret", secret).replace("@key", $("#paper-details").data("key")));
+        $("#paper-secret-url").attr("data-clipboard-text", $("#paper-details .secret").attr("href"));
     }
 
     function paperDisplay () {

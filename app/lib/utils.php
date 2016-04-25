@@ -56,6 +56,23 @@ class Utils {
         return true;
     }
 
+    public static function getServerUrl () {
+        $f3 = \Base::instance();
+        $serverURL = ($f3->get("SERVER.HTTPS") == "on") ? "https" : "http";
+        $serverURL .= "://".$f3->get("SERVER.SERVER_NAME");
+        if ($f3->get("SERVER.SERVER_PORT") != "80")
+            $serverURL .= ":".$f3->get("SERVER.SERVER_PORT");
+        return $serverURL;
+    }
+
+    public static function randString ($length = 10) {
+        $chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        $out = "";
+        for ($i = 0; $i < $length; $i++)
+            $out .= $chars[rand(0, strlen($chars) - 1)];
+        return $out;
+    }
+
     /**
      * Converts all accent characters to ASCII characters.
      *

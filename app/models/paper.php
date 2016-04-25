@@ -17,16 +17,21 @@ class Paper {
      * Array of editable fields
      * @var array
      */
-    public static $JSON_EDITABLE_FIELDS = array("title", "authors", "in", "rating", "year", "url", "date_added", "tags_content", "tags_reading", "tags_notes");
+    public static $JSON_EDITABLE_FIELDS = array("title", "authors", "in", "rating", "year", "url", "date_added", "tags_content", "tags_reading", "tags_notes", "secret");
 
-    function __construct($key = "") {
+    function __construct($key = "", $username = "") {
         $this->f3 = \Base::instance();
         $user = \models\User::instance();
 
-        if (!$user->isLoggedIn())
+        if (!$user->isLoggedIn() && !$username)
             throw new \Exception("User not logged in");
+        if (empty($username))
+            $username = $user->getUsername();
 
-        $this->dataPath = $this->f3->get("DATA_PATH").$user->getUsername();
+        $this->dataPath = $this->f3->get("DATA_PATH").$username;
+        if (!is_dir($this->dataPath))
+            throw new \Exception("User directory missing");
+
         if ($key != "") {
             $this->key = $key;
             $this->folder = $this->getPaperFolder();
@@ -312,6 +317,8 @@ class Paper {
                 (int) $matches[5] < 0 || (int) $matches[4] > 59)
                 throw new \Exception("Invalid date / time");
         }
+        if ($field == "secret" && $value != "" && !preg_match("/^[a-zA-Z0-9]{5,50}$/", $value))
+            throw new \Exception("Invalid secret key");
 
         // preprocess value
         if ($field == "tags_notes" || $field == "tags_reading" || $field == "tags_content" || $field == "authors") {
