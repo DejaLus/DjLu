@@ -342,7 +342,7 @@ a { transition: all .35s; }
 }
 
 #papers-table tr td:last-of-type {
-    padding-right: 3px;
+    padding-right: 8px;
 }
 
 #papers-table .labels-list {
@@ -401,12 +401,21 @@ a { transition: all .35s; }
     font-size: 88%;
 }
 
-#papers-table .link {
+#papers-table .link, #papers-table .has-notes {
+    color: #666;
+    margin-left: 4px;
+}
+
+#papers-table .link i, #papers-table .has-notes i {
+    padding: 0 0.5px;
+}
+
+#papers-table .link:hover {
     color: inherit;
 }
 
 #papers-table .link[href=""] {
-    display: none;
+    visibility: hidden;
 }
 
 /* Table sort */

@@ -29,12 +29,14 @@ class Papers extends \Prefab {
             $key = preg_replace('/^([^_]+)_.+$/', '\1', $fname); // before _ is the "key" of the paper
             $dirPath = $folderPath."/".$fname;
             $jsonPath = $folderPath."/".$fname."/".$key.".json";
+            $mdPath = $folderPath."/".$fname."/".$key.".md";
 
             if ($fname != "." && $fname != ".." && is_dir($dirPath) && is_file($jsonPath)) {
                 $paper = json_decode(file_get_contents($jsonPath), true);
                 $paper["type"] = "full";
                 $paper["key"] = $key;
                 $paper["folder"] = $fname;
+                $paper["hasNotes"] = is_file($mdPath);
                 $papers[$key] = $paper;
             }
             elseif (is_file($dirPath) && preg_match("/^([a-zA-Z0-9]+)\.txt$/", $fname, $matches)) {

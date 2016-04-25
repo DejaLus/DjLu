@@ -19,13 +19,22 @@
 <td><span data-toggle="tooltip" data-placement="top" title="{{ \lib\Formatting::formatAuthors(@paper.authors, 'full') }}">{{ \lib\Formatting::formatAuthors(@paper.authors) }}</span></td>
 <td class="text-right" data-sort="{{ @paper.year }} {{ @paper.in }}">{{ @paper.in }}&nbsp;{{ @paper.year }}</td>
 <td class="text-right" data-sort="{{ @paper.date_added }}">{{ \lib\Formatting::formatDate(@paper.date_added) }}</td>
-<td data-sort="{{ @paper.rating }}">
+<td class="text-right" data-sort="{{ @paper.rating }}">
+    <check if="!empty(@paper.secret)">
+        <true>
+        <a href="{{ 'paperPub', 'user='.\models\User::instance()->getUsername().', key='.@paper.key.', secret='.@paper.secret | alias }}" class="link" target="_blank" data-toggle="tooltip" data-placement="top" title="Public URL"><i class="fa fa-link"></i></a>
+        </true>
+        <false>
+        <a class="link invisible"><i class="fa fa-link"></i></a>
+        </false>
+    </check>
+    <span class="{{ isset(@paper.hasNotes) && @paper.hasNotes ? '' : 'invisible' }} has-notes" data-toggle="tooltip" data-placement="top" title="This paper has notes"><i class="fa fa-pencil-square-o"></i></span>
     <a href="{{ !empty(@paper.url) ? @paper.url : "" }}" class="link" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
 </td>
 </true>
 
 <false>
 <td class="title" colspan="4">{{ nl2br(@paper.str) }}</td>
-<td><a class="link delete" href="#"><i class="fa fa-trash"></i></a></td>
+<td class="text-right"><a class="link delete" href="#"><i class="fa fa-trash"></i></a></td>
 </false>
 </check>
