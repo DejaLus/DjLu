@@ -14,6 +14,8 @@ $(document).ready(function() {
     /////// MARKDOWN EDITOR
     ////////////////////////////////////////
 
+    var mathTimeout;
+
     function renderWithMath (txt) {
         txt = txt.replace(/(^|[^\\])\$\$/g, "$1`eq2");
         txt = txt.replace(/(^|[^\\])\$/g, "$1`eq");
@@ -21,7 +23,8 @@ $(document).ready(function() {
         html = html.replace(/<\/?code>eq2/g, "$$$$");
         html = html.replace(/<\/?code>eq/g, "$$");
         html = html_entity_decode(html, "ENT_QUOTES");
-        setTimeout(function() { MathJax.Hub.Typeset(); }, 300);
+        clearTimeout(mathTimeout);
+        mathTimeout = setTimeout(function() { MathJax.Hub.Typeset(); }, 750);
         return html;
     }
 

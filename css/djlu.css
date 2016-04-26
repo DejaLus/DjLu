@@ -633,6 +633,22 @@ table th.sort-up:after {
     font-size: 15px;
 }
 
+.CodeMirror .CodeMirror-code .cm-header-1 {
+    font-size: 19px;
+}
+
+.CodeMirror .CodeMirror-code .cm-header-2 {
+    font-size: 17px;
+}
+
+.CodeMirror .CodeMirror-code .cm-header-3 {
+    font-size: 15px;
+}
+
+.CodeMirror .CodeMirror-code .cm-header-4, .CodeMirror .CodeMirror-code .cm-header-5, .CodeMirror .CodeMirror-code .cm-header-6 {
+    font-size: 13px;
+}
+
 #paper-notes-content ul {
     padding-left: 20px;
 }
