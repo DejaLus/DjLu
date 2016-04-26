@@ -126,17 +126,14 @@ class Formatting {
      * @param  string $username   username
      */
     public static function formatUsername($username) {
+        if (empty($username))
+            return "";
 
-        function endsWith($text, $ending) {
-            return $ending === "" || (($temp = strlen($text) - strlen($ending)) >= 0 && strpos($text, $ending, $temp) !== false);
-        }
-
-        $add = "'";
-        if(!(endsWith($username, 's') || endsWith($username, 'S'))) {
-            $add .= "s";
-        }
-
-        return $username . $add;
+        $last = $username[strlen($username) - 1];
+        if (strtolower($last) == "s")
+            return $username."'";
+        else
+            return $username."'s";
     }
 
     /**

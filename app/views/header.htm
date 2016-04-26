@@ -4,10 +4,10 @@
     <meta charset="{{ @ENCODING }}">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
+    <meta name="description" content="DjLu is a simple and free tool to organize your research papers. We keep your library simple and flexible by using simple open formats and solutions.">
+    <meta name="author" content="Thomas Robert, Micael Carvalo, Remi Cadene">
 
-    <title>DjLu</title>
+    <title>DjLu - {{ isset(@title) ? @title : "The simple and free tool to organize your research papers" }}</title>
 
     <link rel="stylesheet" href="{{@BASE}}/css/bootstrap.min.css" type="text/css">
     <link href="http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
@@ -38,6 +38,9 @@
     <meta name="msapplication-TileImage" content="/img/mstile-144x144.png">
     <meta name="msapplication-config" content="/img/browserconfig.xml">
     <meta name="theme-color" content="#ffffff">
+    <meta property="og:image" content="/img/apple-touch-icon-180x180.png">
+
+
 </head>
 
 <body id="page-top">
