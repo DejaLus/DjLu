@@ -112,8 +112,8 @@ class Formatting {
 
         if (is_array($tags)) {
             foreach ($tags as $tag) {
-                $bg = isset($tagsDB[$tag]) ? $tagsDB[$tag] : "777";
-                $fg = isset($tagsDB[$tag]) ? self::textColorFromBgColor($tagsDB[$tag]) : "FFF";
+                $bg = isset($tagsDB[$tag]) ? $tagsDB[$tag]["color"] : "777";
+                $fg = isset($tagsDB[$tag]) ? self::textColorFromBgColor($tagsDB[$tag]["color"]) : "FFF";
                 $out .= '<span class="label label-default" data-tag="'.$tag.'" data-tag-group="'.$tagsGroup.'" style="background: #'.$bg.'; color: #'.$fg.'">'.$tag.'</span> ';
             }
         }

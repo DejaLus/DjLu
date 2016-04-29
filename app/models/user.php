@@ -11,6 +11,7 @@ class User extends \Prefab {
     private $db;
     private $dbMapper;
     private $userdata;
+    public static $PREFS_EDITABLE_FIELDS = array("tags", "googleDriveRoot");
 
     function __construct() {
 
@@ -100,7 +101,7 @@ class User extends \Prefab {
      */
     public function getPreferences () {
         if (!$this->isLoggedIn())
-            return array();
+            throw new \Exception("User not logged in");
 
         $filePath = $this->f3->get("DATA_PATH").$this->getUsername()."/preferences.json";
         if (is_file($filePath))
@@ -114,30 +115,66 @@ class User extends \Prefab {
      * @param arrat $preferences
      */
     public function setPreferences ($preferences) {
+        if (!$this->isLoggedIn())
+            throw new \Exception("User not logged in");
+
         $filePath = $this->f3->get("DATA_PATH").$this->getUsername()."/preferences.json";
         if (file_put_contents($filePath, json_encode($preferences, JSON_PRETTY_PRINT)) === false)
             throw new \Exception("Failed to save user preferences");
     }
 
-    /**
-     * Helper to set the fixed color of a tag in preferences
-     * @param string $tag
-     * @param string $group
-     * @param string $color hex value without the #
-     */
-    public function setTagColor ($tag, $group, $color) {
-        if (!in_array($group, \models\Papers::$TAGS_GROUPS))
-            throw new \Exception("Unknown tag group");
-        if (empty($tag))
-            throw new \Exception("Empty tag");
-        if (!preg_match("/^[0-9A-F]{3,6}$/", $color))
-            throw new \Exception("Invalid color");
+    public function editPreferences ($field, $value) {
+        if (!$this->isLoggedIn())
+            throw new \Exception("User not logged in");
 
         $preferences = $this->getPreferences();
-        if (!is_array($preferences["tags_".$group]))
-            $preferences["tags_".$group] = array();
-        $preferences["tags_".$group][$tag] = $color;
 
+        $fieldTree = explode(".", $field);
+        $field = $fieldTree[0];
+
+        // general check, is field editable
+        if (!$field || !in_array($field, self::$PREFS_EDITABLE_FIELDS))
+            throw new \Exception("Field not editable");
+
+        // validate / preprocess tags
+        if ($field == "tags" && count($fieldTree) != 4)
+            throw new \Exception("Invalid tag field");
+        if ($field == "tags" && !in_array($fieldTree[1], \models\Papers::$TAGS_GROUPS))
+            throw new \Exception("Invalid tag group");
+        if ($field == "tags" && (!is_array($preferences[$field][$fieldTree[1]]) || !is_array($preferences[$field][$fieldTree[1]][$fieldTree[2]])))
+            throw new \Exception("Tag does not exist");
+        if ($field == "tags" && $fieldTree[3] != "color" && $fieldTree[3] != "pinned")
+            throw new \Exception("Invalid field");
+        if ($field == "tags" && $fieldTree[3] == "color" && !preg_match("/^[0-9a-f]{6}$/i", $value))
+            throw new \Exception("Invalid color");
+        if ($field == "tags" && $fieldTree[3] == "pinned") {
+            if ($value != "true" && $value != "false")
+                throw new \Exception("Invalid pin value");
+            else
+                $value = $value == "true";
+        }
+
+        // validate / preprocess googleDriveRoot
+        if ($field == "googleDriveRoot" && count($fieldTree) != 1)
+            throw new \Exception("Invalid field");
+
+        // create tree if needed
+        $preferencesRefParent = &$preferences;
+        $preferencesRef = &$preferences;
+        foreach ($fieldTree as $fieldEl) {
+            $preferencesRefParent = &$preferencesRef;
+            if (!is_array($preferencesRef[$fieldEl]))
+                $preferencesRef[$fieldEl] = array();
+            $preferencesRef = &$preferencesRef[$fieldEl];
+        }
+
+        // edit or erase the field
+        if (!empty($value))
+            $preferencesRef = $value;
+        else
+            unset($preferencesRefParent[$fieldEl]);
+
+        // save
         $this->setPreferences($preferences);
     }
 

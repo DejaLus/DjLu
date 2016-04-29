@@ -256,13 +256,13 @@ $(document).ready(function() {
             if (data.success) {
                 paperDisplayInfo(data);
                 $("#paper-row-"+$("#paper-details").data("key")).html(data.tr);
+                $("#papers-col-left-container").html(data.tags);
+                initLeftCol();
                 $.notify({ message: "Paper edited successfully" }, { type: "success" });
             }
             else
                 $.notify({ message: "Failed to edit paper: "+data.message }, { type: "danger" });
         });
-
-        reloadTags();
 
         return false;
     }
@@ -513,37 +513,57 @@ $(document).ready(function() {
 
         $(".colorpicker span").unbind("click").on("click", function() {
             var color = $(this).data("color");
+            var oldColor = leftTagLabels.css("backgroundColor");
             leftTagLabels.css("backgroundColor", "#"+color);
             getTags(tagGroup, tag).css("backgroundColor", "#"+color);
 
-            $.post("/api/settings/tag", {group: tagGroup, tag: tag, color: color}, function (data) {
-                if (data.success)
-                    $.notify({ message: "Tag color saved successfully" }, { type: "success" });
-                else
-                    $.notify({ message: "Failed to save tag color" }, { type: "danger" });
+            $.post("/api/preferences", {field: "tags."+tagGroup+"."+tag+".color", value: color}, function (data) {
+                $.notify({ message: data.message }, { type: data.success ? "success" : "danger" });
+                if (!data.success) {
+                    leftTagLabels.css("backgroundColor", oldColor);
+                    getTags(tagGroup, tag).css("backgroundColor", oldColor);
+                }
             }, "json");
         })
     }
 
-    // tags toogle
-    $(".tag .tag-label").on("click", function () {
-        $(this).parent().toggleClass("tag-active");
-        syncFilters();
-    });
+    function toggleTagPin () {
+        var el = $(this);
+        el.toggleClass("pinned");
+        var tag = el.parent().data("tag");
+        var tagGroup = el.parent().parent().data("tag-group");
+        var val = el.hasClass("pinned");
 
-    // tags reset
-    $("#papers-col-left .tags-reset").on("click", function () {
-        resetFilters($(this).data("tag-group"));
-        syncFilters();
-    });
+        $.post("/api/preferences", {field: "tags."+tagGroup+"."+tag+".pinned", value: val}, function (data) {
+            $.notify({ message: data.message }, { type: data.success ? "success" : "danger" });
+            if (!data.success)
+                el.toggleClass("pinned");
+        }, "json");
+    }
 
-    // colorpicker
-    $("#papers-col-left").mouseleave(function() { $(".tag-colorpicker").popover("hide") });
-    $(".tag-colorpicker").popover({ container: $("#papers-col-left"), trigger: "focus", template: $("#colorpicker").html(), content:" ", placement: "bottom" });
-    $(".tag-colorpicker").on("shown.bs.popover", colorpickerHandler);
+    function initLeftCol () {
+        // tags toggle
+        $(".tag .tag-label").on("click", function () {
+            $(this).parent().toggleClass("tag-active");
+            syncFilters();
+        });
 
+        // tags reset
+        $("#papers-col-left .tags-reset").on("click", function () {
+            resetFilters($(this).data("tag-group"));
+            syncFilters();
+        });
 
+        // colorpicker
+        $("#papers-col-left").mouseleave(function() { $(".tag-colorpicker").popover("hide") });
+        $(".tag-colorpicker").popover({ container: $("#papers-col-left"), trigger: "focus", template: $("#colorpicker").html(), content:" ", placement: "bottom" });
+        $(".tag-colorpicker").on("shown.bs.popover", colorpickerHandler);
 
+        // pin toggle
+        $(".tag .tag-pin").on("click", toggleTagPin);
+    }
+
+    initLeftCol();
 
 
 
@@ -656,16 +676,6 @@ $(document).ready(function() {
             }
             else
                 $.notify({ message: "Fail to add paper(s): "+data.message }, { type: "danger",  z_index: 1051 });
-        });
-
-        return false;
-    }
-
-    function reloadTags () {
-        $.ajax({
-            url: "/api/tagmenu",
-            dataType: "html",
-            success: function (data) { $("#papers-col-left").html(data); }
         });
 
         return false;

@@ -24,6 +24,16 @@ class Settings {
         }
     }
 
+    public function preferences ($f3) {
+        try {
+            $this->user->editPreferences(trim($f3->get("POST.field")), trim($f3->get("POST.value")));
+            echo json_encode(array("success" => true, "message" => "Preferences saved successfully"));
+        }
+        catch (\Exception $e) {
+            echo json_encode(array("success" => false, "message" => $e->getMessage()));
+        }
+    }
+
     /**
      * Set a fixed color to a tag
      */

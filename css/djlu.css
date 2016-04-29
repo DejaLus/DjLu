@@ -300,7 +300,20 @@ a { transition: all .35s; }
     transition: opacity .35s;
     cursor: pointer;
     opacity: 0.3;
-    margin-right: 25px;
+}
+
+#papers-col-left .badge {
+    transition: opacity .35s;
+    opacity: 0.65;
+    font-size: 9px;
+    padding: 3px 5px;
+    background: #AAA;
+    float: right;
+    margin-right: 4px;
+}
+
+#papers-col-left .tag-active .badge {
+    opacity: 1;
 }
 
 #papers-col-left .tag-active .tag-label {
@@ -310,6 +323,26 @@ a { transition: all .35s; }
 #papers-col-left .tag-colorpicker {
     float: right;
     padding: 0.2em .6em .3em;
+}
+
+#papers-col-left .tag-pin {
+    float: right;
+    padding: 0 4px;
+    margin-right: 4px;
+    color: inherit;
+}
+
+#papers-col-left .tag-pin i {
+    transition: all .35s;
+}
+
+#papers-col-left .tag-pin:hover {
+    background: none;
+}
+
+#papers-col-left .tag-pin:not(.pinned) i {
+    transform: rotate(60deg);
+    color: #999;
 }
 
 .colorpicker {

@@ -33,7 +33,7 @@ class Papers {
         array_multisort($addDates, SORT_DESC, $papers);
 
         // gather tags
-        $tags = $this->model->getTags($papers);
+        $tags = $this->model->consolidateTags($papers);
 
         $this->f3->set("papers", $papers);
         $this->f3->set("tags", $tags);
@@ -65,25 +65,26 @@ class Papers {
             return;
         }
 
-        $paper = new \models\Paper($args["key"]);
+        $paperObj = new \models\Paper($args["key"]);
         try {
-            $paper->edit($f3->get("POST.file"), $f3->get("POST.field"), $f3->get("POST.value"));
+            $paperObj->edit($f3->get("POST.file"), $f3->get("POST.field"), $f3->get("POST.value"));
 
             // TODO make this optional
-            $out = $paper->getFiles();
+            $out = $paperObj->getFiles();
             $out["success"] = true;
 
-            // TODO optimize this and make it optional...
-            // get the new tr
-            // we need to get all papers just to be able to compute labels list and colors :(
-            $papers = $this->model->getPapers();
-            $addDates = array_map(function ($x) { return $x["date_added"]; }, $papers);
-            array_multisort($addDates, SORT_DESC, $papers);
-            $this->f3->set("tags", $this->model->getTags($papers));
+            // construct paper & tags for display
+            $tags = $this->model->consolidateTags(array($out["json"]), false);
+            $paper = $paperObj->getFiles()["json"];
+            $paper["type"] = "full";
+            $paper["key"] = $args["key"];
+            $paper["hasNotes"] = isset($out["md"]);
 
             // get the right paper and get HTML
-            $this->f3->set("paper", $papers[$args["key"]]);
+            $this->f3->set("tags", $tags);
+            $this->f3->set("paper", $paper);
             $out["tr"] = \Template::instance()->render("paper.htm", "text/html");
+            $out["tags"] = \Template::instance()->render("tagmenu.htm", "text/html");
 
             echo json_encode($out);
         }
@@ -117,11 +118,11 @@ class Papers {
                 $out["message"] = implode("<br>", $output["errors"]);
             }
 
-            // TODO optimize this...
+            // TODO optimize this after models\Paper refactoring
             $papers = $this->model->getPapers();
             $addDates = array_map(function ($x) { return $x["date_added"]; }, $papers);
             array_multisort($addDates, SORT_DESC, $papers);
-            $this->f3->set("tags", $this->model->getTags($papers));
+            $this->f3->set("tags", $this->model->consolidateTags($papers));
 
             // get the right paper and get HTML
             foreach ($output["keys"] as $key) {
@@ -176,19 +177,6 @@ class Papers {
         }
     }
 
-    public function apiUpdateTags ($f3) {
-
-        // TODO optimize this and make it optional...
-        // get the new tr
-        // we need to get all papers just to be able to compute labels list and colors :(
-        $papers = $this->model->getPapers();
-        $addDates = array_map(function ($x) { return $x["date_added"]; }, $papers);
-        array_multisort($addDates, SORT_DESC, $papers);
-        $this->f3->set("tags", $this->model->getTags($papers));
-
-        echo \Template::instance()->render("tagmenu.htm", "text/html");
-    }
-
     /**
      * Display info for a specific paper
      */
@@ -218,16 +206,10 @@ class Papers {
             }
 
             // gather tags
-            $tags = array();
-            if ($this->user->isLoggedIn()) {
-                $papers = $this->model->getPapers();
-                $addDates = array_map(function ($x) { return $x["date_added"]; }, $papers);
-                array_multisort($addDates, SORT_DESC, $papers);
-                $tags = $this->model->getTags($papers);
-            }
-            else {
-                $tags = $this->model->getTags(array($data["json"]));
-            }
+            if ($this->user->isLoggedIn())
+                $tags = $this->model->getDeclaredTags();
+            else
+                $tags = $this->model->getInviteTags(array($data["json"]));
 
             // display
             $this->f3->set("paper", $data);

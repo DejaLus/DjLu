@@ -27,7 +27,15 @@
 
 <div id="papers-container">
     <div id="papers-col-left">
-        <include href="tagmenu.htm" />
+        <div id="colorpicker" style="display: none;">
+            <div class="popover colorpicker" role="tooltip">
+                <div class="arrow"></div>
+                <repeat group="{{ explode('-', @TAGS_PALETTE) }}" value="{{ @color }}"><span data-color="{{ @color }}" style="background: #{{ @color }}"></span></repeat>
+            </div>
+        </div>
+        <div id="papers-col-left-container">
+            <include href="tagmenu.htm">
+        </div>
     </div>
     <div id="papers-col-middle">
         <table class="table table-striped table-hover" id="papers-table">

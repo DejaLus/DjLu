@@ -17,7 +17,7 @@ $(document).ready(function() {
         html = html.replace(/<\/?code>eq/g, "$$");
         html = html_entity_decode(html, "ENT_QUOTES");
         $("#paper-notes-content").html(html);
-        setTimeout(function() { MathJax.Hub.Typeset(); }, 300);
+        setTimeout(function() { MathJax.Hub.Typeset(); }, 750);
     }
 
     // initiate clipboard js
