@@ -280,7 +280,7 @@ class Paper {
         // citation key
         if (!is_string($citationKey))
             $citationKey = "";
-        $citationKey = preg_replace("[^a-zA-Z0-9]", "", \lib\Utils::remove_accents($citationKey));
+        $citationKey = preg_replace("/[^a-zA-Z0-9]/", "", \lib\Utils::remove_accents($citationKey));
         if (empty($citationKey)) {
             $words = explode(" ", preg_replace("#[-_;:,./?! ]+#", " ", $raw));
             preg_match("/(^|[^0-9-])((17|18|19|20|21)[0-9]{2})([^0-9-]|$)/", $raw, $matches);
@@ -288,7 +288,7 @@ class Paper {
                 $citationKey .= $words[$i];
             if (count($matches) > 3)
                 $citationKey .= $matches[2];
-            $citationKey = preg_replace("[^a-zA-Z0-9]", "", \lib\Utils::remove_accents($citationKey));
+            $citationKey = preg_replace("/[^a-zA-Z0-9]/", "", \lib\Utils::remove_accents($citationKey));
         }
 
         if (empty($citationKey))
@@ -359,7 +359,7 @@ class Paper {
                 throw new \Exception("Failed to remove notes");
 
         if (!empty($content))
-            if (file_put_contents($mdPath, $content) === false)
+            if (file_put_contents($mdPath, $content."\n") === false)
                 throw new \Exception("Failed to save file");
     }
 
