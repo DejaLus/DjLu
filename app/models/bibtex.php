@@ -838,6 +838,10 @@ class BibTex
         }
     }
 
+    public function removeCurlyBraces($value) {
+        return $this->_removeCurlyBraces($value);
+    }
+
     /**
      * Remove curly braces from entry
      *
@@ -1160,6 +1164,7 @@ class BibTex
      */
     function _escape_tex($tex)
     {
+        /*
         $tex = str_replace("\\", "\\\\", $tex);
         $tex = str_replace('#', '\#', $tex);
         $tex = str_replace('$', '\$', $tex);
@@ -1169,6 +1174,7 @@ class BibTex
         $tex = str_replace('_', '\_', $tex);
         $tex = str_replace('{', '\{', $tex);
         $tex = str_replace('}', '\}', $tex);
+        */
         return($tex);
     }
 }

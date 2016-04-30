@@ -108,7 +108,7 @@ class Paper {
             "abstract" => trim($xml["entry"]["summary"])
             );
 
-        $bibtex = new \models\BibTex(array("removeCurlyBraces" => true, "extractAuthors" => false));
+        $bibtex = new \models\BibTex(array("removeCurlyBraces" => false, "extractAuthors" => false));
         $bibtex->addEntry($bib);
         return $bibtex->toBibTex();
     }
@@ -172,7 +172,7 @@ class Paper {
     public static function createFromBibTex ($bibtexData, $citationKey = "") {
 
         // parse bibtex
-        $bibtex = new \models\BibTex(array('removeCurlyBraces' => true, 'extractAuthors' => false));
+        $bibtex = new \models\BibTex(array('removeCurlyBraces' => false, 'extractAuthors' => false));
         $bibtex->content = $bibtexData;
         $bibtex->parse();
 
@@ -247,22 +247,24 @@ class Paper {
         $this->folder = $this->key."_".$folderTitle;
         $this->path = $this->dataPath."/".$this->folder;
 
+        // create bibtex
+        $bibtex = new \models\BibTex(array('removeCurlyBraces' => false, 'extractAuthors' => false));
+        $bibtex->addEntry($data);
+
         // create JSON data
         $json = array(
-            "title" => $data["title"],
-            "authors" => explode(" and ", $data["author"]),
-            "year" => $data["year"] ? $data["year"] : "",
+            "title" => $bibtex->removeCurlyBraces($data["title"]),
+            "authors" => explode(" and ", $bibtex->removeCurlyBraces($data["author"])),
+            "year" => $data["year"] ? $bibtex->removeCurlyBraces($data["year"]) : "",
             "date_added" => date("Y-m-d H:i"),
-            "in" => $data["booktitle"] ? $data["booktitle"] : "",
+            "in" => $data["booktitle"] ? $bibtex->removeCurlyBraces($data["booktitle"]) : "",
             "tags_reading" => array("new"),
-            "url" => $data["url"] ? $data["url"] : "");
+            "url" => $data["url"] ? $bibtex->removeCurlyBraces($data["url"]) : "");
 
         if ($this->writeJSON($json) === false)
             throw new \Exception("Failed to write JSON file");
 
         // save bibtex
-        $bibtex = new \models\BibTex(array('removeCurlyBraces' => true, 'extractAuthors' => false));
-        $bibtex->addEntry($data);
         if (file_put_contents($this->path."/".$this->key.".bib", $bibtex->toBibTex()) === false)
             throw new \Exception("Failed to write bibtex file");
     }
@@ -396,7 +398,7 @@ class Paper {
                     $out["json"] = json_decode(file_get_contents($fpath), true);
                 elseif ($ext == "bib") {
                     $out["bibRaw"] = file_get_contents($fpath);
-                    $bibtex = new \models\BibTex(array('removeCurlyBraces' => true, 'extractAuthors' => false));
+                    $bibtex = new \models\BibTex(array('removeCurlyBraces' => false, 'extractAuthors' => false));
                     $bibtex->content = $out["bibRaw"];
                     $bibtex->parse();
                     if (is_array($bibtex->data) && count($bibtex->data) > 0) {
