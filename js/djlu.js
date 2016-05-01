@@ -232,11 +232,82 @@ $(document).ready(function() {
     /////// PAPER EDIT
     ////////////////////////////////////////
 
+    function enableAutocomplete (el, sourceData) {
+
+        var source = Object.keys(sourceData);
+
+        function tagsEntered(query) {
+            var tags = query.split(";")
+                .map(function(x) { return x.trim(); });
+            tags.pop();
+            return tags;
+        }
+
+        function extractor(query) {
+            var result = /([^;]+)$/.exec(query);
+            if(result && result[1])
+                return result[1].trim();
+            return '';
+        }
+
+        el.attr("autocomplete", "off").typeahead("destroy").typeahead({
+            source: source,
+            updater: function(item) {
+                return this.$element.val().replace(/[^;]*$/,'')+" "+item+'; ';
+            },
+            showHintOnFocus: true,
+            matcher: function (item) {
+                // match if not already in the entered tags
+                var tags = tagsEntered(this.query);
+                tags = tags.map(function (x) { return x.toLowerCase(); });
+                return (tags.indexOf(item.toLowerCase()) == -1);
+            },
+            sorter: function (items) {
+                // sort by beginWith > contains > others, and by popularity in each category
+                var beginswith = [], contains = [], others = [], item;
+                var tquery = extractor(this.query).toLowerCase();
+
+                items.sort(function (a, b) {
+                    return sourceData[b]["count"] - sourceData[a]["count"];
+                });
+
+                while (item = items.shift()) {
+                    var it = this.displayText(item).toLowerCase();
+                    if (it.indexOf(tquery) == 0)
+                        beginswith.push(item);
+                    else if (it.indexOf(tquery) == -1)
+                        others.push(item);
+                    else
+                        contains.push(item);
+                }
+
+                return beginswith.concat(contains, others);
+            },
+            highlighter: function (item) {
+                var query = extractor(this.query).replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&')
+                return item.replace(new RegExp('(' + query + ')', 'ig'), function ($1, match) {
+                    return '<strong>' + match + '</strong>'
+                })
+            }
+        });
+    }
+
+    function disableAutocomplete (el) {
+        el.removeAttr("autocomplete").typeahead("destroy");
+    }
+
     function paperEditShow () {
 
         // get info element
         var el = $(this).children("[data-key]");
         var form = $("#modal-paper-edit");
+        var autocomplete = el.data("autocomplete");
+
+        // handle autocomplete
+        if (autocomplete)
+            enableAutocomplete(form.find('[name="value"]'), tags[autocomplete]);
+        else
+            disableAutocomplete(form.find('[name="value"]'));
 
         form.attr("action", form.data("base-url").replace("@key", $("#paper-details").data("key")));
         form.find('[name="field"]').val(el.data("key"));

@@ -335,7 +335,7 @@ class Paper {
         // preprocess value
         if ($field == "tags_notes" || $field == "tags_reading" || $field == "tags_content" || $field == "authors") {
             $value = explode(";", $value);
-            $value = array_map("trim", $value);
+            $value = array_values(array_unique(array_filter(array_map("trim", $value))));
         }
         if ($field == "year")
             $value = (int) $value;

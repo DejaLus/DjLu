@@ -21,3 +21,6 @@
     </ul>
     <p class="text-right"><a href="#" class="btn btn-default btn-xs tags-reset" data-tag-group="{{ \models\Papers::$TAGS_GROUPS[@i] }}">Reset filters</a></p>
 </loop>
+<script type="text/javascript">
+var tags = {{ json_encode(@tags) }};
+</script>
