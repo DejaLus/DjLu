@@ -110,6 +110,9 @@ class Git extends \Prefab {
      * @return array                 log of git output and success
      */
     public function commitPush ($commitMessage) {
+        if (empty($commitMessage))
+            $commitMessage = "Update library";
+
         exec("git -C ".$this->pathCmd." commit -m ".escapeshellarg($commitMessage)." 2>&1", $log, $result);
         if ($result == 0) {
             $log[] = "";
