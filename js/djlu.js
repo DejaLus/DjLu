@@ -455,7 +455,7 @@ $(document).ready(function() {
                     return;
                 }
 
-                $("#paper-details .url").html(data.url);
+                $("#paper-details .url").html(data.url).attr("href", data.url);
                 $(".paper.active a.pdf").attr("href", data.url);
                 $.notify({ message: data.message }, { type: "success" });
 

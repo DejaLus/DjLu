@@ -29,7 +29,7 @@
         </false>
     </check>
     <span class="{{ isset(@paper.hasNotes) && @paper.hasNotes ? '' : 'invisible' }} has-notes" data-toggle="tooltip" data-placement="top" title="This paper has notes"><i class="fa fa-pencil-square-o"></i></span>
-    <a href="{{ !empty(@paper.url) ? @paper.url : "" }}" class="link" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
+    <a href="{{ !empty(@paper.url) ? @paper.url : "" }}" class="link pdf" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
 </td>
 </true>
 
