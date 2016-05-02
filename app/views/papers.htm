@@ -223,7 +223,7 @@
     </div>
 </form>
 
-<form class="modal fade" id="modal-settings" tabindex="-1" role="dialog" method="POST" action="{{ "settings" | alias }}">
+<div class="modal fade" id="modal-settings" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -231,14 +231,38 @@
                 <h4 class="modal-title"><i class="fa fa-cog"></i> Settings</h4>
             </div>
             <div class="modal-body">
+                <h5>Google Drive</h5>
+                <hr>
+                <p class="text-center">
+                <check if="{{ \models\GoogleDrive::instance()->isLoggedIn() }}">
+                <true> <a class="btn btn-default" id="driveLogout" href="{{ "driveLogout" | alias }}" target="_blank">Logout from Google Drive</a></true>
+                <false>DjLu is logged from your Google Drive account right now.</false>
+                </check>
+                </p>
+                <form class="form-group single-field-edit" method="POST" action="{{ "preferences" | alias }}">
+                    <label for="i_googleDriveRoot" class="control-label">Path where DjLu will store data <small>(<em>e.g.</em> Research/DjLu)</small></label>
+                    <input type="hidden" name="field" value="googleDriveRoot">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="i_googleDriveRoot" placeholder="Path where DjLu will store data (e.g. Research/DjLu)" name="value" value="{{ @user->getPreferences()['googleDriveRoot']; }}">
+                        <span class="input-group-btn">
+                            <button type="submit" class="btn btn-primary" disabled><i class="fa fa-check"></i></button>
+                        </span>
+                    </div>
+                </form>
+
                 <h5>Git repository</h5>
                 <hr>
                 <check if="{{ @user->hasRight('git') }}">
                 <true>
-                <div class="form-group">
+                <form class="form-group single-field-edit" method="POST" action="{{ "settings" | alias }}">
                     <label for="i_git" class="control-label"> Git repo</label>
-                    <input type="text" class="form-control" id="i_git" placeholder="Git repo SSH command (e.g. git@github.com:DejaLus/demoLibrary.git)" name="git" value="{{ @user->getGit(); }}">
-                </div>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="i_git" placeholder="Git repo SSH command (e.g. git@github.com:DejaLus/demoLibrary.git)" name="git" value="{{ @user->getGit(); }}">
+                        <span class="input-group-btn">
+                            <button type="submit" class="btn btn-primary" disabled><i class="fa fa-check"></i></button>
+                        </span>
+                    </div>
+                </form>
                 <div class="form-group">
                     <label class="control-label"> SSH key <sup>*</sup></label>
                     <div class="input-group">
@@ -258,9 +282,8 @@
                 </check>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
-</form>
+</div>

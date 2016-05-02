@@ -458,7 +458,6 @@ $(document).ready(function() {
                 $("#paper-details .url").html(data.url).attr("href", data.url);
                 $(".paper.active a.pdf").attr("href", data.url);
                 $.notify({ message: data.message }, { type: "success" });
-
             }
         });
     }
@@ -752,17 +751,37 @@ $(document).ready(function() {
         return false;
     }
 
-    function settings () {
-        $(this).modal("hide");
-        showSpinner("Saving your settings...");
+    function settingsSubmit () {
+
+        var input = $(this).find("input");
+        var btn = $(this).find("button[type=submit]")
+
+        btn.attr("disabled", "");
+        btn.find("i").removeClass("fa-check").addClass("fa-refresh fa-spin");
 
         ajaxFormProcess($(this), function (data) {
-            hideSpinner();
+            input.removeAttr("disabled");
+            btn.find("i").addClass("fa-check").removeClass("fa-refresh fa-spin");
             if (data.reload)
                 location.reload();
-            $.notify({ message: data.message }, { type: data.success ? "success" : "danger" });
+            $.notify({ message: data.message }, { type: data.success ? "success" : "danger", z_index: 1051 });
         });
 
+        input.attr("disabled", "");
+
+        return false;
+    }
+
+    function settingsEdit () {
+        $(this).parents("form.single-field-edit")
+            .find("button[type=submit]").removeAttr("disabled");
+    }
+
+    function driveLogout () {
+        var el = $(this);
+        $.get(el.attr("href"), function () {
+            el.replaceWith("DjLu is logged out from your Google Drive");
+        });
         return false;
     }
 
@@ -771,7 +790,9 @@ $(document).ready(function() {
     $("#modal-push-btn").on("click", gitPushModal);
     $("#modal-push").on("submit", gitPushForm);
     $("#modal-paper-add").on("submit", paperAdd);
-    $("#modal-settings").on("submit", settings);
+    $("#modal-settings form.single-field-edit input").on("input", settingsEdit);
+    $("#modal-settings form.single-field-edit").on("submit", settingsSubmit);
+    $("#driveLogout").on("click", driveLogout);
 
     // initiate clipboard js
     new Clipboard('.clipboard');
