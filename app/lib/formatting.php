@@ -95,7 +95,7 @@ class Formatting {
     public static function formatDate($date) {
         return '<span class="date" title="'.$date.'" data-toggle="tooltip" data-placement="top">'.
             preg_replace_callback('#^[0-9]+-([0-9]+)-([0-9]+)[^0-9]+([0-9]+)\:[0-9]+$#', function ($els) {
-                return $els[2].'&nbsp;'.self::$MONTHS[(int) $els[1]].'&nbsp;'.$els[3].'h';
+                return $els[2].'&nbsp;'.self::$MONTHS[((int) $els[1]) - 1].'&nbsp;'.$els[3].'h';
             }, $date).'</span>';
     }
 
@@ -177,4 +177,59 @@ class Formatting {
         return ($L > 0.33) ? "000000" : "FFFFFF";
     }
 
+    /**
+     * Parse a date in DjLu (YYYY-MM-DD hh:mm) and return a timestamp or false if wrong date format given
+     * @param  string $date date
+     * @return int|boolean
+     */
+    public static function parseDate ($date) {
+        if (!preg_match('#^([0-9]+)-([0-9]+)-([0-9]+)[^0-9]+([0-9]+)\:([0-9]+)$#', $date, $matches))
+            return false;
+        else
+            return mktime($matches[4], $matches[5], 0, $matches[2], $matches[3], $matches[1]);
+    }
+
+    /**
+     * Indicate if we should show a date splitter ("Today", "This week", "This month", etc.) between two dates
+     *
+     * Note that in this functions we consider that days start at 3am because people regulartly work late at night
+     * so we start day when people usally sleep instead of doing this at midnight when people can still work.
+     *
+     * @param  int  $previous previous timestamp (further in the future than $current)
+     * @param  int  $current  current timestamp before which to display splitter
+     * @return string
+     */
+    public static function getDateSplit ($previous, $current) {
+
+        // today
+        $today = strtotime("today 3am");
+        if ($current >= $today)
+            return $previous >= time() ? "Today" : "";
+
+        // this week
+        $weekStart = strtotime("previous monday 3am");
+        if ($current >= $weekStart)
+            return $previous >= $today ? "This week" : "";
+
+        // last week
+        $lastWeekStart = strtotime("previous monday 3am -7days");
+        if ($current >= $lastWeekStart)
+            return $previous >= $weekStart ? "Last week" : "";
+
+        // this month
+        $monthStart = strtotime("first day of this month 3am");
+        if ($current >= $monthStart)
+            return $previous >= $lastWeekStart ? "This month" : "";
+
+        // given date's month
+        $currentDateMonth = date("F Y", $current);
+        $currentDateMonthStart = strtotime("first day of ".$currentDateMonth." 3am");
+        $currentDateMonthEnd = strtotime("last day of ".$currentDateMonth." 3am") + 24*3600;
+        if ($previous >= min($currentDateMonthEnd, $lastWeekStart) && $current >= $currentDateMonthStart) {
+            if (date("Y") != date("Y", $current))
+                return $currentDateMonth;
+            else
+                return date("F", $current);
+        }
+    }
 }

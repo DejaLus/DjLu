@@ -49,10 +49,18 @@
             </tr>
             </thead>
             <tbody>
+            <set prevdate="{{ INF }}">
             <repeat group="{{ @papers }}" value="{{ @paper }}">
-            <tr class="paper paper-{{ @paper.type }}" data-paper-key="{{ @paper.key }}" id="paper-row-{{ @paper.key }}">
-                <include href="paper.htm" />
-            </tr>
+                <set currdate="{{ \lib\Formatting::parseDate(@paper['date_added']) }}"
+                     dateSplit="{{ \lib\Formatting::getDateSplit(@prevdate, @currdate) }}">
+                <check if="{{ !empty(@dateSplit) }}">
+                <tr class="time-delimiter"><td colspan="5">{{ @dateSplit }}</td></tr>
+                </check>
+                <set prevdate="{{ @currdate }}">
+
+                <tr class="paper paper-{{ @paper.type }}" data-paper-key="{{ @paper.key }}" id="paper-row-{{ @paper.key }}">
+                    <include href="paper.htm" />
+                </tr>
             </repeat>
             </tbody>
         </table>

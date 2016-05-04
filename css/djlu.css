@@ -366,6 +366,13 @@ a { transition: all .35s; }
     vertical-align: top;
 }
 
+#papers-table .time-delimiter td {
+    background-color: #DDD;
+    color: #666;
+    font-weight: bold;
+    padding: 2px 0 2px 8px;
+}
+
 #papers-table .paper td {
     padding: 2px 0 2px 8px;
 }
