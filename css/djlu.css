@@ -387,7 +387,7 @@ a { transition: all .35s; }
 
 #papers-table .labels-list {
     position: absolute;
-    height: 1.45em;
+    height: 1.6em;
     width: 100%;
     margin-left: -8px;
     padding: 0 38px 0 8px;
@@ -396,7 +396,7 @@ a { transition: all .35s; }
 #papers-table .labels-sublist {
     overflow-x: hidden;
     white-space: nowrap;
-    height: 1.45em;
+    height: 1.6em;
 }
 
 #papers-table .labels-sublist-left {
