@@ -422,7 +422,22 @@ a { transition: all .35s; }
 }
 
 #papers-table tr.active td {
-    background: #D9E4F7;
+    background: #E6E6E6;
+    color: #757575;
+    box-shadow: 0 5px 2px -3px rgba(0, 0, 0, 0.25) inset, 0 -5px 2px -3px rgba(0, 0, 0, 0.25) inset;
+}
+#papers-table tr.active td:first-child {
+    box-shadow: 4px 5px 2px -3px rgba(0, 0, 0, 0.25) inset, 5px -5px 2px -3px rgba(0, 0, 0, 0.25) inset;
+}
+#papers-table tr.active td:last-child {
+    box-shadow: -4px 5px 2px -3px rgba(0, 0, 0, 0.25) inset, -3px -5px 2px -3px rgba(0, 0, 0, 0.25) inset;
+}
+
+#papers-table tr.active .label {
+    -webkit-filter: contrast(82%) saturate(80%);
+}
+#papers-table tr.active .date {
+    color: #A0A0A0;
 }
 
 #papers-table .hspace {
@@ -437,7 +452,7 @@ a { transition: all .35s; }
 }
 
 #papers-table .date {
-    color: #C8D0DF;
+    color: #B9B9B9;
     font-size: 88%;
 }
 
