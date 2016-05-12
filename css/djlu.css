@@ -415,6 +415,11 @@ a { transition: all .35s; }
     cursor: pointer;
 }
 
+#papers-table .paper-short .title p {
+    padding: 0;
+    margin: 0;
+}
+
 #papers-table .paper-short .title {
     font-style: italic;
     color: #999;

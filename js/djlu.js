@@ -326,8 +326,10 @@ $(document).ready(function() {
 
             if (data.success) {
                 paperDisplayInfo(data);
-                $("#paper-row-"+$("#paper-details").data("key")).html(data.tr);
+                $("#paper-row-"+$("#paper-details").data("key")).replaceWith(data.tr);
+                $("#paper-row-"+$("#paper-details").data("key")).addClass("active");
                 $("#papers-col-left-container").html(data.tags);
+                initPapersTableStuff();
                 initLeftCol();
                 $.notify({ message: "Paper edited successfully" }, { type: "success" });
             }

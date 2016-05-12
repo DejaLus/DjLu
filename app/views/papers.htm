@@ -44,23 +44,21 @@
                 <th>Title</th>
                 <th>Author</th>
                 <th class="text-right">Publication</th>
-                <th class="text-right">Added</th>
-                <th data-toggle="tooltip" data-placement="top" title="Rating"></th>
+                <th class="text-right sort-up">Added</th>
+                <th class="text-right">Rating</th>
             </tr>
             </thead>
             <tbody>
             <set prevdate="{{ INF }}">
             <repeat group="{{ @papers }}" value="{{ @paper }}">
-                <set currdate="{{ \lib\Formatting::parseDate(@paper['date_added']) }}"
+                <set currdate="{{ \lib\Formatting::parseDate(@paper->getDateAdded()) }}"
                      dateSplit="{{ \lib\Formatting::getDateSplit(@prevdate, @currdate) }}">
                 <check if="{{ !empty(@dateSplit) }}">
-                <tr class="time-delimiter"><td colspan="5">{{ @dateSplit }}</td></tr>
+                <tr class="time-delimiter"><td colspan="5" data-sort="%hide%" data-sort-1="%hide%" data-sort-2="%hide%" data-sort-4="%hide%" data-sort-3="{{ date('Y-m-d H:i', @currdate + 60) }}">{{ @dateSplit }}</td></tr>
                 </check>
                 <set prevdate="{{ @currdate }}">
 
-                <tr class="paper paper-{{ @paper.type }}" data-paper-key="{{ @paper.key }}" id="paper-row-{{ @paper.key }}">
-                    <include href="paper.htm" />
-                </tr>
+                <include href="paper.htm" />
             </repeat>
             </tbody>
         </table>

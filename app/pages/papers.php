@@ -29,7 +29,9 @@ class Papers {
 
         // get papers list
         $papers = $this->model->getPapers();
-        $addDates = array_map(function ($x) { return $x["date_added"]; }, $papers);
+
+        // sort papers by date
+        $addDates = array_map(function ($x) { return $x->getDateAdded(); }, $papers);
         array_multisort($addDates, SORT_DESC, $papers);
 
         // gather tags
@@ -65,24 +67,18 @@ class Papers {
             return;
         }
 
-        $paperObj = new \models\Paper($args["key"]);
+        $paper = new \models\Paper($args["key"]);
         try {
-            $paperObj->edit($f3->get("POST.file"), $f3->get("POST.field"), $f3->get("POST.value"));
-
-            // TODO make this optional
-            $out = $paperObj->getFiles();
-            $out["success"] = true;
+            $paper->edit($f3->get("POST.file"), $f3->get("POST.field"), $f3->get("POST.value"));
 
             // construct paper & tags for display
-            $tags = $this->model->consolidateTags(array($out["json"]), false);
-            $paper = $paperObj->getFiles()["json"];
-            $paper["type"] = "full";
-            $paper["key"] = $args["key"];
-            $paper["hasNotes"] = isset($out["md"]);
-
-            // get the right paper and get HTML
+            $tags = $this->model->consolidateTags(array($paper), false);
             $this->f3->set("tags", $tags);
             $this->f3->set("paper", $paper);
+
+            // get output
+            $out = $paper->getFiles();
+            $out["success"] = true;
             $out["tr"] = \Template::instance()->render("paper.htm", "text/html");
             $out["tags"] = \Template::instance()->render("tagmenu.htm", "text/html");
 
@@ -105,7 +101,7 @@ class Papers {
         try {
             // save the paper(s) and get success keys
             if (!empty($f3->get("POST.raw")))
-                $output = \models\Paper::createFromRawRef($f3->get("POST.raw"), $f3->get("POST.citationKey"));
+                $output = \models\Paper::createShort($f3->get("POST.raw"), $f3->get("POST.citationKey"));
             elseif (!empty($f3->get("POST.id")))
                 $output = \models\Paper::createFromID($f3->get("POST.id"), $f3->get("POST.citationKey"));
             else
@@ -118,18 +114,16 @@ class Papers {
                 $out["message"] = implode("<br>", $output["errors"]);
             }
 
-            // TODO optimize this after models\Paper refactoring
-            $papers = $this->model->getPapers();
-            $addDates = array_map(function ($x) { return $x["date_added"]; }, $papers);
+            // list successful papers
+            $papers = $output["sucesses"];
+            $addDates = array_map(function ($x) { return $x->getDateAdded(); }, $papers);
             array_multisort($addDates, SORT_DESC, $papers);
             $this->f3->set("tags", $this->model->consolidateTags($papers));
 
-            // get the right paper and get HTML
-            foreach ($output["keys"] as $key) {
-                $this->f3->set("paper", $papers[$key]);
-                $out["html"] .= '<tr class="paper paper-'.$papers[$key]['type'].'" data-paper-key="'.$key.'" id="paper-row-'.$key.'">';
+            // get HTML of the papers
+            foreach ($papers as $paper) {
+                $this->f3->set("paper", $paper);
                 $out["html"] .= \Template::instance()->render("paper.htm", "text/html");
-                $out["html"] .= '</tr>';
             }
 
             echo json_encode($out);
@@ -189,19 +183,15 @@ class Papers {
                 throw new \Exception("No paper key given");
 
             $paper = new \models\Paper($args["key"], $args["user"]); // fails here if private access and not logged in
-            $data = $paper->getFiles();
-            $data["key"] = $args["key"];
 
             if (!$paper->exists())
                 throw new \Exception("Paper does not exist");
-            if (!isset($data["json"]))
-                throw new \Exception("Paper does not seem to exist");
 
             // check public access
             if (!empty($args["user"]) &&
                 (!$this->user->isLoggedIn() || $this->user->getUsername() != $args["user"])
-                && (!isset($args["secret"]) || !isset($data["json"]["secret"])
-                || $args["secret"] != $data["json"]["secret"])) {
+                && (!isset($args["secret"]) || !empty($paper->jsonField("secret"))
+                || $args["secret"] != $paper->jsonField("secret"))) {
                 throw new \Exception("You are not allowed to view this");
             }
 
@@ -209,13 +199,13 @@ class Papers {
             if ($this->user->isLoggedIn())
                 $tags = $this->model->getDeclaredTags();
             else
-                $tags = $this->model->getInviteTags(array($data["json"]));
+                $tags = $this->model->getInviteTags(array($paper->getJSON()));
 
             // display
-            $this->f3->set("paper", $data);
+            $this->f3->set("paper", $paper);
             $this->f3->set("tags", $tags);
             $this->f3->set("js", array("simplemde.min.js", "highlight.min.js", "clipboard.min.js", "djluPaper.js"));
-            $this->f3->set("title", $data["json"]["title"]);
+            $this->f3->set("title", $paper->jsonField("title"));
             $this->f3->set("content", "paperDisplay.htm");
             echo \Template::instance()->render("layout.htm");
         }
