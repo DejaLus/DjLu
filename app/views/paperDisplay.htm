@@ -9,33 +9,33 @@
 <section id="paper-display">
     <div class="container">
         <div class="col-md-8 col-md-offset-2">
-            <h1>{{ @paper.json.title }}<br>
-            <small>{{ \lib\Formatting::formatAuthors(@paper.json.authors, 'full') }}</small></h1>
+            <h1>{{ @paper->jsonField('title') }}<br>
+            <small>{{ \lib\Formatting::formatAuthors(@paper->jsonField('authors'), 'full') }}</small></h1>
             <p class="tags">
                 <span class="tags_content">
-                    {{ \lib\Formatting::formatTags(@paper.json.tags_content, "reading", @tags.content) }}
+                    {{ \lib\Formatting::formatTags(@paper->jsonField('tags_content'), "reading", @tags.content) }}
                 </span>
                 <span class="tags_notes">
-                    {{ \lib\Formatting::formatTags(@paper.json.tags_notes, "notes") }}
+                    {{ \lib\Formatting::formatTags(@paper->jsonField('tags_notes'), "notes") }}
                 </span>
                 <span class="tags_reading">
-                    {{ \lib\Formatting::formatTags(@paper.json.tags_reading, "reading", @tags.reading) }}
-                    {{ \lib\Formatting::formatRating(@paper.json.rating, true) }}
+                    {{ \lib\Formatting::formatTags(@paper->jsonField('tags_reading'), "reading", @tags.reading) }}
+                    {{ \lib\Formatting::formatRating(@paper->jsonField('rating'), true) }}
                 </span>
             </p>
             <div class="clearfix"></div>
-            <p class="publication"><strong>Publication: </strong> {{ @paper.json.in }} {{ @paper.json.year }}</p>
-            <p class="date_added"><strong>Added on: </strong> {{ @paper.json.date_added }}</p>
-            <check if="{{ @paper.json.url }}">
-                <p class="url"><strong>URL: </strong> <a href="{{ @paper.json.url }}">{{ @paper.json.url }}</a></p>
+            <p class="publication"><strong>Publication: </strong> {{ @paper->jsonField('in') }} {{ @paper->jsonField('year') }}</p>
+            <p class="date_added"><strong>Added on: </strong> {{ @paper->jsonField('date_added') }}</p>
+            <check if="{{ @paper->jsonField('url') }}">
+                <p class="url"><strong>URL: </strong> <a href="{{ @paper->jsonField('url') }}">{{ @paper->jsonField('url') }}</a></p>
             </check>
 
-            <check if="{{ !empty(@paper.md) }}">
+            <check if="{{ !empty(@paper->getFile('md')) }}">
             <div id="paper-notes">
                 <h4>Notes</h4>
                 <hr>
 
-                <div id="paper-notes-content"></div>
+                <div id="paper-notes-content">{{ @paper->getNotesHTML() }}</div>
 
                 <h5>Markdown</h5>
 
@@ -45,11 +45,11 @@
                     </button>
                 </div>
 
-                <pre id="paper-notes-raw">{{ @paper.md | raw }}</pre>
+                <pre id="paper-notes-raw">{{ @paper->getFile('md') | raw }}</pre>
             </div>
             </check>
 
-            <check if="{{ !empty(@paper.bibRaw) }}">
+            <check if="{{ !empty(@paper->getFile('bib')) }}">
             <div id="paper-bibtex">
                 <h4>Citation</h4>
                 <hr>
@@ -60,7 +60,7 @@
                     </button>
                 </div>
 
-                <div id="paper-citation">{{ @paper.bib.html | raw }}</div>
+                <div id="paper-citation">{{ @paper->getFile('bib')['html'] | raw }}</div>
 
                 <h5>BibTex</h5>
 
@@ -70,7 +70,7 @@
                     </button>
                 </div>
 
-                <pre id="paper-bibtex-content">{{ @paper.bibRaw | raw }}</pre>
+                <pre id="paper-bibtex-content">{{ @paper->getFiles(array('bib'))['bibRaw'] | raw }}</pre>
             </div>
             </check>
         </div>

@@ -10,50 +10,81 @@ class Paper {
     private $f3;
     private $dataPath;
     private $key;
-    private $folder;
-    private $path;
+    private $filename;
+    private $type;
+    private $filesCache = array();
+
+    const TYPE_FULL = "full";
+    const TYPE_SHORT = "short";
 
     /**
-     * Array of editable fields
+     * Array of editable fields in JSON
      * @var array
      */
     public static $JSON_EDITABLE_FIELDS = array("title", "authors", "in", "rating", "year", "url", "date_added", "tags_content", "tags_reading", "tags_notes", "secret");
 
-    function __construct($key = "", $username = "") {
+    function __construct($keyOrPath, $username = "") {
         $this->f3 = \Base::instance();
         $user = \models\User::instance();
 
-        if (!$user->isLoggedIn() && !$username)
+        // extract username
+        if (!$user->isLoggedIn() && empty($username))
             throw new \Exception("User not logged in");
         if (empty($username))
             $username = $user->getUsername();
 
+        // create data path
         $this->dataPath = $this->f3->get("DATA_PATH").$username;
         if (!is_dir($this->dataPath))
             throw new \Exception("User directory missing");
 
-        if ($key != "") {
-            $this->key = $key;
-            $this->folder = $this->getPaperFolder();
-            if ($this->folder)
-                $this->path = $this->dataPath."/".$this->folder;
-        }
+        // create key is given, if not, the paper doesn't exist yet
+        if (empty($keyOrPath))
+            throw new \Exception("No key given");
+
+        $this->key = preg_replace('/^([^_.]+)[_.].+$/', '\1', $keyOrPath);
+        $this->detectPaperFilename($keyOrPath);
     }
 
     /**
      * Get the folder name corresponding to a paper
-     * @param  string $key key of the paper
-     * @return mixed       string if found, false if not
+     * @param  string $possibleFolder suggestion of folder
+     * @return mixed       string if found, null if not
      */
-    private function getPaperFolder () {
-        foreach (scandir($this->dataPath) as $fname) {
-            $keyI = preg_replace('/^([^_]+)_.+$/', '\1', $fname);
-            $dirPath = $this->dataPath."/".$fname;
-            $jsonPath = $this->dataPath."/".$fname."/".$this->key.".json";
-            if ($fname != "." && $fname != ".." && $keyI == $this->key && is_dir($dirPath) && is_file($jsonPath))
-                return $fname;
+    private function detectPaperFilename ($possibleFilename = "") {
+
+        if (!empty($possibleFilename)) {
+            if (is_dir($this->dataPath."/".$possibleFilename) && is_file($this->dataPath."/".$possibleFilename."/".$this->key.".json")) {
+                $this->filename = $possibleFilename;
+                $this->type = self::TYPE_FULL;
+                return;
+            }
+            if (is_file($this->dataPath."/".$possibleFilename) && preg_match("/\.txt$/i", $possibleFilename)) {
+                $this->filename = $possibleFilename;
+                $this->type = self::TYPE_SHORT;
+                return;
+            }
         }
-        return null;
+
+        foreach (scandir($this->dataPath) as $fname) {
+            $keyI = preg_replace('/^([^_.]+)[_.].+$/', '\1', $fname);
+
+            if ($fname == "." || $fname == ".." || $keyI != $this->key)
+                continue;
+
+            $fpath = $this->dataPath."/".$fname;
+            $jsonPath = $this->dataPath."/".$fname."/".$this->key.".json";
+            if (is_dir($fpath) && is_file($jsonPath)) {
+                $this->filename = $fname;
+                $this->type = self::TYPE_FULL;
+                return;
+            }
+            if (is_file($fpath) && preg_match("/\.txt$/i", $fname)) {
+                $this->filename = $fname;
+                $this->type = self::TYPE_SHORT;
+                return;
+            }
+        }
     }
 
     /**
@@ -61,15 +92,42 @@ class Paper {
      * @return boolean
      */
     public function exists () {
-        return $this->folder != null;
+        return $this->filename !== null;
     }
 
     /**
      * Get the key of the paper
      * @return string
      */
-    public function getKey() {
+    public function getKey () {
         return $this->key;
+    }
+
+    /**
+     * Set the key of the paper
+     * @param string $key
+     */
+    public function setKey ($key) {
+        $this->key = $key;
+        $this->detectPaperFilename($key);
+    }
+
+    /**
+     * Return the type of the paper
+     * @return string
+     */
+    public function getType() {
+        return $this->type;
+    }
+
+    /**
+     * Get the path of the paper (directory or file path)
+     * @return string
+     */
+    private function getPath() {
+        if (!$this->exists())
+            throw new \Exception("Paper does not exist");
+        return $this->dataPath . "/" . $this->filename;
     }
 
     /**
@@ -177,7 +235,7 @@ class Paper {
         $bibtex->parse();
 
         // init
-        $successKeys = array();
+        $successes = array();
         $errors = array();
 
         // if bibtex invalid
@@ -204,7 +262,7 @@ class Paper {
             try {
                 $paper = new \models\Paper($key);
                 $paper->createFromBibTexData($data);
-                $successKeys[] = $key;
+                $successes[] = $paper;
             }
             catch (\Exception $e) {
                 $errors[] = "Error for paper with key ".$key.": ".$e->getMessage();
@@ -212,10 +270,10 @@ class Paper {
         }
 
         // return
-        if (count($successKeys) == 0)
+        if (count($successes) == 0)
             throw new \Exception(implode("\n", $errors));
         else
-            return array("keys" => $successKeys, "errors" => $errors);
+            return array("sucesses" => $successes, "errors" => $errors);
     }
 
     /**
@@ -229,11 +287,12 @@ class Paper {
             $this->key = $data["cite"];
         else
             $data["cite"] = $this->key;
+        $this->type = self::TYPE_FULL;
 
         // check key, title, author
         if (!preg_match("/^[a-zA-Z0-9]+$/", $this->key))
             throw new \Exception("Key can only contain letters and numbers");
-        if ($this->getPaperFolder()) // paper already exists
+        if ($this->exists()) // paper already exists
             throw new \Exception("A paper with this key already exists");
         if (empty($data["title"]) || empty($data["author"]))
             throw new \Exception("Empty title or author");
@@ -244,8 +303,7 @@ class Paper {
         $folderTitle = substr($folderTitle, 0, 50);
 
         mkdir($this->dataPath."/".$this->key."_".$folderTitle, 0755);
-        $this->folder = $this->key."_".$folderTitle;
-        $this->path = $this->dataPath."/".$this->folder;
+        $this->filename = $this->key."_".$folderTitle;
 
         // create bibtex
         $bibtex = new \models\BibTex(array('removeCurlyBraces' => false, 'extractAuthors' => false));
@@ -265,7 +323,7 @@ class Paper {
             throw new \Exception("Failed to write JSON file");
 
         // save bibtex
-        if (file_put_contents($this->path."/".$this->key.".bib", $bibtex->toBibTex()) === false)
+        if (file_put_contents($this->getPath()."/".$this->key.".bib", $bibtex->toBibTex()) === false)
             throw new \Exception("Failed to write bibtex file");
     }
 
@@ -275,7 +333,7 @@ class Paper {
      * @param  string $citationKey
      * @return array              success keys and error messages
      */
-    public static function createFromRawRef ($raw, $citationKey = "") {
+    public static function createShort ($raw, $citationKey = "") {
         if (empty(trim($raw)))
             throw new \Exception("No string reference received");
 
@@ -306,7 +364,7 @@ class Paper {
         if (file_put_contents($path, $raw) === false)
             throw new \Exception("Failed to save reference at ".$path);
 
-        return array("keys" => array("short_".$citationKey), "errors" => array());
+        return array("sucesses" => array(new Paper($citationKey)), "errors" => array());
     }
 
     /**
@@ -315,6 +373,8 @@ class Paper {
      * @param  string $value
      */
     private function editJSON ($field, $value) {
+        if (!$this->exists() || $this->type == self::TYPE_SHORT)
+            throw new \Exception("Impossible to edit");
         if (!$field || !in_array($field, self::$JSON_EDITABLE_FIELDS))
             throw new \Exception("Field not editable");
 
@@ -352,9 +412,11 @@ class Paper {
      * @param  string $content Content of the file to write
      */
     private function editMD ($content) {
+        if (!$this->exists() || $this->type == self::TYPE_SHORT)
+            throw new \Exception("Impossible to edit");
 
         $content = trim($content);
-        $mdPath = $this->path."/".$this->key.".md";
+        $mdPath = $this->getPath()."/".$this->key.".md";
 
         if (empty($content) && is_file($mdPath))
             if (!unlink($mdPath))
@@ -363,6 +425,7 @@ class Paper {
         if (!empty($content))
             if (file_put_contents($mdPath, $content."\n") === false)
                 throw new \Exception("Failed to save file");
+        unset($this->filesCache["md"]); // clean cache
     }
 
     /**
@@ -373,12 +436,21 @@ class Paper {
      * @return boolean        success
      */
     public function edit ($file, $field, $value) {
-
-        if ($file == "json")
+        if ($this->type == self::TYPE_FULL && $file == "json")
             return $this->editJSON($field, $value);
-        if ($file == "md")
+        if ($this->type == self::TYPE_FULL && $file == "md")
             return $this->editMD($value);
         throw new \Exception("File not editable");
+    }
+
+    /**
+     * Return a file
+     * @param  string $str file identifier (md, json, bib)
+     * @return mixed
+     */
+    public function getFile($str) {
+        $out = $this->getFiles(array($str));
+        return isset($out[$str]) ? $out[$str] : null;
     }
 
     /**
@@ -391,23 +463,38 @@ class Paper {
         if (!$this->exists())
             return array();
 
+        if ($this->type == self::TYPE_SHORT)
+            return array("md" => file_get_contents($this->getPath()));
+
         foreach ($els as $ext) {
-            $fpath = $this->path."/".$this->key.".".$ext;
+            $ext = preg_replace("/[^a-z0-9]/i", "", $ext);
+            $fpath = $this->getPath()."/".$this->key.".".$ext;
             if (is_file($fpath)) {
-                if ($ext == "json")
-                    $out["json"] = json_decode(file_get_contents($fpath), true);
-                elseif ($ext == "bib") {
-                    $out["bibRaw"] = file_get_contents($fpath);
-                    $bibtex = new \models\BibTex(array('removeCurlyBraces' => false, 'extractAuthors' => false));
-                    $bibtex->content = $out["bibRaw"];
-                    $bibtex->parse();
-                    if (is_array($bibtex->data) && count($bibtex->data) > 0) {
-                        $out["bib"] = $bibtex->data[0];
-                        $out["bib"]["html"] = $bibtex->html();
-                    }
+                if ($ext == "json") {
+                    if (!isset($this->filesCache["json"]))
+                        $this->filesCache["json"] = json_decode(file_get_contents($fpath), true);
+                    $out["json"] = $this->filesCache["json"];
                 }
-                else
-                    $out[$ext] = file_get_contents($fpath);
+                elseif ($ext == "bib") {
+                    if (!isset($this->filesCache["bibRaw"]))
+                        $this->filesCache["bibRaw"] = file_get_contents($fpath);
+                    if (!isset($this->filesCache["bib"])) {
+                        $bibtex = new \models\BibTex(array('removeCurlyBraces' => false, 'extractAuthors' => false));
+                        $bibtex->content = $this->filesCache["bibRaw"];
+                        $bibtex->parse();
+                        if (is_array($bibtex->data) && count($bibtex->data) > 0) {
+                            $this->filesCache["bib"] = $bibtex->data[0];
+                            $this->filesCache["bib"]["html"] = $bibtex->html();
+                        }
+                    }
+                    $out["bibRaw"] = $this->filesCache["bibRaw"];
+                    $out["bib"] = $this->filesCache["bib"];
+                }
+                else {
+                    if (!isset($this->filesCache[$ext]))
+                        $this->filesCache[$ext] = file_get_contents($fpath);
+                    $out[$ext] = $this->filesCache[$ext];
+                }
             }
         }
 
@@ -419,7 +506,48 @@ class Paper {
      * @return array
      */
     public function getJSON () {
-        return $this->getFiles(array("json"))["json"];
+        $json = $this->getFile("json");
+        return $json != null ? $json : array();
+    }
+
+    /**
+     * Return the value of a field from the JSON
+     * @param  string $field field name
+     * @return string
+     */
+    public function jsonField($field) {
+        $json = $this->getJSON();
+        if (isset($json[$field]))
+            return $json[$field];
+        else
+            return null;
+    }
+
+    /**
+     * Return the creation date of the paper
+     * @return string YYYY-MM-DD HH:MM
+     */
+    public function getDateAdded () {
+        if (!$this->exists())
+            return "";
+        elseif ($this->type == self::TYPE_FULL)
+            return $this->jsonField("date_added");
+        else
+            return date("Y-m-d H:i", filemtime($this->getPath()));
+    }
+
+    /**
+     * Return the MD notes about the paper as HTML
+     * @return string
+     */
+    public function getNotesHTML ($options = array()) {
+        $md = $this->getFile("md");
+        if (!$md)
+            return;
+        $parsedown = new \lib\Parsedown();
+        if (isset($options["nl2br"]))
+            $md = str_replace("\n", "<br>", trim($md));
+        return $parsedown->text($md);
     }
 
     /**
@@ -428,12 +556,18 @@ class Paper {
      * @return int number of bytes written or FALSE if error
      */
     public function writeJSON ($json) {
-        return file_put_contents($this->path."/".$this->key.".json", json_encode($json, JSON_PRETTY_PRINT));
+        if ($this->type != self::TYPE_FULL || !$this->exists())
+            return;
+        unset($this->filesCache["json"]); // clean cache
+        return file_put_contents($this->getPath()."/".$this->key.".json", json_encode($json, JSON_PRETTY_PRINT));
     }
 
+    /**
+     * Remove the paper from the library
+     */
     public function delete () {
         if (!$this->exists())
             return true;
-        return \lib\Utils::rrmdir($this->path);
+        return \lib\Utils::rrmdir($this->getPath());
     }
 }

@@ -30,29 +30,10 @@ class Papers extends \Prefab {
 
         $papers = array();
 
-        // iterate of the folders of the user
         foreach (scandir($folderPath) as $fname) {
-
-            $key = preg_replace('/^([^_]+)_.+$/', '\1', $fname); // before _ is the "key" of the paper
-            $dirPath = $folderPath."/".$fname;
-            $jsonPath = $folderPath."/".$fname."/".$key.".json";
-            $mdPath = $folderPath."/".$fname."/".$key.".md";
-
-            if ($fname != "." && $fname != ".." && is_dir($dirPath) && is_file($jsonPath)) {
-                $paper = json_decode(file_get_contents($jsonPath), true);
-                $paper["type"] = "full";
-                $paper["key"] = $key;
-                $paper["folder"] = $fname;
-                $paper["hasNotes"] = is_file($mdPath);
-                $papers[$key] = $paper;
-            }
-            elseif (is_file($dirPath) && preg_match("/^([a-zA-Z0-9]+)\.txt$/", $fname, $matches)) {
-                $papers["short_".$matches[1]] = array(
-                    "type" => "short",
-                    "key" => "short_".$matches[1],
-                    "str" => file_get_contents($dirPath),
-                    "date_added" => date("Y-m-d H:i", filemtime($dirPath)));
-            }
+            $paper = new Paper($fname);
+            if ($paper->exists())
+                $papers[] = $paper;
         }
 
         return $papers;
@@ -67,13 +48,9 @@ class Papers extends \Prefab {
         $keys = array();
 
         foreach (scandir($folderPath) as $fname) {
-
-            $key = preg_replace('/^([^_]+)_.+$/', '\1', $fname);
-            $dirPath = $folderPath."/".$fname;
-            $jsonPath = $folderPath."/".$fname."/".$key.".json";
-
-            if ($fname != "." && $fname != ".." && is_dir($dirPath) && is_file($jsonPath))
-                $keys[] = $key;
+            $paper = new Paper($fname);
+            if ($paper->exists())
+                $keys[] = $paper->getKey();
         }
 
         return $keys;
@@ -159,8 +136,8 @@ class Papers extends \Prefab {
         // loop over tag groups and papers to add tags
         foreach (self::$TAGS_GROUPS as $group) {
             foreach($papers as $paper) {
-                if (is_array($paper["tags_".$group])) {
-                    foreach ($paper["tags_".$group] as $tag) {
+                if (is_array($paper->jsonField("tags_".$group))) {
+                    foreach ($paper->jsonField("tags_".$group) as $tag) {
                         // assign color if needed
                         if (!isset($tags[$group][$tag]))
                             $tags[$group][$tag] = array("pinned" => false, "color" => $palette->getNextColor(), "count" => 0);
@@ -202,8 +179,8 @@ class Papers extends \Prefab {
         // loop over tag groups and papers to add tags
         foreach (self::$TAGS_GROUPS as $group)
             foreach($papers as $paper)
-                if (is_array($paper["tags_".$group]))
-                    foreach ($paper["tags_".$group] as $tag)
+                if (is_array($paper->jsonField("tags_".$group)))
+                    foreach ($paper->jsonField("tags_".$group) as $tag)
                         $tags[$group][$tag] = array("pinned" => false, "color" => $palette->getNextColor(), "count" => 1);
 
         return $tags;
