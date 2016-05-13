@@ -118,7 +118,7 @@ class Papers {
             $papers = $output["sucesses"];
             $addDates = array_map(function ($x) { return $x->getDateAdded(); }, $papers);
             array_multisort($addDates, SORT_DESC, $papers);
-            $this->f3->set("tags", $this->model->consolidateTags($papers));
+            $this->f3->set("tags", $this->model->consolidateTags($papers, true, false));
 
             // get HTML of the papers
             foreach ($papers as $paper) {
