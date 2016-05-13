@@ -544,10 +544,19 @@ class Paper {
         $md = $this->getFile("md");
         if (!$md)
             return;
+        $md = preg_replace('/(^|[^\\\])\$\$/', '\1`eq2', $md);
+        $md = preg_replace('/(^|[^\\\])\$/',   '\1`eq',  $md);
+
         $parsedown = new \lib\Parsedown();
         if (isset($options["nl2br"]))
             $md = str_replace("\n", "<br>", trim($md));
-        return $parsedown->text($md);
+        $html = $parsedown->text($md);
+
+        $html = preg_replace('/\<\\/?code\>eq2/', '$$', $html);
+        $html = preg_replace('/\<\\/?code\>eq/', '$', $html);
+        $html = html_entity_decode($html, ENT_QUOTES);
+
+        return $html;
     }
 
     /**

@@ -698,6 +698,12 @@ table th.sort-up:after {
     font-size: 15px;
 }
 
+#paper-notes-content table td,
+#paper-notes-content table th {
+    border: 1px solid #ddd;
+    padding: 5px;
+}
+
 .CodeMirror .CodeMirror-code .cm-header-1 {
     font-size: 19px;
 }
