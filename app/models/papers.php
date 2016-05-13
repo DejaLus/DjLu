@@ -62,6 +62,9 @@ class Papers extends \Prefab {
      * @return string
      */
     public function getNextAvailableKey ($prefix) {
+        if (empty($prefix))
+            return "Empty";
+
         $sufixes = array();
         foreach ($this->getKeys() as $key)
             if (strpos($key, $prefix) === 0)

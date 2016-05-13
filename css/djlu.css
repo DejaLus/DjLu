@@ -646,8 +646,11 @@ table th.sort-up:after {
     top: 0;
     right: 0;
     display: block;
-    padding: 1px 12px;
     border-radius: 0 4px 0 4px;
+}
+
+.right-action-buttons-pre .btn.clipboard {
+    padding: 1px 12px;
 }
 
 .right-action-buttons .clipboard .fa-clipboard:before, .right-action-buttons-pre .clipboard .fa-clipboard:before {

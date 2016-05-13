@@ -753,6 +753,18 @@ $(document).ready(function() {
         return false;
     }
 
+    function bibtexInit () {
+        $("#i_bibtex").val(
+            "@article{,\n"+
+            "  author = {},\n"+
+            "  year = {},\n"+
+            "  title = {},\n"+
+            "  booktitle = {},\n"+
+            "  journal = {},\n"+
+            "  volume = {}\n"+
+            "}");
+    }
+
     function settingsSubmit () {
 
         var input = $(this).find("input");
@@ -792,6 +804,7 @@ $(document).ready(function() {
     $("#modal-push-btn").on("click", gitPushModal);
     $("#modal-push").on("submit", gitPushForm);
     $("#modal-paper-add").on("submit", paperAdd);
+    $("#bibtex-init").on("click", bibtexInit);
     $("#modal-settings form.single-field-edit input").on("input", settingsEdit);
     $("#modal-settings form.single-field-edit").on("submit", settingsSubmit);
     $("#driveLogout").on("click", driveLogout);
@@ -800,5 +813,3 @@ $(document).ready(function() {
     new Clipboard('.clipboard');
 
 });
-
-
