@@ -203,13 +203,22 @@ class Formatting {
 
         // today
         $today = strtotime("today 3am");
+        if ($today > time())
+            $today = strtotime("yesterday 3am");
         if ($current >= $today)
             return $previous >= time() ? "Today" : "";
+
+        // yesterday
+        $yesterday = strtotime("yesterday 3am");
+        if ($today == $yesterday)
+            $yesterday = strtotime("yesterday 3am -1day");
+        if ($current >= $yesterday)
+            return $previous >= $today ? "Yesterday" : "";
 
         // this week
         $weekStart = strtotime("previous monday 3am");
         if ($current >= $weekStart)
-            return $previous >= $today ? "This week" : "";
+            return $previous >= $yesterday ? "This week" : "";
 
         // last week
         $lastWeekStart = strtotime("previous monday 3am -7days");
