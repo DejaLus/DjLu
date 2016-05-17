@@ -9,14 +9,12 @@ class Papers extends \Prefab {
 
     private $f3;
     private $user;
-    private $username;
     public static $TAGS_GROUPS = array("content", "reading");
     public static $TAGS_GROUPS_LABELS = array("Content", "Reading status");
 
     function __construct() {
         $this->f3 = \Base::instance();
         $this->user = \models\User::instance();
-        $this->username = $this->user->getUsername();
     }
 
     /**
@@ -26,7 +24,7 @@ class Papers extends \Prefab {
      */
     public function getPapers () {
 
-        $folderPath = $this->f3->get("DATA_PATH").$this->username;
+        $folderPath = $this->f3->get("DATA_PATH").$this->user->getUsername();
 
         $papers = array();
 
@@ -44,7 +42,7 @@ class Papers extends \Prefab {
      */
     public function getKeys () {
 
-        $folderPath = $this->f3->get("DATA_PATH").$this->username;
+        $folderPath = $this->f3->get("DATA_PATH").$this->user->getUsername();
         $keys = array();
 
         foreach (scandir($folderPath) as $fname) {
