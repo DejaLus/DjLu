@@ -200,23 +200,17 @@ class Paper {
     public static function createFromId ($rawId, $citationKey = "") {
 
         $rawId = trim($rawId);
-
-        // arXiv
-        if (strpos($rawId, "arXiv:") === 0) {
-            $id = preg_replace("#^arXiv:(.+)$#", '\1', $rawId);
-            $bibtex = self::bibTexFromArXiv($id);
-        }
-        elseif (preg_match("#arxiv\.org/[a-z]{3}/([0-9]+\.?[0-9]+v?[0-9]*)#", $rawId, $match) === 1) {
-            $id = $match[1];
-            $bibtex = self::bibTexFromArXiv($id);
-        }
-        // DOI
-        elseif (strpos($rawId, "doi:") === 0) {
-            $id = preg_replace("#^doi:(.+)$#", '\1', $rawId);
-            $bibtex = self::bibTexFromDOI($id);
-        }
-        else
+        if (preg_match("/^(?:doi:)?(10\..+)$/", $rawId, $match)) {
+            // DOI
+            $rawId = $match[1];
+            $bibtex = self::bibTexFromDOI($rawId);
+        } elseif (preg_match("/^(?:ar[Xx]iv:)?(?:.*arxiv\.org\/[a-z]{3}\/)?(.+)$/", $rawId, $match)) {
+            // arXiv
+            $rawId = $match[1];
+            $bibtex = self::bibTexFromArXiv($rawId);
+        } else {
             throw new \Exception("ID not supported");
+        }
 
         return self::createFromBibTex($bibtex, $citationKey);
     }
