@@ -1,6 +1,15 @@
 $(document).ready(function() {
 
     'use strict';
+    $.notifyDefaults({
+        placement: {
+            from: "bottom"
+        },
+        animate:{
+            enter: "animated fadeInUp",
+            exit: "animated fadeOutDown"
+        }
+    });
 
     ///////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////

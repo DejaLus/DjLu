@@ -1,6 +1,16 @@
 'use strict';
 
 $(document).ready(function () {
+    
+    $.notifyDefaults({
+        placement: {
+            from: "bottom"
+        },
+        animate:{
+            enter: "animated fadeInUp",
+            exit: "animated fadeOutDown"
+        }
+    });
 
     // jQuery for page scrolling feature - requires jQuery Easing plugin
     $('a.page-scroll').bind('click', function(event) {
