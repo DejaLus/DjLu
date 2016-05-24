@@ -204,7 +204,7 @@ class Paper {
             // DOI
             $rawId = $match[1];
             $bibtex = self::bibTexFromDOI($rawId);
-        } elseif (preg_match("/^(?:ar[Xx]iv:)?(?:.*arxiv\.org\/[a-z]{3}\/)?(.+)$/", $rawId, $match)) {
+        } elseif (preg_match("/^(?:ar[Xx]iv:)?(?:.*arxiv\.org\/[a-z]{3}\/)?([0-9]+\.?[0-9]+v?[0-9]*)/", $rawId, $match)) {
             // arXiv
             $rawId = $match[1];
             $bibtex = self::bibTexFromArXiv($rawId);
