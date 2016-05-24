@@ -8,13 +8,13 @@ namespace models;
 class Git extends \Prefab {
 
     private $f3;
-    private $username;
+    private $user;
     private $path;
 
     function __construct() {
         $this->f3 = \Base::instance();
-        $this->username = \models\User::instance()->getUsername();
-        $this->path = $this->f3->get("ROOT")."/".$this->f3->get("DATA_PATH").$this->username;
+        $this->user = User::instance();
+        $this->path = $this->f3->get("ROOT")."/".$this->f3->get("DATA_PATH").$this->user->getUsername();
         $this->pathCmd = escapeshellarg($this->path);
     }
 
@@ -42,9 +42,9 @@ class Git extends \Prefab {
 
         ////////
         // set ssh config to use key
-        $fakeHost = "djlu-".$this->username;
+        $fakeHost = "djlu-".$this->user->getUsername();
         $clonePath = $fakeHost.":".$match[5];
-        $sshPath = $this->f3->get("ROOT")."/".$this->f3->get("DATA_PATH").'_keys/'.$this->username;
+        $sshPath = $this->f3->get("ROOT")."/".$this->f3->get("DATA_PATH").'_keys/'.$this->user->getUsername();
 
         $sshConfigPath = getenv("HOME")."/.ssh/config";
         if(!file_exists($sshConfigPath)) {
