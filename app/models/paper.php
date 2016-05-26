@@ -448,6 +448,21 @@ class Paper {
     }
 
     /**
+     * Indicate if the paper has a given file
+     * @param  string $ext file extension (md, json, bib)
+     * @return boolean
+     */
+    public function hasFile($ext) {
+        if (!$this->exists() || $this->type == self::TYPE_SHORT)
+            return false;
+
+        $ext = preg_replace("/[^a-z0-9]/i", "", $ext);
+        $fpath = $this->getPath()."/".$this->key.".".$ext;
+
+        return is_file($fpath);
+    }
+
+    /**
      * Return different elements related to a given paper
      * @param  array  $els elements to get
      * @return array       list of requested elements (if exists)

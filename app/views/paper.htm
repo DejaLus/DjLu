@@ -31,7 +31,7 @@
         <a class="link invisible"><i class="fa fa-link"></i></a>
         </false>
     </check>
-    <span class="{{ @paper->jsonField('hasNotes') ? '' : 'invisible' }} has-notes" data-toggle="tooltip" data-placement="top" title="This paper has notes"><i class="fa fa-pencil-square-o"></i></span>
+    <span class="{{ @paper->hasFile('md') ? '' : 'invisible' }} has-notes" data-toggle="tooltip" data-placement="top" title="This paper has notes"><i class="fa fa-pencil-square-o"></i></span>
     <a href="{{ !empty(@paper->jsonField('url')) ? @paper->jsonField('url') : "" }}" class="link pdf" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
 </td>
 
