@@ -27,7 +27,7 @@
             <p class="publication"><strong>Publication: </strong> {{ @paper->jsonField('in') }} {{ @paper->jsonField('year') }}</p>
             <p class="date_added"><strong>Added on: </strong> {{ @paper->jsonField('date_added') }}</p>
             <check if="{{ @paper->jsonField('url') }}">
-                <p class="url"><strong>URL: </strong> <a href="{{ @paper->jsonField('url') }}">{{ @paper->jsonField('url') }}</a></p>
+                <p class="url"><strong>URL: </strong> <a href="{{ @paper->jsonField('url') }}" target="_blank">{{ @paper->jsonField('url') }}</a></p>
             </check>
 
             <check if="{{ !empty(@paper->getFile('md')) }}">
