@@ -1,3 +1,5 @@
+<a id="fix-col-left" class="tag-pin"><i class="fa fa-thumb-tack" role="button" data-toggle="tooltip" title="Prevent the window of rectracting automatically"></i></a>
+
 <loop from="{{ @i=0 }}" to="{{ @i < count(\models\Papers::$TAGS_GROUPS) }}" step="{{ @i++ }}">
     <h3>{{ \models\Papers::$TAGS_GROUPS_LABELS[@i] }}</h3>
     <ul class="nav" data-tag-group="{{ \models\Papers::$TAGS_GROUPS[@i] }}">

@@ -622,7 +622,25 @@ $(document).ready(function() {
         }, "json");
     }
 
+    function fixColLeft () {
+        $(this).toggleClass("pinned");
+        if ($(this).hasClass("pinned")) {
+            $('#papers-container').addClass("fixed-col-left");
+            Cookies.set("fix-col-left", true);
+        } else {
+            $('#papers-container').removeClass("fixed-col-left");
+            Cookies.remove("fix-col-left");
+        }
+    }
+
     function initLeftCol () {
+        // fix col left
+        if (Cookies.get("fix-col-left")) {
+            $("#fix-col-left").toggleClass("pinned");
+            $('#papers-container').addClass("fixed-col-left");
+        }
+        $("#fix-col-left").on("click", fixColLeft);
+
         // tags toggle
         $(".tag .tag-label").on("click", function () {
             $(this).parent().toggleClass("tag-active");
