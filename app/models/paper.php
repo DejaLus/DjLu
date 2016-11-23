@@ -131,6 +131,31 @@ class Paper {
     }
 
     /**
+     * Get the doi from arXiv ID if it exists
+     * @param  string $id arXiv ID
+     * @return string     DOI or NULL
+     */
+    private static function doiFromArXiv ($id) {
+        $xml = @file_get_contents("http://export.arxiv.org/api/query?id_list=".$id);
+        if (!$xml)
+            throw new \Exception("Error while loading, the ID probably do not exist");
+
+        $xml = json_decode(json_encode(simplexml_load_string($xml)), true);
+
+        if ($xml["entry"]["title"] == "Error")
+            throw new \Exception("No paper found for arXiv id ".$id);
+
+        foreach ($xml["entry"]["link"] as $link) {
+            if ($link["@attributes"]["title"] === "doi") {
+                $doi = preg_replace("#^.+?//.+?/(.+)$#", "$1", $link["@attributes"]["href"]);
+                return $doi;
+            }
+        }
+        
+        return;
+    }
+
+    /**
      * Get the bibtex from arXiv ID
      * @param  string $id arXiv ID
      * @return string     bibtex
@@ -164,7 +189,7 @@ class Paper {
             "eprint" => $id,
             "url" => call_user_func(function($links) {foreach ($links as $y) { if($y["@attributes"]["title"] == "pdf") { return $y["@attributes"]["href"]; } }}, $xml["entry"]["link"]),
             "abstract" => trim($xml["entry"]["summary"])
-            );
+        );
 
         $bibtex = new \models\BibTex(array("removeCurlyBraces" => false, "extractAuthors" => false));
         $bibtex->addEntry($bib);
@@ -207,7 +232,12 @@ class Paper {
         } elseif (preg_match("/^(?:ar[Xx]iv:)?(?:.*arxiv\.org\/[a-z]{3}\/)?([0-9]+\.?[0-9]+v?[0-9]*)/", $rawId, $match)) {
             // arXiv
             $rawId = $match[1];
-            $bibtex = self::bibTexFromArXiv($rawId);
+            $doi = self::doiFromArXiv($rawId);
+            if ($doi === NULL) {
+                $bibtex = self::bibTexFromArXiv($rawId);
+            } else {
+                $bibtex = self::bibTexFromDOI($doi);
+            }
         } else {
             throw new \Exception("ID not supported");
         }
