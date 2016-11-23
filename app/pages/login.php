@@ -32,6 +32,26 @@ class Login {
     }
 
     /**
+     * Change user's password
+     */
+    public function changePassword ($f3) {
+
+        try {
+            // get post
+            $password = $f3->get("POST.old_password");
+            $newPassword = $f3->get("POST.new_password");
+
+            if (\models\User::instance()->changePassword($password, $newPassword)) {
+                \lib\Flash::instance()->addMessage("Your password has been changed", "info");
+            }
+        }
+        catch (\Exception $e) {
+            \lib\Flash::instance()->addMessage($e->getMessage(), "danger");
+        }
+        $f3->reroute("@papers");
+    }
+
+    /**
      * Do logout processing
      */
     public function logout ($f3) {

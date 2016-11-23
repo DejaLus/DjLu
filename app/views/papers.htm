@@ -242,7 +242,6 @@
             </div>
             <div class="modal-body">
                 <h5>Google Drive</h5>
-                <hr>
                 <p class="text-center">
                 <check if="{{ \models\GoogleDrive::instance()->isLoggedIn() }}">
                 <true> <a class="btn btn-default" id="driveLogout" href="{{ "driveLogout" | alias }}" target="_blank">Logout from Google Drive</a></true>
@@ -260,8 +259,8 @@
                     </div>
                 </form>
 
-                <h5>Git repository</h5>
                 <hr>
+                <h5>Git repository</h5>
                 <check if="{{ @user->hasRight('git') }}">
                 <true>
                 <form class="form-group single-field-edit" method="POST" action="{{ "settings" | alias }}">
@@ -290,6 +289,42 @@
                 <p>Git feature is disabled for your account. Ask your DjLu administrator to enable it if your want to use it.</p>
                 </false>
                 </check>
+
+                <hr>
+                <h5>Manage account</h5>
+                <p class="text-center">
+                    <div id="manage-account-div">
+                        <p class="text-center">
+                            <button type="button" class="btn btn-default" id="btn-change-password">Change Password</button>
+                            <button type="button" class="btn btn-primary" id="btn-change-password-confirm">Confirm</button>
+                        </p>
+                    </div>
+                    <div id="change-password-div">
+                        <form class="form-horizontal" id="change-form" method="POST" action="{{ 'changePassword' | alias }}">
+                            <div class="form-group">
+                                <label for="i_password" class="col-sm-6 control-label">Old password</label>
+                                <div class="col-sm-4">
+                                    <input type="password" class="form-control" id="i_old_password" placeholder="Password">
+                                    <input type="hidden" id="i_old_password4" name="old_password">
+                                    <input type="hidden" id="s_sid_c" value="<?php echo session_id(); ?>">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="i_password" class="col-sm-6 control-label">New password</label>
+                                <div class="col-sm-4">
+                                    <input type="password" class="form-control" id="i_new_password" placeholder="Password">
+                                    <input type="hidden" id="i_new_password4" name="new_password">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="i_password" class="col-sm-6 control-label">Repeat new password</label>
+                                <div class="col-sm-4">
+                                    <input type="password" class="form-control" id="i_confirm_password" placeholder="Password">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

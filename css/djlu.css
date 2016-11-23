@@ -249,7 +249,7 @@ a { transition: all .35s; }
     font-weight: bold;
     text-align: center;
     color: #717171;
-    margin-top: 40px;
+    margin-top: 30px;
 }
 
 #modal-settings h5:first-child {
@@ -260,6 +260,7 @@ a { transition: all .35s; }
     width: 50px;
     border-width: 3px;
     border-color: #D4D4D4;
+    margin-top: 30px;
 }
 
 /***** LEFT COLUMN (TAGS) *****/
@@ -798,3 +799,17 @@ table th.sort-up:after {
 .confirmation .popover-title {
     text-align: center;
 }
+
+#change-password-div {
+    display: none;
+    padding-top: 15px;
+}
+
+#manage-account-div {
+    margin-top: 15px;
+}
+
+#btn-change-password-confirm {
+    display: none;
+}
+

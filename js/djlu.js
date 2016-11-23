@@ -18,6 +18,20 @@ $(document).ready(function() {
     ///////////////////////////////////////////////////////////////////////////
 
 
+    function encode_utf8(val) {
+        return unescape(encodeURIComponent(val));
+    }
+
+    function hash(text, standard_key) {
+        var bcrypt = dcodeIO.bcrypt;
+        var ntext = encode_utf8(text);
+        if (standard_key)
+            var djkey = '$2a$10$Ex3s.i/XW9efb/61f5mB8e';
+        else
+            var djkey = bcrypt.genSaltSync(15);
+        return bcrypt.hashSync(text, djkey);
+    }
+
 
     ////////////////////////////////////////
     /////// MARKDOWN EDITOR
@@ -841,6 +855,50 @@ $(document).ready(function() {
         });
         return false;
     }
+
+    function hideAllSettings () {
+        $("#change-password-div").hide();
+        $("#btn-change-password-confirm").hide();
+        $("#i_old_password").val('');
+        $("#i_old_password4").val('');
+        $("#i_new_password").val('');
+        $("#i_new_password4").val('');
+        $("#i_confirm_password").val('');
+        $("#i_confirm_password4").val('');
+        $("#btn-change-password").text('Change Password');
+    }
+
+    $("#btn-change-password").on("click", function () {
+        if ($('#change-password-div').is(':visible')) {
+            hideAllSettings();
+        } else {
+            $("#change-password-div").show();
+            $("#btn-change-password-confirm").show();
+            $("#btn-change-password").text('Cancel');
+        }
+    });
+
+    $("#btn-change-password-confirm").on("click", function () {
+        if($("#i_old_password").val().length < 8 || $("#i_old_password").val().length > 16 || $("#i_new_password").val().length < 8 || $("#i_new_password").val().length > 16) {
+            $.notify({ message: "Password must have at least 8 and at most 16 characters." }, { type: "danger", z_index: 1051 });
+            return false;
+        }
+        if($("#i_new_password").val() != $("#i_confirm_password").val()) {
+            $.notify({ message: "New password and its confirmation must match." }, { type: "danger", z_index: 1051 });
+            return false;
+        }
+        
+        var hash1 = hash($("#i_old_password").val(), true).substring(29);
+        var hash2 = hash(hash1.concat($("#s_sid_c").val()), false);
+        $("#i_old_password4").val(hash2);
+
+        $("#i_new_password4").val(hash($("#i_new_password").val(), true).substring(29));
+        $("#change-form").submit();
+    });
+    
+    $('#modal-settings').on('hidden.bs.modal', function () {
+        hideAllSettings();
+    });
 
     // register events
     $("#pull-btn").on("click", gitPull);

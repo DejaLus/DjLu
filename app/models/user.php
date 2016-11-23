@@ -259,6 +259,30 @@ class User extends \Prefab {
     }
 
     /**
+     * Change user's password
+     */
+    public function changePassword ($password, $newPassword) {
+
+        $sid = $this->f3->get("COOKIE.PHPSESSID");
+
+        $userdata = $this->dbMapper->load(array("@username=?", $this->userdata['username']));
+        if (count($userdata) > 1)
+            throw new \Exception("Internal auth error #ABDErr2");
+
+        // auth ok
+        if (count($userdata) < 1 || !password_verify($userdata['password'] . $sid, $password))
+            throw new \Exception("Wrong password for '" . $userdata['username'] . "'");
+
+        // set session and cookies
+        $userdata['password'] = $newPassword;
+        $userdata->update();
+        $this->f3->set("COOKIE.username", $this->userdata['username'], 60*60*24*14);
+        $this->f3->set("COOKIE.token", sha1($this->f3->get("APP_SALT").$userdata['password']), 60*60*24*14);
+
+        return true;
+    }
+
+    /**
      * Do logout processing
      */
     public function logout () {

@@ -39,7 +39,7 @@ class Papers {
 
         $this->f3->set("papers", $papers);
         $this->f3->set("tags", $tags);
-        $this->f3->set("js", array("bootstrap3-typeahead.min.js", "simplemde.min.js", "highlight.min.js", "tablesort.min.js", "djlu.js", "clipboard.min.js"));
+        $this->f3->set("js", array("bcrypt.min.js", "bootstrap3-typeahead.min.js", "simplemde.min.js", "highlight.min.js", "tablesort.min.js", "djlu.js", "clipboard.min.js"));
         $this->f3->set("title", \lib\Formatting::formatUsername($this->user->getUsername())." library");
         $this->f3->set("content", "papers.htm");
         echo \Template::instance()->render("layout.htm");
@@ -204,7 +204,7 @@ class Papers {
             // display
             $this->f3->set("paper", $paper);
             $this->f3->set("tags", $tags);
-            $this->f3->set("js", array("simplemde.min.js", "highlight.min.js", "clipboard.min.js", "djluPaper.js"));
+            $this->f3->set("js", array("bcrypt.min.js", "simplemde.min.js", "highlight.min.js", "clipboard.min.js", "djluPaper.js"));
             $this->f3->set("title", $paper->jsonField("title"));
             $this->f3->set("content", "paperDisplay.htm");
             echo \Template::instance()->render("layout.htm");
