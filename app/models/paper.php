@@ -453,6 +453,25 @@ class Paper {
     }
 
     /**
+     * Edit the markdown file
+     * @param  string $content Content of the file to write
+     */
+    private function editBibTex ($content) {
+        if (!$this->exists() || $this->type == self::TYPE_SHORT)
+            throw new \Exception("Impossible to edit");
+
+        $content = trim($content);
+        if (empty($content))
+            throw new \Exception("You can't have an empty bibtex file");
+
+        $path = $this->getPath()."/".$this->key.".bib";
+        if (file_put_contents($path, $content."\n") === false)
+            throw new \Exception("Failed to save file");
+        unset($this->filesCache["bibRaw"]); // clean cache
+        unset($this->filesCache["bib"]); // clean cache
+    }
+
+    /**
      * Edit a field about the paper
      * @param  string $file
      * @param  string $field
@@ -462,6 +481,8 @@ class Paper {
     public function edit ($file, $field, $value) {
         if ($this->type == self::TYPE_FULL && $file == "json")
             return $this->editJSON($field, $value);
+        if ($this->type == self::TYPE_FULL && $file == "bibtex")
+            return $this->editBibTex($value);
         if ($this->type == self::TYPE_FULL && $file == "md")
             return $this->editMD($value);
         throw new \Exception("File not editable");

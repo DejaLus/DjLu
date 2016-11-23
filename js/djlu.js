@@ -175,6 +175,16 @@ $(document).ready(function() {
             .attr("href", $("#paper-details .secret").data("base-url")
             .replace("@secret", secret).replace("@key", $("#paper-details").data("key")));
         $("#paper-secret-url").attr("data-clipboard-text", $("#paper-details .secret").attr("href"));
+
+        // bibtex
+        if (data.bibRaw !== undefined) {
+            $("#paper-bibtex-content").html(data.bibRaw);
+            $("#paper-bibtex").show();
+        }
+        if (typeof data.bib == 	"object" && data.bib !== null && data.bib.html !== undefined) {
+            $("#paper-citation").html(data.bib.html);
+            $("#paper-bibtex").show();
+        }
     }
 
     function paperDisplay () {
@@ -200,16 +210,6 @@ $(document).ready(function() {
             $("#paper-details").data("key", key);
             $("#paper-details .citationKey").html(key);
             paperDisplayInfo(data);
-
-            // bibtex
-            if (data.bibRaw !== undefined) {
-                $("#paper-bibtex-content").html(data.bibRaw);
-                $("#paper-bibtex").show();
-            }
-            if (data.bib !== undefined && data.bib.html !== undefined) {
-                $("#paper-citation").html(data.bib.html);
-                $("#paper-bibtex").show();
-            }
 
             // display all
             $("#paper-wait").hide();
@@ -307,8 +307,9 @@ $(document).ready(function() {
 
     function paperEditShow () {
 
+        var el = ($(this).attr("data-key")) ? $(this) : $(this).children("[data-key]")
+
         // get info element
-        var el = $(this).children("[data-key]");
         var form = $("#modal-paper-edit");
         var autocomplete = el.data("autocomplete");
 
@@ -320,7 +321,15 @@ $(document).ready(function() {
 
         form.attr("action", form.data("base-url").replace("@key", $("#paper-details").data("key")));
         form.find('[name="field"]').val(el.data("key"));
-        form.find('[name="value"]').val(el.html());
+        form.find('[name="file"]').val(el.data("file") ? el.data("file") : "json");
+        if (el.data("type") == "textarea") {
+            form.find('#modal-paper-edit-textarea-value').val(el.html()).attr("name", "value").show();
+            form.find('#modal-paper-edit-value').attr("name", "").hide();
+        }
+        else {
+            form.find('#modal-paper-edit-textarea-value').attr("name", "").hide();
+            form.find('#modal-paper-edit-value').attr("name", "value").val(el.html()).show();
+        }
         $("#modal-paper-edit-label").html(el.data("title"));
 
         form.modal();
@@ -332,7 +341,6 @@ $(document).ready(function() {
 
         ajaxFormProcess($(this), function (data) {
             hideSpinner();
-
             if (data.success) {
                 paperDisplayInfo(data);
                 $("#paper-row-"+$("#paper-details").data("key")).replaceWith(data.tr);
@@ -391,6 +399,7 @@ $(document).ready(function() {
 
     // register events
     $("#paper-details > *:has([data-key])").on("dblclick", paperEditShow);
+    $("#paper-bibtex-content").on("dblclick", paperEditShow);
     $("#paper-notes-add-btn").on("click", paperAddNotes);
     $("#modal-paper-edit").on("shown.bs.modal", function () { $('#modal-paper-edit-value').focus(); });
     $("#modal-paper-edit").on("submit", paperEditForm);

@@ -612,6 +612,15 @@ table th.sort-up:after {
     border-radius: 5px;
 }
 
+#paper-bibtex-content {
+    cursor: pointer;
+}
+
+#paper-bibtex-content:hover {
+    transition: border .35s;
+    border-color: #aaa;
+}
+
 #paper-details .title {
     font-size: 18px;
     font-weight: 500;

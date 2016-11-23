@@ -129,7 +129,7 @@
                     <i class="fa fa-clipboard" aria-hidden="true" alt="Copy to clipboard"></i>
                 </button>
             </div>
-            <pre id="paper-bibtex-content"></pre>
+            <pre id="paper-bibtex-content" data-key="bibtex" data-title="BibTex" data-type="textarea" data-file="bibtex"></pre>
         </div>
         <div id="paper-delete" class="text-center" style="display: none;">
             <button id="paper-delete-btn" class="btn btn-danger">Delete paper</button>
@@ -183,7 +183,8 @@
                     <label for="modal-paper-edit-value" id="modal-paper-edit-label"></label>
                     <input type="hidden" name="field" value="" />
                     <input type="hidden" name="file" value="json" />
-                    <input class="form-control" rows="4" name="value" id="modal-paper-edit-value" />
+                    <input class="form-control" name="value" id="modal-paper-edit-value" />
+                    <textarea class="form-control" rows="12" name="value-textarea" id="modal-paper-edit-textarea-value" /></textarea>
                 </div>
             </div>
             <div class="modal-footer">
