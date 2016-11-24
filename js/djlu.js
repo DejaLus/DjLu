@@ -444,7 +444,9 @@ $(document).ready(function() {
         }, 800);
     }
 
-    function driveAjaxPDF (type, paper, ajaxMethod, formData) {
+    function driveAjaxPDF (obj, type, paper, ajaxMethod, formData) {
+        var l = $(obj).ladda();
+        l.ladda('start');
         $.ajax({
             type: ajaxMethod,
             url: "/api/drive/"+type+"/"+paper,
@@ -457,18 +459,23 @@ $(document).ready(function() {
                 if (data.success == false && data.reason == "auth") {
                     loopCount++;
                     if (loopCount < 3)
-                        driveLogin(data.url, function () { return driveAjaxPDF (type, paper, ajaxMethod, formData); });
+                        driveLogin(data.url, function () { return driveAjaxPDF (obj, type, paper, ajaxMethod, formData); });
                     return;
                 }
 
                 if (data.success == false) {
                     $.notify({ message: data.message }, { type: "danger" });
+                    l.ladda('stop');
                     return;
                 }
 
                 $("#paper-details .url").html(data.url).attr("href", data.url);
                 $(".paper.active a.pdf").attr("href", data.url);
                 $.notify({ message: data.message }, { type: "success" });
+                l.ladda('stop');
+            },
+            fail: function () {
+                l.ladda('stop');
             }
         });
     }
@@ -477,13 +484,13 @@ $(document).ready(function() {
     $("#js_drive_fetch").on("click", function () {
         loopCount = 0;
         var key = $("#paper-details").data("key");
-        driveAjaxPDF ("fetch", key, "GET");
+        driveAjaxPDF (this, "fetch", key, "GET");
     });
 
     $("#js_drive_import").on("click", function () {
         loopCount = 0;
         var key = $("#paper-details").data("key");
-        driveAjaxPDF ("upload/url", key, "GET");
+        driveAjaxPDF (this, "upload/url", key, "GET");
     });
 
     $(document).on("change", "#js_drive_upload :file", function(e) {
@@ -493,7 +500,7 @@ $(document).ready(function() {
         var formData = new FormData();
         formData.append("pdf", file);
         if (file != undefined) {
-            driveAjaxPDF ("upload/post", key, "POST", formData);
+            driveAjaxPDF ($("#js_drive_upload"), "upload/post", key, "POST", formData);
         }
      });
 
