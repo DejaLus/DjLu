@@ -7,4 +7,4 @@ if [ $BASEDIR = '.' ]; then
 fi
 
 # Run server
-php -S localhost:8080 -t $BASEDIR
+php -S 0.0.0.0:8080 -t $BASEDIR
