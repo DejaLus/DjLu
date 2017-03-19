@@ -24,7 +24,7 @@
         </div>
     </div>
 </nav>
-
+<div id="has_gdrive" class="hidden" data-return="{{ \models\GoogleDrive::instance()->isInitialized()?'true':'false' }}"></div>
 <div id="papers-container">
     <div id="papers-col-left">
         <div id="colorpicker" style="display: none;">
@@ -243,9 +243,20 @@
             <div class="modal-body">
                 <h5>Google Drive</h5>
                 <p class="text-center">
-                <check if="{{ \models\GoogleDrive::instance()->isLoggedIn() }}">
-                <true> <a class="btn btn-default" id="driveLogout" href="{{ "driveLogout" | alias }}" target="_blank">Logout from Google Drive</a></true>
-                <false>DjLu is logged from your Google Drive account right now.</false>
+                <check if="{{ \models\GoogleDrive::instance()->isInitialized() }}">
+                    <true>
+                        <check if="{{ \models\GoogleDrive::instance()->isLoggedIn() }}">
+                            <true>
+                                <a class="btn btn-default" id="driveLogout" href="{{ "driveLogout" | alias }}" target="_blank">Logout from Google Drive</a>
+                            </true>
+                            <false>
+                                DjLu is not yet connected to your Google Drive account.
+                            </false>
+                        </check>
+                    </true>
+                    <false>
+                        Google Drive is disabled for this instance of DjLu.
+                    </false>
                 </check>
                 </p>
                 <form class="form-group single-field-edit" method="POST" action="{{ "preferences" | alias }}">

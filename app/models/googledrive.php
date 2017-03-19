@@ -13,6 +13,7 @@ class GoogleDrive extends \Prefab {
     private $root;
     private $drivePath;
     private $driveRootId;
+    private $isInitialized;
 
     /**
      * Create the Google Drive model object
@@ -21,6 +22,11 @@ class GoogleDrive extends \Prefab {
     public function __construct($drivePath = "/") {
 
         $this->f3 = \Base::instance();
+
+        if(!file_exists(getcwd() . "/googleAPI.json")) {
+            $this->isInitialized = false;
+            return;
+        }
 
         // init client
         $this->user = \models\User::instance();
@@ -32,6 +38,8 @@ class GoogleDrive extends \Prefab {
         $this->client->setAccessType("offline"); // offline to get refresh token
 
         $this->drivePath = $drivePath;
+        
+        $this->isInitialized = true;
 
         try {
             // saved token
@@ -61,6 +69,13 @@ class GoogleDrive extends \Prefab {
         }
     }
 
+    /**
+     * Indicates if the Google Drive config is present
+     * @return boolean status
+     */
+    public function isInitialized () {
+        return $this->isInitialized;
+    }
     //////////////////////////////
     /////// TOKEN FUNCTIONS
     //////////////////////////////
@@ -72,6 +87,9 @@ class GoogleDrive extends \Prefab {
      * @return string token
      */
     private function getToken () {
+        if(!$this->isInitialized()) {
+            return null;
+        }
         return $this->user->getGoogleToken();
     }
 
@@ -80,14 +98,21 @@ class GoogleDrive extends \Prefab {
      * @param string $token
      */
     private function setToken ($token) {
+        if(!$this->isInitialized()) {
+            return false;
+        }
         $this->user->setGoogleToken($token);
         $this->client->setAccessToken($token);
+        return true;
     }
 
     /**
      * Remove the Google Drive token stored for the user
      */
     public function removeToken () {
+        if(!$this->isInitialized()) {
+            return;
+        }
         $this->user->setGoogleToken("");
     }
 
@@ -106,6 +131,9 @@ class GoogleDrive extends \Prefab {
      * @return boolean status
      */
     public function isLoggedIn () {
+        if(!$this->isInitialized()) {
+            return true;
+        }
         return !$this->client->isAccessTokenExpired();
     }
 
@@ -114,7 +142,6 @@ class GoogleDrive extends \Prefab {
      * @param  string $code OAuth returned code
      */
     public function authenticate ($code) {
-
         try {
             // auth with return code
             $this->client->authenticate($code);
@@ -133,6 +160,9 @@ class GoogleDrive extends \Prefab {
      * @return string url
      */
     public function getLoginURL () {
+        if(!$this->isInitialized()) {
+            return null;
+        }
         return $this->client->createAuthUrl();
     }
 
@@ -147,6 +177,10 @@ class GoogleDrive extends \Prefab {
      * @return string id
      */
     private function getDjLuDriveRootId () {
+
+        if(!$this->isInitialized()) {
+            return null;
+        }
 
         if ($this->driveRootId)
             return $this->driveRootId;
@@ -237,6 +271,10 @@ class GoogleDrive extends \Prefab {
      */
     public function getPaperPdfFromId ($paperId) {
 
+        if(!$this->isInitialized()) {
+            return null;
+        }
+
         $response = $this->drive->files->listFiles(array(
             'q' => "'".$paperId."' in parents and mimeType = 'application/pdf' and trashed = false",
             'spaces' => 'drive',
@@ -258,6 +296,10 @@ class GoogleDrive extends \Prefab {
      * @param string $data     content of the pdf
      */
     public function setPaperPdfFromId ($paperId, $paperKey, $data) {
+
+        if(!$this->isInitialized()) {
+            return null;
+        }
 
         // trash previous PDF
         $response = $this->drive->files->listFiles(array(

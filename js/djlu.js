@@ -447,87 +447,99 @@ $(document).ready(function() {
 
     var loopCount = 0;
 
+    function checkGDriveAvailability() {
+        return $("#has_gdrive").data("return") == true;
+    }
+
     function driveLogin (url, callback) {
-        var left = window.screenX + (window.outerWidth / 2) - (400 / 2);
-        var top = window.screenY + (window.outerHeight / 2) - (500 / 2);
-        var windowFeatures = "width=400,height=500,top=" + top + ",left=" + left +
-                             ",location=yes,toolbar=no,menubar=no";
-        var popupWindow = window.open(url, "oauth2_popup", windowFeatures);
+        if(checkGDriveAvailability()) {
+            var left = window.screenX + (window.outerWidth / 2) - (400 / 2);
+            var top = window.screenY + (window.outerHeight / 2) - (500 / 2);
+            var windowFeatures = "width=400,height=500,top=" + top + ",left=" + left +
+                                 ",location=yes,toolbar=no,menubar=no";
+            var popupWindow = window.open(url, "oauth2_popup", windowFeatures);
 
-        if (!popupWindow || popupWindow.closed || typeof popupWindow.closed == "undefined") {
-            $.notify({ message: "You must login with your Google account, please unblock the popups for the domain and try again" }, { type: "danger" });
-            return;
-        }
-
-        var oauthInterval = window.setInterval(function() {
-            if (popupWindow.closed) {
-                window.clearInterval(oauthInterval);
-                callback();
+            if (!popupWindow || popupWindow.closed || typeof popupWindow.closed == "undefined") {
+                $.notify({ message: "You must login with your Google account, please unblock the popups for the domain and try again" }, { type: "danger" });
+                return;
             }
-        }, 800);
+
+            var oauthInterval = window.setInterval(function() {
+                if (popupWindow.closed) {
+                    window.clearInterval(oauthInterval);
+                    callback();
+                }
+            }, 800);
+        }
     }
 
     function driveAjaxPDF (obj, type, paper, ajaxMethod, formData) {
-        var l = $(obj).ladda();
-        l.ladda('start');
-        $.ajax({
-            type: ajaxMethod,
-            url: "/api/drive/"+type+"/"+paper,
-            data: formData,
-            processData: false,
-            contentType: false,
-            dataType: "json",
-            success: function (data) {
+        if(checkGDriveAvailability()) {
+            var l = $(obj).ladda();
+            l.ladda('start');
+            $.ajax({
+                type: ajaxMethod,
+                url: "/api/drive/"+type+"/"+paper,
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: "json",
+                success: function (data) {
 
-                if (data.success == false && data.reason == "auth") {
-                    loopCount++;
-                    if (loopCount < 3)
-                        driveLogin(data.url, function () { return driveAjaxPDF (obj, type, paper, ajaxMethod, formData); });
-                    return;
-                }
+                    if (data.success == false && data.reason == "auth") {
+                        loopCount++;
+                        if (loopCount < 3)
+                            driveLogin(data.url, function () { return driveAjaxPDF (obj, type, paper, ajaxMethod, formData); });
+                        return;
+                    }
 
-                if (data.success == false) {
-                    $.notify({ message: data.message }, { type: "danger" });
+                    if (data.success == false) {
+                        $.notify({ message: data.message }, { type: "danger" });
+                        l.ladda('stop');
+                        return;
+                    }
+
+                    $("#paper-details .url").html(data.url).attr("href", data.url);
+                    $(".paper.active a.pdf").attr("href", data.url);
+                    $.notify({ message: data.message }, { type: "success" });
                     l.ladda('stop');
-                    return;
+                },
+                fail: function () {
+                    l.ladda('stop');
                 }
-
-                $("#paper-details .url").html(data.url).attr("href", data.url);
-                $(".paper.active a.pdf").attr("href", data.url);
-                $.notify({ message: data.message }, { type: "success" });
-                l.ladda('stop');
-            },
-            fail: function () {
-                l.ladda('stop');
-            }
-        });
+            });
+        }
     }
 
     // register events
-    $("#js_drive_fetch").on("click", function () {
-        loopCount = 0;
-        var key = $("#paper-details").data("key");
-        driveAjaxPDF (this, "fetch", key, "GET");
-    });
+    if(checkGDriveAvailability()) {
+        $("#js_drive_fetch").on("click", function () {
+            loopCount = 0;
+            var key = $("#paper-details").data("key");
+            driveAjaxPDF (this, "fetch", key, "GET");
+        });
 
-    $("#js_drive_import").on("click", function () {
-        loopCount = 0;
-        var key = $("#paper-details").data("key");
-        driveAjaxPDF (this, "upload/url", key, "GET");
-    });
+        $("#js_drive_import").on("click", function () {
+            loopCount = 0;
+            var key = $("#paper-details").data("key");
+            driveAjaxPDF (this, "upload/url", key, "GET");
+        });
 
-    $(document).on("change", "#js_drive_upload :file", function(e) {
-        loopCount = 0;
-        var key = $("#paper-details").data("key");
-        var file = e.target.files[0];
-        var formData = new FormData();
-        formData.append("pdf", file);
-        if (file != undefined) {
-            driveAjaxPDF ($("#js_drive_upload"), "upload/post", key, "POST", formData);
-        }
-     });
-
-
+        $(document).on("change", "#js_drive_upload :file", function(e) {
+            loopCount = 0;
+            var key = $("#paper-details").data("key");
+            var file = e.target.files[0];
+            var formData = new FormData();
+            formData.append("pdf", file);
+            if (file != undefined) {
+                driveAjaxPDF ($("#js_drive_upload"), "upload/post", key, "POST", formData);
+            }
+         });
+    } else {
+        $("#js_drive_fetch").attr("disabled", true);
+        $("#js_drive_import").attr("disabled", true);
+        $("#js_drive_upload").attr("disabled", true);
+    }
 
 
 
