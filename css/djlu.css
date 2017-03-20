@@ -299,7 +299,7 @@ a { transition: all .35s; }
 }
 
 #papers-col-left li {
-    padding: 4px 10px;
+    padding: 2px 10px;
 }
 
 #papers-col-left p {
@@ -319,6 +319,17 @@ a { transition: all .35s; }
     transition: opacity .35s;
     cursor: pointer;
     opacity: 0.3;
+    display: block;
+    overflow: hidden;
+}
+
+#papers-col-left .tag-label .label {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    padding: 4px 5px;
+    vertical-align: top;
 }
 
 #papers-col-left .badge {
@@ -329,6 +340,7 @@ a { transition: all .35s; }
     background: #AAA;
     float: right;
     margin-right: 4px;
+    margin-left: 5px;
 }
 
 #papers-col-left .tag-active .badge {
@@ -789,15 +801,6 @@ table th.sort-up:after {
     width: 100%;
 }
 
-.limited-tag {
-    display: inline-block;
-    max-width: 85px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-}
-
-
 /******* SINGLE PAPER PAGE ******/
 
 #paper-display h1 {
@@ -838,4 +841,3 @@ table th.sort-up:after {
 #btn-change-password-confirm {
     display: none;
 }
-

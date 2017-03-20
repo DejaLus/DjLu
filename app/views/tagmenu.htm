@@ -14,10 +14,10 @@
                 </false>
             </check>
             <li class="tag" data-tag="{{ @tag }}">
-                <span title="{{ @tag }}" class="tag-label label label-default" style="background: #{{ @tagData.color }}; color: #{{ \lib\Formatting::textColorFromBgColor(@tagData.color); }}"><span class="limited-tag">{{ @tag }}</span></span>
                 <a class="tag-colorpicker label label-default papers-col-extra-content" tabindex="0" role="button" style="background: #{{ @tagData.color }}"><i class="fa fa-caret-down"></i></a>
                 <a class="papers-col-extra-content tag-pin {{ @tagData.pinned ? 'pinned' : '' }}"><i class="fa fa-thumb-tack" role="button" {{ @pininfo }}></i></a>
                 <span class="badge papers-col-extra-content" {{ @countinfo }}>{{ @tagData.count ? @tagData.count : 0 }}</span>
+                <span title="{{ @tag }}" class="tag-label"><span class="label label-default" style="background: #{{ @tagData.color }}; color: #{{ \lib\Formatting::textColorFromBgColor(@tagData.color); }}">{{ @tag }}</span></span>
             </li>
         </repeat>
     </ul>
