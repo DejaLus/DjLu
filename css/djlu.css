@@ -306,15 +306,6 @@ a { transition: all .35s; }
     padding: 4px 10px;
 }
 
-#papers-col-left .tag-label > span {
-    transition: opacity .5s;
-    opacity: 0;
-}
-
-#papers-col-left:hover .tag-label > span, .fixed-col-left #papers-col-left .tag-label > span {
-    opacity: 1;
-}
-
 #papers-col-left .tag-label {
     transition: opacity .35s;
     cursor: pointer;
