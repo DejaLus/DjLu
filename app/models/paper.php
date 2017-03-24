@@ -329,7 +329,7 @@ class Paper {
         mkdir($this->dataPath."/".$this->key."_".$folderTitle, 0755);
         $this->filename = $this->key."_".$folderTitle;
 
-        // create bibtex
+        // create bibtex for JSON data
         $bibtex = new \models\BibTex(array('removeCurlyBraces' => false, 'extractAuthors' => false));
         $bibtex->addEntry($data);
 
@@ -346,6 +346,11 @@ class Paper {
         if ($this->writeJSON($json) === false)
             throw new \Exception("Failed to write JSON file");
 
+        // create bibtex data, with added {} to the title to preserve casing for BibTex usage
+        $bibtex = new \models\BibTex(array('removeCurlyBraces' => false, 'extractAuthors' => false));
+        $data["title"] = "{" . $data["title"] . "}";
+        $bibtex->addEntry($data);
+        
         // save bibtex
         if (file_put_contents($this->getPath()."/".$this->key.".bib", $bibtex->toBibTex()) === false)
             throw new \Exception("Failed to write bibtex file");
