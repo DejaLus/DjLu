@@ -101,7 +101,7 @@
                     <a href="#" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" title="Generate sharing key" id="js-generate-sharing-key"><i class="fa fa-refresh fa-fw"></i></a>
                     <button id="paper-secret-url" type="button" class="clipboard btn btn-default btn-xs" data-clipboard-text="#"><i class="fa fa-clipboard fa-fw" aria-hidden="true" alt="Copy to clipboard"></i></button>
                 </span>
-                <strong>Sharing secret key: </strong><a href="#" target="_blank" data-base-url="{{ \lib\Utils::getServerUrl() }}{{ 'paperPub', 'user='.@user->getUsername() | alias }}" class="secret" data-key="secret" data-title="Sharing secret key (must be 5 to 50 numbers or letters)"></a></p>
+                <strong>Sharing secret key: </strong><a href="#" target="_blank" data-base-url="{{ \lib\Utils::getServerUrl() }}{{ 'paperPub', 'user='.@user->getUsername() | alias }}" class="secret" data-key="secret" data-title="Sharing secret key (5-50 numbers or letters, leave empty to stop sharing)"></a></p>
             <p class="editable"><strong>Rating: </strong><span class="rating" data-key="rating" data-title="Rating (/5)"></span></p>
         </div>
         <div id="paper-notes" style="display: none;">
