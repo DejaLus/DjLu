@@ -610,6 +610,43 @@ $(document).ready(function() {
         $("#papers-col-left").find('ul[data-tag-group="'+tagGroup+'"] .tag').removeClass("tag-active");
     }
 
+    function sortTags (tagGroup, currentSort=0) {
+        var sortButton = $("#papers-col-left").find('a[data-tag-group="'+tagGroup+'"] .isort');
+        var ul = $("#papers-col-left").find('ul[data-tag-group="'+tagGroup+'"]');
+        var tags = $.makeArray(ul.children());
+        if (currentSort == 1) {
+            sortButton.removeClass("fa-sort-amount-asc");
+            sortButton.addClass("fa-sort-amount-desc");
+        } else if (currentSort == 2) {
+            sortButton.removeClass("fa-sort-amount-desc");
+            sortButton.addClass("fa-bars");
+        } else {
+            currentSort = 0;
+            sortButton.removeClass("fa-bars");
+            sortButton.addClass("fa-sort-amount-asc");
+        }
+        Cookies.set("sort-state-" + tagGroup, currentSort);
+        tags.sort(function(a, b) {
+            if (currentSort == 0) {
+                var vA = $(a).text();
+                var vB = $(b).text();
+            } else if (currentSort == 1) {
+                var vA = $(b).text();
+                var vB = $(a).text();
+            } else {
+                var vA = +$(a).data("pos");
+                var vB = +$(b).data("pos");
+            }
+            if (vA < vB) return -1;
+            if (vA > vB) return 1;
+            return 0;
+        });
+        ul.empty();
+        $.each(tags, function() {
+            ul.append(this);
+        });
+    }
+
     function syncFilters() {
         $(".paper").each(function() {
             var paper = $(this);
@@ -675,7 +712,20 @@ $(document).ready(function() {
         }
     }
 
+    function activateTags() {
+        $(".tag .tag-label").on("click", function () {
+            $(this).parent().toggleClass("tag-active");
+            syncFilters();
+        });
+    }
+
     function initLeftCol () {
+        for (var cookie in Cookies.get()) {
+            if (cookie.startsWith("sort-state-")) {
+                sortTags(cookie.substring(11), Cookies.get(cookie));
+            }
+        }
+
         // fix col left
         if (Cookies.get("fix-col-left")) {
             $("#fix-col-left").toggleClass("pinned");
@@ -683,10 +733,15 @@ $(document).ready(function() {
         }
         $("#fix-col-left").on("click", fixColLeft);
 
-        // tags toggle
-        $(".tag .tag-label").on("click", function () {
-            $(this).parent().toggleClass("tag-active");
-            syncFilters();
+        // sort tags
+        $("#papers-col-left .sort").on("click", function () {
+            var tagGroup = $(this).data("tag-group");
+            if (Cookies.get("sort-state-" + tagGroup) !== undefined) {
+                sortTags(tagGroup, +Cookies.get("sort-state-" + tagGroup)+1);
+            } else {
+                sortTags(tagGroup);
+            }
+            activateTags();
         });
 
         // tags reset
@@ -702,6 +757,8 @@ $(document).ready(function() {
 
         // pin toggle
         $(".tag .tag-pin").on("click", toggleTagPin);
+
+        activateTags();
     }
 
     initLeftCol();

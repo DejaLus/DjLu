@@ -13,7 +13,7 @@
                     <set pininfo="" countinfo="">
                 </false>
             </check>
-            <li class="tag" data-tag="{{ @tag }}">
+            <li class="tag" data-tag="{{ @tag }}" data-pos="{{ @j }}">
                 <a class="tag-colorpicker label label-default papers-col-extra-content" tabindex="0" role="button" style="background: #{{ @tagData.color }}"><i class="fa fa-caret-down"></i></a>
                 <a class="papers-col-extra-content tag-pin {{ @tagData.pinned ? 'pinned' : '' }}"><i class="fa fa-thumb-tack" role="button" {{ @pininfo }}></i></a>
                 <span class="badge papers-col-extra-content" {{ @countinfo }}>{{ @tagData.count ? @tagData.count : 0 }}</span>
@@ -21,7 +21,12 @@
             </li>
         </repeat>
     </ul>
-    <p class="text-right"><a href="#" class="btn btn-default btn-xs tags-reset papers-col-extra-content" data-tag-group="{{ \models\Papers::$TAGS_GROUPS[@i] }}">Reset filters</a></p>
+    <p class="text-right">
+        <a href="#" class="sort papers-col-extra-content" data-tag-group="{{ \models\Papers::$TAGS_GROUPS[@i] }}">
+            <i class="fa fa-bars isort" role="button" data-toggle="tooltip" title="Switch between different strategies for sorting tags"></i>
+        </a>
+        <a href="#" class="btn btn-default btn-xs tags-reset papers-col-extra-content" data-tag-group="{{ \models\Papers::$TAGS_GROUPS[@i] }}">Reset filters</a>
+    </p>
 </loop>
 <script type="text/javascript">
 var tags = {{ json_encode(@tags) }};

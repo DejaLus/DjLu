@@ -347,6 +347,13 @@ a { transition: all .35s; }
     padding: 0.2em .6em .3em;
 }
 
+#papers-col-left .sort {
+    float: left;
+    padding: 0 4px;
+    margin-right: 4px;
+    color: inherit;
+}
+
 #papers-col-left .tag-pin {
     float: right;
     padding: 0 4px;
