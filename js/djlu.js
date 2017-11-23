@@ -628,11 +628,11 @@ $(document).ready(function() {
         Cookies.set("sort-state-" + tagGroup, currentSort);
         tags.sort(function(a, b) {
             if (currentSort == 0) {
-                var vA = $(a).text();
-                var vB = $(b).text();
+                var vA = $(a).data("tag").toLowerCase();
+                var vB = $(b).data("tag").toLowerCase();
             } else if (currentSort == 1) {
-                var vA = $(b).text();
-                var vB = $(a).text();
+                var vA = $(b).data("tag").toLowerCase();
+                var vB = $(a).data("tag").toLowerCase();
             } else {
                 var vA = +$(a).data("pos");
                 var vB = +$(b).data("pos");
