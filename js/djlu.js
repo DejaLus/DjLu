@@ -304,7 +304,7 @@ $(document).ready(function() {
                         contains.push(item);
                 }
 
-                return beginswith.concat(contains, others);
+                return beginswith.concat(contains);
             },
             highlighter: function (item) {
                 var query = extractor(this.query).replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&')
