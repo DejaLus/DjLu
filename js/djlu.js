@@ -717,6 +717,16 @@ $(document).ready(function() {
             $(this).parent().toggleClass("tag-active");
             syncFilters();
         });
+
+        // colorpicker
+        $("#papers-col-left").mouseleave(function() { $(".tag-colorpicker").popover("hide") });
+        $(".tag-colorpicker").popover({ container: $("#papers-col-left"), trigger: "focus", template: $("#colorpicker").html(), content:" ", placement: "bottom" });
+        $(".tag-colorpicker").on("shown.bs.popover", colorpickerHandler);
+
+        // pin toggle
+        $(".tag .tag-pin").on("click", toggleTagPin);
+
+
     }
 
     function initLeftCol () {
@@ -749,14 +759,6 @@ $(document).ready(function() {
             resetFilters($(this).data("tag-group"));
             syncFilters();
         });
-
-        // colorpicker
-        $("#papers-col-left").mouseleave(function() { $(".tag-colorpicker").popover("hide") });
-        $(".tag-colorpicker").popover({ container: $("#papers-col-left"), trigger: "focus", template: $("#colorpicker").html(), content:" ", placement: "bottom" });
-        $(".tag-colorpicker").on("shown.bs.popover", colorpickerHandler);
-
-        // pin toggle
-        $(".tag .tag-pin").on("click", toggleTagPin);
 
         activateTags();
     }
