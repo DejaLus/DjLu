@@ -201,6 +201,49 @@ $(document).ready(function() {
         }
     }
 
+    function unblockSide() {
+        // display all
+        $("#paper-wait").hide();
+        $("#paper-details").show();
+        $("#paper-notes-add").hide();
+        $("#paper-notes-content").hide();
+        $("#paper-notes").show();
+        $("#paper-delete").show();
+    }
+
+    function ajaxError() {
+        $("#papers-table .paper").removeClass("active");
+        $("#paper-wait").hide();
+        $("#paper-placeholder").show();
+        $.notify({ message: "Oops. This paper did not load well.<br/>Please check your network connection. If everything is OK, report this bug with information about the paper" }, { type: "danger" });
+    }
+
+    function ajaxSuccess(data, key) {
+        if (data.success === false) {
+            $.notify({ message: "Failed to get paper's info: "+data.message }, { type: "danger" });
+            return;
+        }
+
+        $("#paper-details").data("key", key);
+        $("#paper-details .citationKey").html(key);
+        paperDisplayInfo(data);
+
+        unblockSide();
+
+        // notes
+        if (data.md !== undefined) {
+            $("#paper-notes-content").show();
+            mdeEditMode(); // needs to be in edit mode
+            markdownEditor.value(data.md);
+            markdownEditor.codemirror.refresh();
+            markdownEditor.togglePreview();
+        }
+        else {
+            $("#paper-notes-add").show();
+            markdownEditor.value("");
+        }
+    }
+
     function paperDisplay () {
 
         $("#paper-placeholder").hide();
@@ -214,39 +257,13 @@ $(document).ready(function() {
 
         var key = $(this).data("paper-key");
 
-        $.get("/api/paper/"+key, function (data) {
-
-            if (data.success === false) {
-                $.notify({ message: "Failed to get paper's info: "+data.message }, { type: "danger" });
-                return;
-            }
-
-            $("#paper-details").data("key", key);
-            $("#paper-details .citationKey").html(key);
-            paperDisplayInfo(data);
-
-            // display all
-            $("#paper-wait").hide();
-            $("#paper-details").show();
-            $("#paper-notes-add").hide();
-            $("#paper-notes-content").hide();
-            $("#paper-notes").show();
-            $("#paper-delete").show();
-
-            // notes
-            if (data.md !== undefined) {
-                $("#paper-notes-content").show();
-                mdeEditMode(); // needs to be in edit mode
-                markdownEditor.value(data.md);
-                markdownEditor.codemirror.refresh();
-                markdownEditor.togglePreview();
-            }
-            else {
-                $("#paper-notes-add").show();
-                markdownEditor.value("");
-            }
-
-        }, "json");
+        $.ajax({
+            url: "/api/paper/"+key,
+            success: function(data){ajaxSuccess(data,key);},
+            error: function(){ajaxError(key);},
+            timeout: 2000,
+            dataType: 'JSON'
+        });
     }
 
 

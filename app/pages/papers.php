@@ -44,6 +44,19 @@ class Papers {
         $this->f3->set("content", "papers.htm");
         echo \Template::instance()->render("layout.htm");
     }
+    
+    public function fixUTF($d) {
+        if (is_array($d)) {
+            foreach ($d as $k => $v) {
+                $d[$k] = $this->fixUTF($v);
+            }
+        } else if (is_string ($d)) {
+            $enc = mb_detect_encoding($d);
+            $value = iconv($enc, 'UTF-8', $d);
+            return $value;
+        }
+        return $d;
+    }
 
     /**
      * API call to get detail infos about a paper
@@ -55,7 +68,8 @@ class Papers {
         }
 
         $paper = new \models\Paper($args['key']);
-        echo json_encode($paper->getFiles());
+        $info = json_encode($this->fixUTF($paper->getFiles()));
+        echo $info;
     }
 
     /**
@@ -82,7 +96,7 @@ class Papers {
             $out["tr"] = \Template::instance()->render("paper.htm", "text/html");
             $out["tags"] = \Template::instance()->render("tagmenu.htm", "text/html");
 
-            echo json_encode($out);
+            echo json_encode($this->fixUTF($out));
         }
         catch (\Exception $e) {
             echo json_encode(array("success" => false, "message" => $e->getMessage()));
@@ -126,7 +140,7 @@ class Papers {
                 $out["html"] .= \Template::instance()->render("paper.htm", "text/html");
             }
 
-            echo json_encode($out);
+            echo json_encode($this->fixUTF($out));
         }
         catch (\Exception $e) {
             echo json_encode(array("success" => false, "message" => nl2br($e->getMessage())));

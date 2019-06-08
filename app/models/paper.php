@@ -575,6 +575,19 @@ class Paper {
         return $json != null ? $json : array();
     }
 
+    public function fixUTF($d) {
+        if (is_array($d)) {
+            foreach ($d as $k => $v) {
+                $d[$k] = $this->fixUTF($v);
+            }
+        } else if (is_string ($d)) {
+            $enc = mb_detect_encoding($d);
+            $value = iconv($enc, 'UTF-8', $d);
+            return $value;
+        }
+        return $d;
+    }
+
     /**
      * Return the value of a field from the JSON
      * @param  string $field field name
@@ -583,7 +596,7 @@ class Paper {
     public function jsonField($field) {
         $json = $this->getJSON();
         if (isset($json[$field]))
-            return $json[$field];
+            return $this->fixUTF($json[$field]);
         else
             return null;
     }

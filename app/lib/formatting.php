@@ -24,14 +24,14 @@ class Formatting {
             if (!$firstName)
                 return trim(array_shift($parts));
             else
-                return trim(array_shift($parts))." ".implode(array_map(function($s){ return trim($s)[0]; }, $parts)).".";
+                return trim(array_shift($parts))." ".implode(array_map(function($s){ return mb_substr($s,0,1); }, $parts)).".";
         }
         elseif (strpos($author, " ") !== false) {
             $parts = explode(" ", $author);
             if (!$firstName)
                 return trim(array_pop($parts));
             else
-                return trim(array_pop($parts))." ".implode(array_map(function($s){ return trim($s)[0]; }, $parts)).".";
+                return trim(array_pop($parts))." ".implode(array_map(function($s){ return mb_substr($s,0,1); }, $parts)).".";
         }
         else
             return $author;
